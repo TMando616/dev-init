@@ -1,59 +1,57 @@
 # Design Document: dev-init
 
 ## Overview
-**Purpose**: 「DevInit」は、初学者がブラウザ上で即座にプログラミング演習を行える環境を提供します。
+**Purpose**: 「DevInit」は、初学者がブラウザ上で即座にプログラミング学習を開始できる環境を提供します。
 **Users**: 初学者ユーザー（演習実施）、管理者（教材管理）。
-**Impact**: ローカル環境構築の壁を取り払い、Webブラウザのみで学習を完結させます。
+**Impact**: MVPではブラウザ完結型のコード編集・保存機能を中核とし、学習の継続性を担保します。
 
 ### Goals
-- ブラウザ完結型のコード編集・実行環境の提供
-- Dockerを利用した隔離された安全な実行基盤の構築
-- 将来的な多言語対応を可能にする拡張性の確保（Strategyパターン）
-- 堅牢なレイヤードアーキテクチャによる保守性の向上
+- Next.jsとLaravelを組み合わせたAPIベースのSPA構築
+- 教材表示（Markdown）とコードエディタ（Monaco等）の統合
+- ユーザー認証と教材管理（CRUD）の実現
+- 将来のコード実行エンジン（Docker等）を容易に追加できるモジュール構造
 
-### Non-Goals
-- 本番環境レベルの複雑なインフラ構成（初期はシングルサーバー想定）
-- 高度なIDE機能（LSP連携等はMVP対象外）
-- ユーザー間のソーシャル機能
+### Non-Goals (Future Extensions)
+- **Dockerコンテナによるコード実行機能（フェーズ2）**
+- 実行結果のキャプチャとフィードバック表示
+- 高度なIDE機能
 
 ## Boundary Commitments
 ### This Spec Owns
-- フロントエンド（Next.js）の演習・管理画面
+- フロントエンド（Next.js）の演習・管理・認証画面
 - バックエンド（Laravel）のAPIおよびビジネスロジック
-- 実行エンジン（Docker連携）のライフサイクル管理
 - 教材データおよびユーザー進捗のデータモデル
 
 ### Out of Boundary
-- ホストOSのセキュリティ設定（Dockerデーモンの権限管理等）
-- 外部認証プロバイダ（NextAuth等のライブラリに依存）
+- ホストOSのセキュリティ設定
+- 実行環境のインフラ自動構築
 
 ## Architecture
 ### Architecture Pattern & Boundary Map
-**Selected Pattern**: APIベースのモジュラーモノリス。
-- **Frontend (Next.js)**: UIおよび状態管理を担当。
-- **Backend (Laravel)**: ビジネスロジック、データ永続化、外部プロセス（Docker）制御を担当。
+**Selected Pattern**: APIベースのモジュラーモノリス（準備段階）。
+- **Frontend (Next.js)**: UIおよびフロントエンドの状態管理。
+- **Backend (Laravel)**: ビジネスロジック、認証、データ永続化。
 
 ```mermaid
 graph TD
     User[User/Admin] --> Frontend[Next.js Frontend]
     Frontend --> API[Laravel API]
-    subgraph Backend [Modular Monolith]
+    subgraph Backend [Laravel Core]
         API --> Controller
         Controller --> Service
         Service --> Repository
-        Service --> ExecutionEngine[Code Execution Engine]
+        Service --> EducationModule[Education Module]
     end
-    ExecutionEngine --> DockerSDK[Docker PHP SDK]
-    DockerSDK --> DockerContainer[Ephemeral Docker Container]
+    API --> Auth[Laravel Sanctum/Fortify]
 ```
 
 ### Technology Stack
 | Layer | Choice / Version | Role in Feature |
 |-------|------------------|-----------------|
-| Frontend | Next.js 14+ / TypeScript | SPA、Markdown表示、コード編集 |
-| Backend | Laravel 10+ / PHP 8.2+ | API、ビジネスロジック、Docker制御 |
-| Database | PostgreSQL | 教材、ユーザー、実行ログの保存 |
-| Infrastructure | Docker | 隔離されたユーザーコードの実行環境 |
+| Frontend | Next.js 14+ / TypeScript | SPA、Markdown表示、コード編集、認証UI |
+| Backend | Laravel 10+ / PHP 8.2+ | API、ビジネスロジック、認証機能 |
+| Database | PostgreSQL | 教材、ユーザー、提出コードの保存 |
+| Authentication | Laravel Sanctum | APIベースのトークン認証 |
 
 ## File Structure Plan
 ### Directory Structure
@@ -61,91 +59,73 @@ graph TD
 /
 ├── frontend/                # Next.js Application
 │   ├── src/
-│   │   ├── components/      # UI Components (Editor, Viewer)
+│   │   ├── app/             # Pages (App Router)
+│   │   ├── components/      # UI Components (Editor, Viewer, Auth)
 │   │   ├── services/        # API Clients
-│   │   └── types/           # Frontend Types
+│   │   └── hooks/           # Custom Hooks (Auth state, etc.)
 ├── backend/                 # Laravel Application
 │   ├── app/
 │   │   ├── Modules/
-│   │   │   ├── Education/   # 教材管理モジュール
-│   │   │   └── Execution/   # 実行エンジンモジュール (Strategy/Factory適用)
-│   │   │       ├── Contracts/
-│   │   │       ├── Factories/
-│   │   │       └── Strategies/
+│   │   │   ├── Education/   # 教材管理・演習記録モジュール
+│   │   │   └── Identity/    # ユーザー・認証管理モジュール
 │   │   ├── Http/Controllers/
 │   │   ├── Services/
 │   │   └── Repositories/
 │   └── tests/               # PHPUnit Tests
-└── docker/                  # Dockerfiles for execution environments
+└── docker/                  # (Future) Dockerfiles for execution environments
 ```
 
 ## System Flows
-### Code Execution Flow
+### Content Access Flow
 ```mermaid
 sequenceDiagram
     participant U as User
     participant F as Frontend
-    participant B as Backend (Service)
-    participant E as ExecutionFactory
-    participant S as ExecutionStrategy
-    participant D as Docker
+    participant B as Backend (API)
+    participant R as Repository
     
-    U->>F: Submit Code
-    F->>B: POST /api/execute
-    B->>E: create(language)
-    E-->>B: Return Strategy Instance
-    B->>S: execute(code)
-    S->>D: Create & Start Container
-    D-->>S: Return Stdout/Stderr
-    S->>D: Destroy Container
-    S-->>B: Return Result Object
-    B-->>F: Return JSON Result
-    F->>U: Display Result
+    U->>F: Access Problem Page
+    F->>B: GET /api/problems/{id}
+    B->>R: Find Problem
+    R-->>B: Return Data
+    B-->>F: JSON Result
+    F->>U: Render Markdown & Editor
 ```
 
 ## Components and Interfaces
 
-### Execution Module
+### Education Module
 
-| Component | Domain/Layer | Intent | Req Coverage | Key Dependencies | Contracts |
-|-----------|--------------|--------|--------------|--------------------------|-----------|
-| ExecutionFactory | Execution | 言語に応じたStrategyを生成 | 3.1, 4.3 | ExecutionStrategy | Factory |
-| PythonStrategy | Execution | PythonコードをDockerで実行 | 1.2, 3.2 | Docker SDK | Strategy |
-| ExecutionService | Backend | 実行フローのオーケストレーション | 1.2 | ExecutionFactory, Repository | Service |
+| Component | Layer | Intent | Req Coverage |
+|-----------|-------|--------|--------------|
+| ProblemService | Service | 教材の検索、作成、更新を制御 | 2.1, 2.2 |
+| SubmissionService | Service | ユーザーが記述したコードの保存と復元 | 1.4 |
 
-#### ExecutionStrategy Interface
-```php
-interface ExecutionStrategy {
-    /**
-     * @param string $code 実行するソースコード
-     * @return ExecutionResult 実行結果（出力、エラー、実行時間等）
-     */
-    public function execute(string $code): ExecutionResult;
-}
-```
+### Identity Module
 
-#### API Contract
-| Method | Endpoint | Request | Response | Errors |
-|--------|----------|---------|----------|--------|
-| POST | /api/execute | { language: string, code: string } | { output: string, exit_code: int } | 400, 422, 500 |
-| GET | /api/problems | - | Array<Problem> | 500 |
+| Component | Layer | Intent | Req Coverage |
+|-----------|-------|--------|--------------|
+| AuthController | Http | ログイン・登録エンドポイント | 3.1, 3.2 |
+| UserService | Service | ユーザー情報の取得、権限チェック | 3.3 |
 
 ## Data Models
 ### Domain Model
-- **Problem**: タイトル、本文（MD）、模範解答、制限時間（Timeout）。
-- **Submission**: ユーザー、問題、提出コード、実行結果、ステータス。
+- **User**: ID, Name, Email, Password, Role (Admin/User).
+- **Problem**: ID, Title, Content (MD), Model Answer, CreatedAt.
+- **Submission**: ID, UserID, ProblemID, Code, Status (Saved), UpdatedAt.
 
 ### Physical Data Model (PostgreSQL)
-- `problems`: `id`, `title`, `content`, `model_answer`, `timeout`, `created_at`, `updated_at`
-- `submissions`: `id`, `user_id`, `problem_id`, `code`, `result_output`, `status`, `created_at`
+- `users`: `id`, `name`, `email`, `password`, `role`, `created_at`
+- `problems`: `id`, `title`, `content`, `model_answer`, `created_at`, `updated_at`
+- `submissions`: `id`, `user_id`, `problem_id`, `code`, `status`, `updated_at`
 
 ## Error Handling
 ### Error Strategy
-- **User Code Error**: コンテナの標準エラー出力をキャプチャし、200 OKのレスポンス内で「実行エラー」として返す。
-- **Timeout**: 実行時間が閾値を超えた場合、コンテナを強制終了し、「Time Limit Exceeded」を返す。
+- **Auth Error**: 401 Unauthorized または 403 Forbidden を返却し、フロントエンドでログイン画面へ誘導。
+- **Validation Error**: 422 Unprocessable Entity を返却し、エラーメッセージを表示。
 - **System Error**: 500 Internal Server Errorを返し、ログに詳細を記録する。
 
 ## Testing Strategy
-- **Unit Tests**: `ExecutionFactory`が正しいStrategyを返すか、`ExecutionResult`のパース処理等。
-- **Integration Tests**: 実際にDockerコンテナを立ち上げ、簡単なコード（`print('hello')`）が実行され結果が返るか。
-- **API Tests**: Laravelの`TestCase`を用いたエンドポイントの正常・異常系テスト。
+- **API Tests**: Laravelの`TestCase`を用いたエンドポイントの正常・異常系テスト（CRUD, Auth）。
+- **Unit Tests**: 権限チェックロジックや、Markdownパースの補助処理など。
+- **Frontend Tests**: 基本的なコンポーネントのレンダリングテスト。
