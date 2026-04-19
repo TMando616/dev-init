@@ -1,36 +1,35 @@
 # Requirements Document
 
 ## Introduction
-「DevInit」は、プログラミング初学者がブラウザ上で直接コードを記述・実行し、即座にフィードバックを得られる学習プラットフォームです。Dockerを利用した安全なコード実行環境を提供し、管理者が教材を柔軟に管理できる仕組みを構築します。本要件定義では、MVP（Minimum Viable Product）として、1言語の実行環境をブラウザ上で完結させる最小構成の実現を目指します。
+「DevInit」は、プログラミング初学者がブラウザ上で直接コードを記述・学習できるプラットフォームです。MVP（Minimum Viable Product）では、開発環境構築の壁を取り払う第一歩として、教材の閲覧、コードの編集、および基本的なユーザー管理機能を提供し、バックエンドとの連携基盤を確立することを目標とします。コードの実際の実行環境（Docker等）は将来の拡張フェーズで導入します。
 
 ## Boundary Context
 - **In scope**:
   - Markdown形式の問題文表示機能
-  - ブラウザ上でのコード編集および実行結果の表示
-  - 模範解答とのコード比較（テキストベース）
+  - ブラウザ上でのコード編集エディタ（編集内容の保持）
+  - 模範解答とのコード比較（テキストベースの表示）
   - 教材（問題、解答）のCRUD操作
-  - ユーザー管理の基本機能
-  - Dockerコンテナ内での安全なコード実行（1言語）
-- **Out of scope**:
-  - 複数言語の同時サポート（MVP以降に検討）
-  - 高度なコード差分解析（行単位の単純比較にとどめる）
-  - リアルタイムでの共同編集機能
-  - 外部サービス（GitHub等）との連携
+  - ユーザー管理（登録、ログイン、一覧表示）の基本機能
+  - フロントエンドとバックエンドのAPI連携基盤
+- **Out of scope (Future Extensions)**:
+  - **Dockerコンテナ内でのコード実行機能**
+  - 実行結果のリアルタイムフィードバック
+  - ネットワークアクセス制限やリソース制限の実装
+  - 複数言語の実行エンジン切り替え
 - **Adjacent expectations**:
-  - 実行環境はホストシステムから分離され、悪意のあるコードから保護されていること
-  - フロントエンドとバックエンドはAPIを介して通信すること
+  - フロントエンドとバックエンドは分離され、RESTful APIを介して通信すること
+  - 将来のコード実行機能導入を見据えた拡張性のある設計であること
 
 ## Requirements
 
-### Requirement 1: 演習画面（ユーザー機能）
-**Objective:** As a 初学者ユーザー, I want ブラウザ上で問題を確認しコードを実行できる演習画面, so that 開発環境を構築することなく学習を開始できる。
+### Requirement 1: 演習・学習画面（ユーザー機能）
+**Objective:** As a 初学者ユーザー, I want ブラウザ上で問題を確認しエディタでコードを入力できる画面, so that 学習コンテンツに集中できる。
 
 #### Acceptance Criteria
 1. When ユーザーが演習ページを開いたとき, the System shall Markdown形式の問題文をレンダリングして表示する
-2. When ユーザーがコードを実行したとき, the Execution Service shall Dockerコンテナ内でコードを評価し、標準出力およびエラーを出力する
-3. When コードの実行が完了したとき, the System shall 実行結果をユーザー画面に表示する
-4. When ユーザーが模範解答の表示を選択したとき, the System shall 現在の入力コードと模範解答を並べて表示する
-5. The Editor shall シンタックスハイライト機能を備えたコード編集環境を提供する
+2. The Editor shall シンタックスハイライト機能を備えたコード編集環境を提供する
+3. When ユーザーが模範解答の表示を選択したとき, the System shall 現在の入力コードと模範解答を並べて表示する
+4. (MVP) When ユーザーが「保存」をクリックしたとき, the System shall 入力中のコードをサーバー側に保存し、次回アクセス時に復元する
 
 ### Requirement 2: 教材管理（管理者機能）
 **Objective:** As a 管理者, I want 教材の追加・編集やユーザー管理ができる管理画面, so that 学習コンテンツを適切に運用できる。
@@ -41,20 +40,19 @@
 3. When 管理者がユーザー一覧を表示したとき, the Admin Service shall 登録済みユーザーの情報をリスト形式で表示する
 4. If 教材の保存時に必須項目が未入力の場合, then the System shall エラーメッセージを表示し、保存を中断する
 
-### Requirement 3: セキュアなコード実行環境
-**Objective:** As a システム運用者, I want ユーザーが送信したコードを隔離された環境で実行する仕組み, so that ホストシステムの安全性を維持できる。
+### Requirement 3: ユーザー認証・認可
+**Objective:** As a ユーザー, I want アカウントを作成しログインできる機能, so that 自分の学習進捗やコードを管理できる。
 
 #### Acceptance Criteria
-1. When コード実行リクエストを受け取ったとき, the Execution Factory shall 実行専用の一時的なDockerコンテナを生成する
-2. While コードの実行中, the Execution Service shall CPUやメモリの使用量および実行時間に制限（タイムアウト）を設ける
-3. When コードの実行が終了またはタイムアウトしたとき, the Execution Factory shall 生成したコンテナを即座に破棄する
-4. The Execution Environment shall ネットワークアクセスを遮断した状態でコードを実行する
+1. When 未登録ユーザーがサインアップしたとき, the System shall ユーザー情報をデータベースに登録し、自動的にログイン状態にする
+2. When 既存ユーザーがログインしたとき, the System shall 認証情報を確認し、個人用ページへのアクセスを許可する
+3. The System shall 管理者権限を持つユーザーのみが管理画面へアクセスできるように制御する
 
 ### Requirement 4: システム品質と拡張性
-**Objective:** As a 開発者, I want モジュラーモノリス構成とレイヤードアーキテクチャの採用, so that 将来的な機能拡張や保守を容易にする。
+**Objective:** As a 開発者, I want レイヤードアーキテクチャの採用, so that 将来の実行エンジン導入を容易にする。
 
 #### Acceptance Criteria
 1. The Backend System shall Controller, Service, Repositoryの各層に責務を分離して実装する
-2. The Frontend System shall 静的解析ツール（ESLint/Prettier）を通過したコードで構成される
-3. Where 将来的に複数言語をサポートする場合, the Execution Strategy shall 実行エンジンを容易に切り替え可能とする
-4. The Backend System shall 主要なロジックに対してPHPUnitによる自動テストを備える
+2. The Frontend System shall Next.jsの標準的なディレクトリ構造に従い、再利用可能なコンポーネントを構成する
+3. The System Architecture shall コード実行機能（将来実装）をモジュールとして追加可能な疎結合な構成とする
+4. The Backend System shall APIの各エンドポイントに対してテストを備える
