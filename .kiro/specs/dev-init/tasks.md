@@ -3,7 +3,7 @@
 ## 1. Foundation: プロジェクト基盤の構築
 このフェーズでは、フロントエンドとバックエンドのベースプロジェクトを作成し、共通の構成を設定します。
 
-- [ ] 1.1 バックエンド（Laravel）の初期化
+- [x] 1.1 バックエンド（Laravel）の初期化
   - `laravel new backend` によるプロジェクト作成
   - データベース接続（SQLite/PostgreSQL）の設定
   - `php artisan test` が正常に動作することを確認
