@@ -9,7 +9,7 @@
   - `php artisan test` が正常に動作することを確認
   - _Requirements: 4.1, 4.4_
 
-- [ ] 1.2 フロントエンド（Next.js）の初期化
+- [x] 1.2 フロントエンド（Next.js）の初期化
   - `npx create-next-app@latest frontend` による TypeScript/App Router プロジェクト作成
   - Tailwind CSS, ESLint, Prettier の初期設定
   - `npm run dev` で初期画面が表示されることを確認
