@@ -15,7 +15,7 @@
   - `npm run dev` で初期画面が表示されることを確認
   - _Requirements: 4.2_
 
-- [ ] 1.3 Docker開発環境の構築
+- [x] 1.3 Docker開発環境の構築
   - `docker-compose.yml` の作成（frontend, backend, db, nginx）
   - 各サービス用 `Dockerfile` の作成
   - 共通 `.env` ファイルの設定
