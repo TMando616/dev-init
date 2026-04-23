@@ -50,7 +50,7 @@ graph TD
 |-------|------------------|-----------------|
 | Frontend | Next.js 14+ / TypeScript | SPA、Markdown表示、コード編集、認証UI |
 | Backend | Laravel 10+ / PHP 8.2+ | API、ビジネスロジック、認証機能 |
-| Database | PostgreSQL | 教材、ユーザー、提出コードの保存 |
+| Database | PostgreSQL | レッスン、ユーザー、提出コードの保存 |
 | Authentication | Laravel Sanctum | APIベースのトークン認証 |
 
 ## File Structure Plan
@@ -66,7 +66,7 @@ graph TD
 ├── backend/                 # Laravel Application
 │   ├── app/
 │   │   ├── Modules/
-│   │   │   ├── Education/   # 教材管理・演習記録モジュール
+│   │   │   ├── Education/   # レッスン管理・演習記録モジュール
 │   │   │   └── Identity/    # ユーザー・認証管理モジュール
 │   │   ├── Http/Controllers/
 │   │   ├── Services/
@@ -84,9 +84,9 @@ sequenceDiagram
     participant B as Backend (API)
     participant R as Repository
     
-    U->>F: Access Problem Page
-    F->>B: GET /api/problems/{id}
-    B->>R: Find Problem
+    U->>F: Access Lesson Page
+    F->>B: GET /api/lessons/{id}
+    B->>R: Find Lesson
     R-->>B: Return Data
     B-->>F: JSON Result
     F->>U: Render Markdown & Editor
@@ -98,7 +98,7 @@ sequenceDiagram
 
 | Component | Layer | Intent | Req Coverage |
 |-----------|-------|--------|--------------|
-| ProblemService | Service | 教材の検索、作成、更新を制御 | 2.1, 2.2 |
+| LessonService | Service | レッスンの検索、作成、更新を制御 | 2.1, 2.2 |
 | SubmissionService | Service | ユーザーが記述したコードの保存と復元 | 1.4 |
 
 ### Identity Module
@@ -111,13 +111,13 @@ sequenceDiagram
 ## Data Models
 ### Domain Model
 - **User**: ID, Name, Email, Password, Role (Admin/User).
-- **Problem**: ID, Title, Content (MD), Model Answer, CreatedAt.
-- **Submission**: ID, UserID, ProblemID, Code, Status (Saved), UpdatedAt.
+- **Lesson**: ID, Title, Content (MD), Model Answer, CreatedAt.
+- **Submission**: ID, UserID, LessonID, Code, Status (Saved), UpdatedAt.
 
 ### Physical Data Model (PostgreSQL)
 - `users`: `id`, `name`, `email`, `password`, `role`, `created_at`
-- `problems`: `id`, `title`, `content`, `model_answer`, `created_at`, `updated_at`
-- `submissions`: `id`, `user_id`, `problem_id`, `code`, `status`, `updated_at`
+- `lessons`: `id`, `title`, `content`, `model_answer`, `created_at`, `updated_at`
+- `submissions`: `id`, `user_id`, `lesson_id`, `code`, `status`, `updated_at`
 
 ## Error Handling
 ### Error Strategy

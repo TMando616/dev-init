@@ -5,10 +5,10 @@
 
 ## Boundary Context
 - **In scope**:
-  - Markdown形式の問題文表示機能
+  - Markdown形式のレッスン内容（本文）表示機能
   - ブラウザ上でのコード編集エディタ（編集内容の保持）
   - 模範解答とのコード比較（テキストベースの表示）
-  - 教材（問題、解答）のCRUD操作
+  - レッスン（本文、解答）のCRUD操作
   - ユーザー管理（登録、ログイン、一覧表示）の基本機能
   - フロントエンドとバックエンドのAPI連携基盤
 - **Out of scope (Future Extensions)**:
@@ -23,22 +23,23 @@
 ## Requirements
 
 ### Requirement 1: 演習・学習画面（ユーザー機能）
-**Objective:** As a 初学者ユーザー, I want ブラウザ上で問題を確認しエディタでコードを入力できる画面, so that 学習コンテンツに集中できる。
+**Objective:** As a 初学者ユーザー, I want ブラウザ上でレッスンを確認しエディタでコードを入力できる画面, so that 学習コンテンツに集中できる。
 
 #### Acceptance Criteria
-1. When ユーザーが演習ページを開いたとき, the System shall Markdown形式の問題文をレンダリングして表示する
+1. When ユーザーがレッスンページを開いたとき, the System shall Markdown形式のレッスン本文をレンダリングして表示する
 2. The Editor shall シンタックスハイライト機能を備えたコード編集環境を提供する
 3. When ユーザーが模範解答の表示を選択したとき, the System shall 現在の入力コードと模範解答を並べて表示する
 4. (MVP) When ユーザーが「保存」をクリックしたとき, the System shall 入力中のコードをサーバー側に保存し、次回アクセス時に復元する
 
-### Requirement 2: 教材管理（管理者機能）
-**Objective:** As a 管理者, I want 教材の追加・編集やユーザー管理ができる管理画面, so that 学習コンテンツを適切に運用できる。
+### Requirement 2: レッスン管理（管理者機能）
+**Objective:** As a 管理者, I want レッスンの追加・編集やユーザー管理ができる管理画面, so that 学習コンテンツを適切に運用できる。
 
 #### Acceptance Criteria
-1. When 管理者が新しい問題を作成するとき, the Admin Service shall タイトル、Markdown形式の本文、模範解答を保存する
-2. When 管理者が既存の問題を編集するとき, the Admin Service shall 変更内容をデータベースに反映する
+1. When 管理者が新しいレッスンを作成するとき, the Admin Service shall タイトル、Markdown形式の本文、模範解答を保存する
+2. When 管理者が既存のレッスンを編集するとき, the Admin Service shall 変更内容をデータベースに反映する
 3. When 管理者がユーザー一覧を表示したとき, the Admin Service shall 登録済みユーザーの情報をリスト形式で表示する
-4. If 教材の保存時に必須項目が未入力の場合, then the System shall エラーメッセージを表示し、保存を中断する
+4. If レッスンの保存時に必須項目が未入力の場合, then the System shall エラーメッセージを表示し、保存を中断する
+
 
 ### Requirement 3: ユーザー認証・認可
 **Objective:** As a ユーザー, I want アカウントを作成しログインできる機能, so that 自分の学習進捗やコードを管理できる。
