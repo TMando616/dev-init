@@ -48,6 +48,7 @@ graph TD
 ### Technology Stack
 | Layer | Choice / Version | Role in Feature |
 |-------|------------------|-----------------|
+| Infrastructure | Docker / Docker Compose | 開発環境のコンテナ化（Frontend, Backend, DB） |
 | Frontend | Next.js 14+ / TypeScript | SPA、Markdown表示、コード編集、認証UI |
 | Backend | Laravel 10+ / PHP 8.2+ | API、ビジネスロジック、認証機能 |
 | Database | PostgreSQL | レッスン、ユーザー、提出コードの保存 |
@@ -58,21 +59,23 @@ graph TD
 ```
 /
 ├── frontend/                # Next.js Application
-│   ├── src/
-│   │   ├── app/             # Pages (App Router)
-│   │   ├── components/      # UI Components (Editor, Viewer, Auth)
-│   │   ├── services/        # API Clients
-│   │   └── hooks/           # Custom Hooks (Auth state, etc.)
 ├── backend/                 # Laravel Application
-│   ├── app/
-│   │   ├── Modules/
-│   │   │   ├── Education/   # レッスン管理・演習記録モジュール
-│   │   │   └── Identity/    # ユーザー・認証管理モジュール
-│   │   ├── Http/Controllers/
-│   │   ├── Services/
-│   │   └── Repositories/
-│   └── tests/               # PHPUnit Tests
-└── docker/                  # (Future) Dockerfiles for execution environments
+├── docker/                  # Docker configuration files
+│   ├── nginx/               # Nginx reverse proxy config
+│   ├── php/                 # PHP-FPM config
+│   └── postgres/            # DB init scripts (if any)
+├── docker-compose.yml       # Orchestration for development
+└── .env.example             # Shared environment template
+```
+
+## Architecture
+### Infrastructure Map (Docker)
+```mermaid
+graph LR
+    User[User Browser] --> Nginx[Nginx Container]
+    Nginx --> Frontend[Next.js Container]
+    Nginx --> Backend[Laravel/PHP-FPM Container]
+    Backend --> DB[(PostgreSQL Container)]
 ```
 
 ## System Flows

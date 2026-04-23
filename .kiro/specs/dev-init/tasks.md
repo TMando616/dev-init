@@ -15,11 +15,19 @@
   - `npm run dev` で初期画面が表示されることを確認
   - _Requirements: 4.2_
 
-- [ ] 1.3 データベーススキーマの定義とマイグレーション
+- [ ] 1.3 Docker開発環境の構築
+  - `docker-compose.yml` の作成（frontend, backend, db, nginx）
+  - 各サービス用 `Dockerfile` の作成
+  - 共通 `.env` ファイルの設定
+  - `docker-compose up` で全サービスが正常に起動することを確認
+  - _Requirements: 4.1_
+
+- [ ] 1.4 データベーススキーマの定義とマイグレーション
   - `users`, `lessons`, `submissions` テーブルの作成
   - 権限（Role）管理用カラムの追加
   - シーダーによる初期サンプルデータの投入
   - _Requirements: 2.1, 3.1_
+
 
 ## 2. Core: バックエンドAPIの構築
 認証およびレッスン管理、コード保存のAPIを実装します。
