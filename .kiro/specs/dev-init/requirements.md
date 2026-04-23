@@ -6,6 +6,7 @@
 ## Boundary Context
 - **In scope**:
   - Docker Composeによる統一された開発環境（Frontend, Backend, DB）
+  - GitHub ActionsによるCI環境の構築（Lintチェック、自動テストの実行）
   - Markdown形式のレッスン内容（本文）表示機能
   - ブラウザ上でのコード編集エディタ（編集内容の保持）
   - 模範解答とのコード比較（テキストベースの表示）

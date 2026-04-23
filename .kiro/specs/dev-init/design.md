@@ -78,6 +78,18 @@ graph LR
     Backend --> DB[(PostgreSQL Container)]
 ```
 
+### CI/CD Pipeline (GitHub Actions)
+**Tool**: GitHub Actions
+**Triggers**: Pull Request to `main`, Push to `main`.
+- **Frontend Job**:
+  - `npm install`
+  - `npm run lint`
+  - `npm run build`
+- **Backend Job**:
+  - `composer install`
+  - `php artisan pint` (Lint)
+  - `php artisan test` (Unit/Feature Tests)
+
 ## System Flows
 ### Content Access Flow
 ```mermaid

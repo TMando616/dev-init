@@ -28,6 +28,13 @@
   - シーダーによる初期サンプルデータの投入
   - _Requirements: 2.1, 3.1_
 
+- [ ] 1.5 CI環境（GitHub Actions）の構築
+  - `.github/workflows/ci.yml` の作成
+  - フロントエンドの Lint/Build ジョブ設定
+  - バックエンドの Lint/Test ジョブ設定
+  - プルリクエスト時の自動実行確認
+  - _Requirements: 4.1_
+
 
 ## 2. Core: バックエンドAPIの構築
 認証およびレッスン管理、コード保存のAPIを実装します。
