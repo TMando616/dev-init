@@ -2,9 +2,14 @@ FROM node:20-alpine
 
 WORKDIR /app/frontend
 
-# Install dependencies if needed (optional here as we mount volumes)
-# RUN npm install
+# Install dependencies
+COPY frontend/package*.json ./
+RUN npm install
+
+# Copy source code
+COPY frontend/ .
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+# Use npx directly to avoid shell path issues
+CMD ["npx", "next", "dev"]

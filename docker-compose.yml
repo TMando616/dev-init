@@ -35,6 +35,8 @@ services:
       - "3000:3000"
     environment:
       NODE_ENV: development
+    # Ensure node_modules is not overwritten by host
+    restart: always
 
   db:
     image: postgres:16-alpine
