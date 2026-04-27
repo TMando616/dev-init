@@ -22,13 +22,13 @@
   - `docker-compose up` で全サービスが正常に起動することを確認
   - _Requirements: 4.1_
 
-- [ ] 1.4 データベーススキーマの定義とマイグレーション
+- [x] 1.4 データベーススキーマの定義とマイグレーション
   - `users`, `lessons`, `submissions` テーブルの作成
   - 権限（Role）管理用カラムの追加
   - シーダーによる初期サンプルデータの投入
   - _Requirements: 2.1, 3.1_
 
-- [ ] 1.5 CI環境（GitHub Actions）の構築
+- [x] 1.5 CI環境（GitHub Actions）の構築
   - `.github/workflows/ci.yml` の作成
   - フロントエンドの Lint/Build ジョブ設定
   - バックエンドの Lint/Test ジョブ設定
@@ -39,7 +39,7 @@
 ## 2. Core: バックエンドAPIの構築
 認証およびレッスン管理、コード保存のAPIを実装します。
 
-- [ ] 2.1 ユーザー認証（Auth）の実装
+- [x] 2.1 ユーザー認証（Auth）の実装
   - Laravel Sanctum のセットアップ
   - ユーザー登録、ログイン、ログアウトのエンドポイント作成
   - 認証ミドルウェアの適用とテスト
