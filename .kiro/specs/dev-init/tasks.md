@@ -45,13 +45,13 @@
   - 認証ミドルウェアの適用とテスト
   - _Requirements: 3.1, 3.2_
 
-- [ ] 2.2 レッスン管理（Lesson CRUD）APIの実装
+- [x] 2.2 レッスン管理（Lesson CRUD）APIの実装
   - `LessonController`, `Service`, `Repository` の実装
   - 一覧取得、詳細取得、作成、更新、削除のAPIエンドポイント作成
   - 管理者権限によるアクセス制限の実装
   - _Requirements: 2.1, 2.2, 2.3, 3.3_
 
-- [ ] 2.3 コード保存・復元（Submission）APIの実装
+- [x] 2.3 コード保存・復元（Submission）APIの実装
   - ユーザーが記述中のコードを保存するエンドポイント作成
   - 特定のレッスンに対する保存済みコードを取得する機能
   - 提出履歴（簡易）の記録機能
