@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useEffect, useState, use } from 'react';
+import React, { useEffect, useState, use, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui';
 import api from '@/lib/api';
 import Editor from '@monaco-editor/react';
 import ReactMarkdown from 'react-markdown';
-import { ChevronLeft, Save, Play, CheckCircle } from 'lucide-react';
+import { ChevronLeft, Save, Play, Eye, EyeOff, CloudCheck, CloudUpload } from 'lucide-react';
 import Link from 'next/link';
 
 interface Lesson {
@@ -21,10 +21,14 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
   const { id } = use(params);
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [code, setCode] = useState<string>('// ここにコードを書いてください\n');
+  const [lastSavedCode, setLastSavedCode] = useState<string>('');
+  
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [showModelAnswer, setShowModelAnswer] = useState(false);
 
   useEffect(() => {
     const fetchLessonAndSubmission = async () => {
@@ -37,6 +41,7 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
         setLesson(lessonRes.data);
         if (submissionRes.data && submissionRes.data.code) {
           setCode(submissionRes.data.code);
+          setLastSavedCode(submissionRes.data.code);
         }
       } catch (error) {
         console.error('Failed to fetch lesson data', error);
@@ -50,23 +55,33 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
     }
   }, [id, authLoading, user]);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async (codeToSave: string) => {
+    if (!codeToSave || codeToSave === lastSavedCode) return;
+    
     setIsSaving(true);
     try {
       await api.post('/api/submissions', {
         lesson_id: id,
-        code: code,
+        code: codeToSave,
         status: 'saved'
       });
-      // 保存成功のフィードバック（簡易）
-      alert('保存しました！');
+      setLastSavedCode(codeToSave);
     } catch (error) {
       console.error('Save failed', error);
-      alert('保存に失敗しました。');
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [id, lastSavedCode]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (code !== lastSavedCode && !isLoading) {
+        handleSave(code);
+      }
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [code, lastSavedCode, handleSave, isLoading]);
 
   if (authLoading || isLoading) {
     return (
@@ -98,8 +113,28 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
           <h1 className="font-bold text-lg truncate max-w-[300px] md:max-w-md">
             {lesson.title}
           </h1>
+          {isSaving ? (
+            <div className="flex items-center text-xs text-slate-400 animate-pulse">
+              <CloudUpload size={14} className="mr-1" />
+              保存中...
+            </div>
+          ) : (
+            <div className="flex items-center text-xs text-emerald-500">
+              <CloudCheck size={14} className="mr-1" />
+              保存済み
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className={`text-slate-300 hover:bg-slate-700 hover:text-white ${showModelAnswer ? 'bg-slate-700 text-white' : ''}`}
+            onClick={() => setShowModelAnswer(!showModelAnswer)}
+          >
+            {showModelAnswer ? <EyeOff size={18} className="mr-2" /> : <Eye size={18} className="mr-2" />}
+            模範解答
+          </Button>
           <Button 
             variant="ghost" 
             size="sm" 
@@ -120,33 +155,63 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
       {/* Main Content */}
       <main className="flex-1 flex overflow-hidden">
         {/* Left Pane: Instructions */}
-        <div className="w-1/2 overflow-y-auto bg-white text-slate-900 p-8 border-r border-slate-200 prose prose-slate max-w-none">
+        <div className={`${showModelAnswer ? 'w-1/3' : 'w-1/2'} overflow-y-auto bg-white text-slate-900 p-8 border-r border-slate-200 prose prose-slate max-w-none transition-all`}>
           <ReactMarkdown>{lesson.content}</ReactMarkdown>
         </div>
 
-        {/* Right Pane: Editor */}
-        <div className="w-1/2 flex flex-col bg-slate-900">
-          <div className="h-8 bg-slate-800 border-b border-slate-700 px-4 flex items-center text-xs font-mono text-slate-400">
-            main.js
+        {/* Right Pane: Editor(s) */}
+        <div className={`${showModelAnswer ? 'w-2/3' : 'w-1/2'} flex flex-row bg-slate-900 transition-all`}>
+          {/* Your Editor */}
+          <div className="flex-1 flex flex-col border-r border-slate-700">
+            <div className="h-8 bg-slate-800 border-b border-slate-700 px-4 flex items-center text-xs font-mono text-slate-400 justify-between">
+              <span>main.js</span>
+              <span className="text-[10px] text-slate-500 uppercase tracking-wider font-sans">あなたのコード</span>
+            </div>
+            <div className="flex-1">
+              <Editor
+                height="100%"
+                defaultLanguage="javascript"
+                theme="vs-dark"
+                value={code}
+                onChange={(value) => setCode(value || '')}
+                options={{
+                  fontSize: 14,
+                  minimap: { enabled: false },
+                  scrollBeyondLastLine: false,
+                  lineNumbers: 'on',
+                  padding: { top: 16 },
+                  automaticLayout: true,
+                }}
+              />
+            </div>
           </div>
-          <div className="flex-1">
-            <Editor
-              height="100%"
-              defaultLanguage="javascript"
-              theme="vs-dark"
-              value={code}
-              onChange={(value) => setCode(value || '')}
-              options={{
-                fontSize: 14,
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                lineNumbers: 'on',
-                roundedSelection: false,
-                padding: { top: 16 },
-                automaticLayout: true,
-              }}
-            />
-          </div>
+
+          {/* Model Answer (Optional) */}
+          {showModelAnswer && (
+            <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-right-4 duration-300 border-l border-slate-700">
+              <div className="h-8 bg-slate-800 border-b border-slate-700 px-4 flex items-center text-xs font-mono text-slate-400 justify-between">
+                <span>solution.js</span>
+                <span className="text-[10px] text-amber-500 uppercase tracking-wider font-sans font-bold">模範解答</span>
+              </div>
+              <div className="flex-1 opacity-80">
+                <Editor
+                  height="100%"
+                  defaultLanguage="javascript"
+                  theme="vs-dark"
+                  value={lesson.model_answer || '// 模範解答は用意されていません'}
+                  options={{
+                    fontSize: 14,
+                    minimap: { enabled: false },
+                    readOnly: true,
+                    scrollBeyondLastLine: false,
+                    lineNumbers: 'on',
+                    padding: { top: 16 },
+                    automaticLayout: true,
+                  }}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </div>
