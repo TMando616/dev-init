@@ -48,6 +48,14 @@ export default function Home() {
       <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
         <h1 className="text-xl font-bold text-slate-900">DevInit</h1>
         <div className="flex items-center gap-4">
+          {user?.role === 'admin' && (
+            <Link href="/admin">
+              <Button variant="ghost" size="sm" className="text-slate-600 flex items-center gap-2">
+                <Settings size={18} />
+                管理画面
+              </Button>
+            </Link>
+          )}
           <span className="text-sm text-slate-600">{user?.name} さん</span>
           <Button variant="outline" size="sm" onClick={logout}>
             ログアウト
