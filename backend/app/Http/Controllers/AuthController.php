@@ -82,4 +82,12 @@ class AuthController extends Controller
     {
         return response()->json($request->user());
     }
+
+    /**
+     * Display a listing of users (Admin only).
+     */
+    public function index()
+    {
+        return response()->json(User::all());
+    }
 }

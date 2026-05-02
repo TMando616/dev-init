@@ -23,6 +23,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Admin Only
     Route::middleware('admin')->group(function () {
+        Route::get('/users', [AuthController::class, 'index']);
         Route::post('/lessons', [LessonController::class, 'store']);
         Route::put('/lessons/{id}', [LessonController::class, 'update']);
         Route::delete('/lessons/{id}', [LessonController::class, 'destroy']);
