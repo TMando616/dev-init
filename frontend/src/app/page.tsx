@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui';
 import api from '@/lib/api';
-import { ChevronRight, BookOpen } from 'lucide-react';
+import { ChevronRight, BookOpen, Settings } from 'lucide-react';
 
 interface Lesson {
   id: number;

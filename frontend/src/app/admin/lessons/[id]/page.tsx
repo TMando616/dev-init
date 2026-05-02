@@ -7,7 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Button, Input } from '@/components/ui';
 import api from '@/lib/api';
 import Editor from '@monaco-editor/react';
-import { ArrowLeft, Save, Eye } from 'lucide-react';
+import { ArrowLeft, Save } from 'lucide-react';
 
 export default function LessonEditor({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
