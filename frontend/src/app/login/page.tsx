@@ -20,7 +20,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await api.post('/api/login', { email, password });
+      const response = await api.post('/login', { email, password });
       login(response.data.token, response.data.user);
     } catch (err) {
       if (isAxiosError(err)) {

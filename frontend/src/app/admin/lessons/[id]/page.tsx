@@ -30,7 +30,7 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
     if (!isNew) {
       const fetchLesson = async () => {
         try {
-          const response = await api.get(`/api/lessons/${id}`);
+          const response = await api.get(`/lessons/${id}`);
           const lesson = response.data;
           setTitle(lesson.title);
           setContent(lesson.content);
@@ -59,9 +59,9 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
 
     try {
       if (isNew) {
-        await api.post('/api/lessons', payload);
+        await api.post('/lessons', payload);
       } else {
-        await api.put(`/api/lessons/${id}`, payload);
+        await api.put(`/lessons/${id}`, payload);
       }
       router.push('/admin');
     } catch (error) {

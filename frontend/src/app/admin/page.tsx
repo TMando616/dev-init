@@ -28,7 +28,7 @@ export default function AdminDashboard() {
 
     const fetchLessons = async () => {
       try {
-        const response = await api.get('/api/lessons');
+        const response = await api.get('/lessons');
         setLessons(response.data);
       } catch (error) {
         console.error('Failed to fetch lessons', error);
@@ -46,7 +46,7 @@ export default function AdminDashboard() {
     if (!confirm('このレッスンを削除してもよろしいですか？')) return;
 
     try {
-      await api.delete(`/api/lessons/${id}`);
+      await api.delete(`/lessons/${id}`);
       setLessons(lessons.filter(l => l.id !== id));
     } catch (error) {
       console.error('Delete failed', error);

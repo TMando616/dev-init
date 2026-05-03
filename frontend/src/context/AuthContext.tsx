@@ -39,7 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const response = await api.get('/api/user');
+      const response = await api.get('/user');
       setUser(response.data);
     } catch (error) {
       console.error('Failed to fetch user', error);
@@ -72,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      await api.post('/api/logout');
+      await api.post('/logout');
     } catch (error) {
       console.error('Logout failed', error);
     } finally {

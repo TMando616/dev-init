@@ -21,7 +21,7 @@ export default function Home() {
   useEffect(() => {
     const fetchLessons = async () => {
       try {
-        const response = await api.get('/api/lessons');
+        const response = await api.get('/lessons');
         setLessons(response.data);
       } catch (error) {
         console.error('Failed to fetch lessons', error);

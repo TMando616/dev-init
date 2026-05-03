@@ -28,7 +28,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const response = await api.post('/api/register', {
+      const response = await api.post('/register', {
         name,
         email,
         password,

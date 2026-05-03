@@ -34,8 +34,8 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
     const fetchLessonAndSubmission = async () => {
       try {
         const [lessonRes, submissionRes] = await Promise.all([
-          api.get(`/api/lessons/${id}`),
-          api.get(`/api/submissions/lesson/${id}`).catch(() => ({ data: null }))
+          api.get(`/lessons/${id}`),
+          api.get(`/submissions/lesson/${id}`).catch(() => ({ data: null }))
         ]);
 
         setLesson(lessonRes.data);
@@ -60,7 +60,7 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
     
     setIsSaving(true);
     try {
-      await api.post('/api/submissions', {
+      await api.post('/submissions', {
         lesson_id: id,
         code: codeToSave,
         status: 'saved'
