@@ -139,7 +139,7 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
             variant="ghost" 
             size="sm" 
             className="text-slate-300 hover:bg-slate-700 hover:text-white"
-            onClick={handleSave}
+            onClick={() => handleSave(code)}
             disabled={isSaving}
           >
             <Save size={18} className="mr-2" />
