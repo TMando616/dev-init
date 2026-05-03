@@ -58,8 +58,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [checkAuth]);
 
   useEffect(() => {
+    if (loading) return;
+
     const publicPaths = ['/login', '/register'];
-    if (!loading && !user && !publicPaths.includes(pathname)) {
+    if (!user && !publicPaths.includes(pathname)) {
       router.push('/login');
     }
   }, [user, loading, pathname, router]);
