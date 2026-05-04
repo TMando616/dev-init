@@ -1,0 +1,31 @@
+# Phase 2 Requirements: Code Execution & Admin Expansion
+
+## Introduction
+Phase 2では、DevInitの根幹となる「コード実行環境」の導入と、管理者によるユーザー管理機能の強化（CRUD）を行います。
+
+## Requirements
+
+### Requirement 1: 安全なブラウザ内コード実行環境
+**Objective:** ユーザーが書いたJavaScriptコードを、メイン画面を壊さずに安全に実行し、結果を表示する。
+
+#### Acceptance Criteria
+1. Web WorkerまたはIframeを使用して、ユーザーコードをメインスレッドから隔離して実行する
+2. 実行結果（console.log等）をキャプチャし、UI上のコンソール領域に表示する
+3. 無限ループ等の危険なコードに対してタイムアウト制限を設ける
+4. 実行ボタンをクリックした際に、最新のコードが即座に実行される
+
+### Requirement 2: 管理者によるユーザーCRUD拡張
+**Objective:** 管理者がユーザー情報を完全に制御し、権限昇格や削除を行えるようにする。
+
+#### Acceptance Criteria
+1. 管理者が特定のユーザーの「名前」「メールアドレス」「役割（Admin/User）」を編集できる
+2. 管理者がユーザーを削除できる
+3. 管理者が新しいユーザーを手動で招待（作成）できる
+4. 編集・削除時に確認ダイアログを表示し、誤操作を防止する
+
+### Requirement 3: コンソールUIの実装
+**Objective:** 実行結果をユーザーが確認しやすくする。
+
+#### Acceptance Criteria
+1. エディタ下部または横に、標準出力（ログ）とエラーを表示するコンソール領域を設ける
+2. コンソールの内容をクリアする機能を提供する
