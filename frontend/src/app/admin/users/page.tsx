@@ -36,7 +36,30 @@ export default function AdminUsers() {
   const [newPassword, setNewPassword] = useState('');
   const [newRole, setNewRole] = useState('user');
 
+  useEffect(() => {
+    if (!authLoading && (!currentUser || currentUser.role !== 'admin')) {
+      router.push('/');
+      return;
+    }
+
+    const fetchUsersData = async () => {
+      try {
+        const response = await api.get('/users');
+        setUsers(response.data);
+      } catch (error) {
+        console.error('Failed to fetch users', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (currentUser?.role === 'admin') {
+      fetchUsersData();
+    }
+  }, [currentUser, authLoading, router]);
+
   const fetchUsers = async () => {
+    setIsLoading(true);
     try {
       const response = await api.get('/users');
       setUsers(response.data);
@@ -46,17 +69,6 @@ export default function AdminUsers() {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (!authLoading && (!currentUser || currentUser.role !== 'admin')) {
-      router.push('/');
-      return;
-    }
-
-    if (currentUser?.role === 'admin') {
-      fetchUsers();
-    }
-  }, [currentUser, authLoading, router]);
 
   const handleEditStart = (user: User) => {
     setEditingId(user.id);

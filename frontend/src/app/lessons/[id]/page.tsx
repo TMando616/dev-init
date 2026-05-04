@@ -9,6 +9,8 @@ import Editor from '@monaco-editor/react';
 import ReactMarkdown from 'react-markdown';
 import { ChevronLeft, Save, Play, Eye, EyeOff, CloudCheck, CloudUpload } from 'lucide-react';
 import Link from 'next/link';
+import { runner } from '@/lib/codeRunner';
+import { Console } from '@/components/Console';
 
 interface Lesson {
   id: number;
@@ -29,6 +31,11 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [showModelAnswer, setShowModelAnswer] = useState(false);
+
+  // Execution State
+  const [logs, setLogs] = useState<string[]>([]);
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [isExecuting, setIsExecuting] = useState(false);
 
   useEffect(() => {
     const fetchLessonAndSubmission = async () => {
@@ -83,6 +90,23 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
     return () => clearTimeout(timer);
   }, [code, lastSavedCode, handleSave, isLoading]);
 
+  const handleRun = async () => {
+    setIsExecuting(true);
+    // Clear previous logs when running
+    setLogs([]);
+    setError(undefined);
+    
+    const result = await runner.run(code);
+    setLogs(result.logs);
+    setError(result.error);
+    setIsExecuting(false);
+  };
+
+  const handleClearConsole = () => {
+    setLogs([]);
+    setError(undefined);
+  };
+
   if (authLoading || isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50">
@@ -105,7 +129,7 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
   return (
     <div className="flex flex-col h-screen bg-slate-900 text-slate-100">
       {/* Header */}
-      <header className="h-14 border-b border-slate-700 bg-slate-800 px-4 flex items-center justify-between">
+      <header className="h-14 border-b border-slate-700 bg-slate-800 px-4 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center gap-4">
           <Link href="/" className="p-2 hover:bg-slate-700 rounded-lg transition-colors text-slate-400 hover:text-slate-100">
             <ChevronLeft size={20} />
@@ -145,9 +169,14 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
             <Save size={18} className="mr-2" />
             {isSaving ? '保存中...' : '保存'}
           </Button>
-          <Button size="sm" className="bg-emerald-600 hover:bg-emerald-500 text-white border-none">
+          <Button 
+            size="sm" 
+            className="bg-emerald-600 hover:bg-emerald-500 text-white border-none"
+            onClick={handleRun}
+            disabled={isExecuting}
+          >
             <Play size={18} className="mr-2" />
-            実行
+            {isExecuting ? '実行中...' : '実行'}
           </Button>
         </div>
       </header>
@@ -159,50 +188,26 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
           <ReactMarkdown>{lesson.content}</ReactMarkdown>
         </div>
 
-        {/* Right Pane: Editor(s) */}
-        <div className={`${showModelAnswer ? 'w-2/3' : 'w-1/2'} flex flex-row bg-slate-900 transition-all`}>
-          {/* Your Editor */}
-          <div className="flex-1 flex flex-col border-r border-slate-700">
-            <div className="h-8 bg-slate-800 border-b border-slate-700 px-4 flex items-center text-xs font-mono text-slate-400 justify-between">
-              <span>main.js</span>
-              <span className="text-[10px] text-slate-500 uppercase tracking-wider font-sans">あなたのコード</span>
-            </div>
-            <div className="flex-1">
-              <Editor
-                height="100%"
-                defaultLanguage="javascript"
-                theme="vs-dark"
-                value={code}
-                onChange={(value) => setCode(value || '')}
-                options={{
-                  fontSize: 14,
-                  minimap: { enabled: false },
-                  scrollBeyondLastLine: false,
-                  lineNumbers: 'on',
-                  padding: { top: 16 },
-                  automaticLayout: true,
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Model Answer (Optional) */}
-          {showModelAnswer && (
-            <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-right-4 duration-300 border-l border-slate-700">
+        {/* Right Pane: Editor(s) & Console */}
+        <div className={`${showModelAnswer ? 'w-2/3' : 'w-1/2'} flex flex-col bg-slate-900 transition-all`}>
+          {/* Editors Container */}
+          <div className="flex-1 flex flex-row overflow-hidden">
+            {/* Your Editor */}
+            <div className="flex-1 flex flex-col border-r border-slate-700">
               <div className="h-8 bg-slate-800 border-b border-slate-700 px-4 flex items-center text-xs font-mono text-slate-400 justify-between">
-                <span>solution.js</span>
-                <span className="text-[10px] text-amber-500 uppercase tracking-wider font-sans font-bold">模範解答</span>
+                <span>main.js</span>
+                <span className="text-[10px] text-slate-500 uppercase tracking-wider font-sans">あなたのコード</span>
               </div>
-              <div className="flex-1 opacity-80">
+              <div className="flex-1">
                 <Editor
                   height="100%"
                   defaultLanguage="javascript"
                   theme="vs-dark"
-                  value={lesson.model_answer || '// 模範解答は用意されていません'}
+                  value={code}
+                  onChange={(value) => setCode(value || '')}
                   options={{
                     fontSize: 14,
                     minimap: { enabled: false },
-                    readOnly: true,
                     scrollBeyondLastLine: false,
                     lineNumbers: 'on',
                     padding: { top: 16 },
@@ -211,7 +216,43 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
                 />
               </div>
             </div>
-          )}
+
+            {/* Model Answer (Optional) */}
+            {showModelAnswer && (
+              <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-right-4 duration-300 border-l border-slate-700">
+                <div className="h-8 bg-slate-800 border-b border-slate-700 px-4 flex items-center text-xs font-mono text-slate-400 justify-between">
+                  <span>solution.js</span>
+                  <span className="text-[10px] text-amber-500 uppercase tracking-wider font-sans font-bold">模範解答</span>
+                </div>
+                <div className="flex-1 opacity-80">
+                  <Editor
+                    height="100%"
+                    defaultLanguage="javascript"
+                    theme="vs-dark"
+                    value={lesson.model_answer || '// 模範解答は用意されていません'}
+                    options={{
+                      fontSize: 14,
+                      minimap: { enabled: false },
+                      readOnly: true,
+                      scrollBeyondLastLine: false,
+                      lineNumbers: 'on',
+                      padding: { top: 16 },
+                      automaticLayout: true,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Console Area */}
+          <div className="h-1/3 min-h-[150px]">
+            <Console 
+              logs={logs} 
+              error={error} 
+              onClear={handleClearConsole} 
+            />
+          </div>
         </div>
       </main>
     </div>
