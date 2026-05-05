@@ -21,7 +21,8 @@ export default function LoginPage() {
 
     try {
       const response = await api.post('/login', { email, password });
-      login(response.data.token, response.data.user);
+      console.log('Login Response:', response.data);
+      login(response.data.access_token, response.data.user);
     } catch (err) {
       if (isAxiosError(err)) {
         setError(err.response?.data?.message || 'ログインに失敗しました。');

@@ -34,7 +34,8 @@ export default function RegisterPage() {
         password,
         password_confirmation: passwordConfirmation,
       });
-      login(response.data.token, response.data.user);
+      console.log('Register Response:', response.data);
+      login(response.data.access_token, response.data.user);
     } catch (err) {
       if (isAxiosError(err)) {
         setError(err.response?.data?.message || '登録に失敗しました。');

@@ -28,9 +28,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   const checkAuth = useCallback(async () => {
-    // Ensure this runs in the next tick if called synchronously in effect
-    await Promise.resolve();
-    
     const token = localStorage.getItem('token');
     if (!token) {
       setUser(null);
@@ -43,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(response.data);
     } catch (error) {
       console.error('Failed to fetch user', error);
-      localStorage.removeItem('token');
+      // api.interceptors.response already handles 401, but we ensure state is cleared
       setUser(null);
     } finally {
       setLoading(false);
@@ -51,10 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      checkAuth();
-    }, 0);
-    return () => clearTimeout(timer);
+    checkAuth();
   }, [checkAuth]);
 
   useEffect(() => {
@@ -67,6 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [user, loading, pathname, router]);
 
   const login = (token: string, userData: User) => {
+    console.log('Login function called with token:', token);
     localStorage.setItem('token', token);
     setUser(userData);
     router.push('/');
