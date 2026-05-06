@@ -84,6 +84,28 @@ class AuthController extends Controller
     }
 
     /**
+     * Create a new user (Admin only).
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|string|in:admin,user',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => $request->role,
+        ]);
+
+        return response()->json($user, 201);
+    }
+
+    /**
      * Display a listing of users (Admin only).
      */
     public function index()
