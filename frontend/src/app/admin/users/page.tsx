@@ -138,21 +138,16 @@ export default function AdminUsers() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <>
       <header className="bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between sticky top-0 z-10">
-        <div className="flex items-center gap-4">
-          <Link href="/admin" className="text-slate-500 hover:text-slate-900 transition-colors">
-            <ArrowLeft size={20} />
-          </Link>
-          <h1 className="text-xl font-bold">ユーザー管理</h1>
-        </div>
-        <Button onClick={() => setShowAddModal(true)} className="flex items-center gap-2">
+        <h1 className="text-xl font-bold">ユーザー管理</h1>
+        <Button onClick={() => setShowAddModal(true)} size="sm" className="flex items-center gap-2">
           <UserPlus size={18} />
           新規ユーザー追加
         </Button>
       </header>
 
-      <main className="p-8 max-w-6xl mx-auto">
+      <main className="p-8 max-w-6xl mx-auto w-full">
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
           <table className="w-full text-left">
             <thead className="bg-slate-50 border-b border-slate-200">
@@ -296,7 +291,7 @@ export default function AdminUsers() {
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">メールアドレス</label>
-                <Input type="email" value={newEmail} onChange={(e) => newEmail(e.target.value)} required placeholder="user@example.com" />
+                <Input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} required placeholder="user@example.com" />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">初期パスワード</label>
@@ -325,6 +320,6 @@ export default function AdminUsers() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
