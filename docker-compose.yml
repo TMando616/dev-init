@@ -35,6 +35,11 @@ services:
       - "3000:3000"
     environment:
       NODE_ENV: development
+      WATCHPACK_POLLING: "true"
+      NEXT_PUBLIC_API_URL: "http://localhost:8080/api"
+    command: npx next dev --webpack -H 0.0.0.0
+    tty: true
+    stdin_open: true
     # Ensure node_modules is not overwritten by host
     restart: always
 

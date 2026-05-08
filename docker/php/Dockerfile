@@ -9,10 +9,11 @@ RUN apk add --no-cache \
     zip \
     unzip \
     libzip-dev \
-    postgresql-dev
+    postgresql-dev \
+    icu-dev
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_pgsql pgsql gd xml zip bcmath
+RUN docker-php-ext-install pdo_pgsql pgsql gd xml zip bcmath intl
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
