@@ -36,60 +36,86 @@ export class CodeRunner {
     const logs: string[] = [];
 
     return new Promise((resolve) => {
-      const timeout = setTimeout(() => {
-        resolve({ logs, error: 'Error: Execution timed out (Possible infinite loop)' });
-        if (this.iframe) {
-          document.body.removeChild(this.iframe);
-          this.iframe = null;
-        }
-      }, 3000); // 3秒でタイムアウト
-
-      // Iframe内の窓口
-      const win = iframe.contentWindow;
-      if (!win) {
-        clearTimeout(timeout);
-        resolve({ logs, error: 'Error: Could not access execution context' });
-        return;
-      }
-
-      // console.log をオーバーライド
-      win.console.log = (...args: unknown[]) => {
-        logs.push(args.map(arg => 
-          typeof arg === 'object' && arg !== null ? JSON.stringify(arg) : String(arg)
-        ).join(' '));
-      };
-
-      // console.error をオーバーライド
-      win.console.error = (...args: unknown[]) => {
-        logs.push(`Error: ${args.join(' ')}`);
-      };
-
-      // エラーハンドリング
-      win.onerror = (message) => {
-        clearTimeout(timeout);
-        resolve({ logs, error: String(message) });
-        return true;
-      };
-
-      try {
-        // コードの実行
-        const script = win.document.createElement('script');
-        script.textContent = `
-          try {
-            ${code}
-          } catch (e) {
-            console.error((e as Error).message);
-          }
-        `;
-        win.document.body.appendChild(script);
+      const messageHandler = (event: MessageEvent) => {
+        // 実行用Iframeからのメッセージのみを処理
+        if (event.source !== iframe.contentWindow) return;
         
-        // 実行完了（非同期処理は追えないが、同期的な実行はここで終わる）
+        const { type, payload } = event.data;
+        if (type === 'log') {
+          logs.push(payload);
+        } else if (type === 'error') {
+          logs.push(`Error: ${payload}`);
+        } else if (type === 'finished') {
+          cleanup();
+          resolve({ logs });
+        } else if (type === 'runtimeError') {
+          cleanup();
+          resolve({ logs, error: payload });
+        }
+      };
+
+      window.addEventListener('message', messageHandler);
+
+      const timeout = setTimeout(() => {
+        cleanup();
+        resolve({ logs, error: 'Error: Execution timed out (Possible infinite loop)' });
+      }, 3000);
+
+      const cleanup = () => {
         clearTimeout(timeout);
-        resolve({ logs });
-      } catch (e: unknown) {
-        clearTimeout(timeout);
-        resolve({ logs, error: (e as Error).message });
-      }
+        window.removeEventListener('message', messageHandler);
+        if (this.iframe && this.iframe.parentNode) {
+          document.body.removeChild(this.iframe);
+        }
+        this.iframe = null;
+      };
+
+      // Iframe内で実行するHTML/JS
+      // console.log等をオーバーライドして親ウィンドウにメッセージを送る
+      const srcdoc = `
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="utf-8"></head>
+        <body>
+          <script>
+            (function() {
+              const post = (type, payload) => {
+                window.parent.postMessage({ type, payload }, '*');
+              };
+
+              console.log = (...args) => {
+                post('log', args.map(arg => 
+                  typeof arg === 'object' && arg !== null ? 
+                  (function() { 
+                    try { return JSON.stringify(arg); } 
+                    catch(e) { return String(arg); } 
+                  })() : String(arg)
+                ).join(' '));
+              };
+
+              console.error = (...args) => {
+                post('error', args.join(' '));
+              };
+
+              window.onerror = (message, source, lineno, colno, error) => {
+                post('runtimeError', error ? error.message : String(message));
+                return true;
+              };
+
+              try {
+                ${code}
+                // 実行完了を通知
+                setTimeout(() => post('finished'), 10);
+              } catch (e) {
+                post('runtimeError', e.message);
+              }
+            })();
+          </script>
+        </body>
+        </html>
+      `;
+
+      iframe.srcdoc = srcdoc;
     });
   }
 }
