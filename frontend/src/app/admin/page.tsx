@@ -136,6 +136,6 @@ export default function AdminDashboard() {
           </table>
         </div>
       </main>
-    </>
+    </div>
   );
 }
