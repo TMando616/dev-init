@@ -40,7 +40,8 @@ export default function Sidebar() {
   ];
 
   const isActive = (href: string) => {
-    if (href === '/' && pathname !== '/') return false;
+    if (href === '/') return pathname === '/';
+    if (href === '/admin') return pathname === '/admin';
     return pathname.startsWith(href);
   };
 
