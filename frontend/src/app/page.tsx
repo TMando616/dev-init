@@ -3,9 +3,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { Button } from '@/components/ui';
 import api from '@/lib/api';
-import { ChevronRight, BookOpen, Settings } from 'lucide-react';
+import { ChevronRight, BookOpen } from 'lucide-react';
 
 interface Lesson {
   id: number;
@@ -14,7 +13,7 @@ interface Lesson {
 }
 
 export default function Home() {
-  const { user, logout, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 

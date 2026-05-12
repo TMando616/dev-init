@@ -14,8 +14,6 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
-import { Button } from './ui';
-import { cn } from '@/lib/api'; // Assuming cn utility might be in api or I should create a separate lib/utils.ts
 
 // Since I don't see a lib/utils.ts, I'll use a simple conditional class joiner
 const classNames = (...classes: (string | boolean | undefined)[]) => {

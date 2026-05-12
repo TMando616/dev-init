@@ -48,7 +48,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    checkAuth();
+    let isMounted = true;
+
+    const initAuth = async () => {
+      await checkAuth();
+      if (isMounted) {
+        // Any additional logic after checkAuth if needed
+      }
+    };
+
+    initAuth();
+
+    return () => {
+      isMounted = false;
+    };
   }, [checkAuth]);
 
   useEffect(() => {
