@@ -1,7 +1,7 @@
 # Tasks: Phase 3 - Dashboard, Progress & Categories
 
 ## 1. Database & API (Backend)
-- [ ] 1.1 `categories` テーブルの作成とマイグレーション実装
+- [x] 1.1 `categories` テーブルの作成とマイグレーション実装
 - [ ] 1.2 `lessons` テーブルへの `category_id` 追加とデータ整合性の確保
 - [ ] 1.3 `CategoryController` の作成 (管理者用CRUD)
 - [ ] 1.4 `DashboardController` の作成と進捗集計ロジックの実装
