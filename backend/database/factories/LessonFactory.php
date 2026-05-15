@@ -17,6 +17,7 @@ class LessonFactory extends Factory
     public function definition(): array
     {
         return [
+            'category_id' => null,
             'title' => $this->faker->sentence(),
             'content' => $this->faker->paragraphs(3, true),
             'model_answer' => "console.log('Hello, World!');",

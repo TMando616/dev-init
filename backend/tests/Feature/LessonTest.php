@@ -92,4 +92,13 @@ class LessonTest extends TestCase
         $response->assertStatus(204);
         $this->assertDatabaseMissing('lessons', ['id' => $lesson->id]);
     }
+
+    public function test_lesson_belongs_to_category()
+    {
+        $category = \App\Models\Category::factory()->create();
+        $lesson = Lesson::factory()->create(['category_id' => $category->id]);
+
+        $this->assertEquals($category->id, $lesson->category->id);
+        $this->assertTrue($category->lessons->contains($lesson));
+    }
 }
