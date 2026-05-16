@@ -10,15 +10,14 @@ class Lesson extends Model
     use HasFactory;
 
     protected $fillable = [
-        'category_id',
         'title',
         'content',
         'model_answer',
     ];
 
-    public function category()
+    public function categories()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsToMany(Category::class);
     }
 
     public function submissions()

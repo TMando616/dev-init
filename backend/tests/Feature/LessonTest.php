@@ -93,12 +93,15 @@ class LessonTest extends TestCase
         $this->assertDatabaseMissing('lessons', ['id' => $lesson->id]);
     }
 
-    public function test_lesson_belongs_to_category()
+    public function test_lesson_can_belong_to_multiple_categories()
     {
-        $category = \App\Models\Category::factory()->create();
-        $lesson = Lesson::factory()->create(['category_id' => $category->id]);
+        $categories = \App\Models\Category::factory(2)->create();
+        $lesson = Lesson::factory()->create();
+        
+        $lesson->categories()->attach($categories->pluck('id'));
 
-        $this->assertEquals($category->id, $lesson->category->id);
-        $this->assertTrue($category->lessons->contains($lesson));
+        $this->assertCount(2, $lesson->categories);
+        $this->assertTrue($categories[0]->lessons->contains($lesson));
+        $this->assertTrue($categories[1]->lessons->contains($lesson));
     }
 }
