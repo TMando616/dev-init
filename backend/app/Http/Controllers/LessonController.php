@@ -28,6 +28,8 @@ class LessonController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'model_answer' => 'nullable|string',
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'exists:categories,id',
         ]);
 
         $lesson = $this->service->createLesson($validated);
@@ -58,10 +60,11 @@ class LessonController extends Controller
             'title' => 'sometimes|required|string|max:255',
             'content' => 'sometimes|required|string',
             'model_answer' => 'nullable|string',
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'exists:categories,id',
         ]);
 
         $lesson = $this->service->updateLesson((int)$id, $validated);
-
         if (!$lesson) {
             return response()->json(['message' => 'Lesson not found'], 404);
         }

@@ -16,11 +16,11 @@ class CategoryRepository
     }
 
     /**
-     * Find a category by ID.
+     * Find a category by ID with lessons.
      */
     public function find(int $id): ?Category
     {
-        return Category::find($id);
+        return Category::with('lessons.categories')->find($id);
     }
 
     /**
