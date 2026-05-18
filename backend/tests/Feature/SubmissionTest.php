@@ -63,4 +63,21 @@ class SubmissionTest extends TestCase
 
         $response->assertStatus(404);
     }
+
+    public function test_user_can_complete_lesson()
+    {
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/submissions/complete', [
+                'lesson_id' => $this->lesson->id,
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'completed');
+
+        $this->assertDatabaseHas('submissions', [
+            'user_id' => $this->user->id,
+            'lesson_id' => $this->lesson->id,
+            'status' => 'completed',
+        ]);
+    }
 }

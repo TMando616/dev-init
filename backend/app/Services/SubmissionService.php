@@ -19,6 +19,19 @@ class SubmissionService
         );
     }
 
+    public function completeLesson(int $userId, int $lessonId): Submission
+    {
+        $submission = $this->repository->findForUserAndLesson($userId, $lessonId);
+        
+        return $this->repository->updateOrCreate(
+            ['user_id' => $userId, 'lesson_id' => $lessonId],
+            [
+                'status' => 'completed',
+                'code' => $submission ? $submission->code : ''
+            ]
+        );
+    }
+
     public function getSubmission(int $userId, int $lessonId): ?Submission
     {
         return $this->repository->findForUserAndLesson($userId, $lessonId);

@@ -31,6 +31,23 @@ class SubmissionController extends Controller
     }
 
     /**
+     * Mark a lesson as completed.
+     */
+    public function complete(Request $request)
+    {
+        $validated = $request->validate([
+            'lesson_id' => 'required|exists:lessons,id',
+        ]);
+
+        $submission = $this->service->completeLesson(
+            $request->user()->id,
+            $validated['lesson_id']
+        );
+
+        return response()->json($submission);
+    }
+
+    /**
      * Display the specified submission for the authenticated user.
      */
     public function show(Request $request, string $lessonId)

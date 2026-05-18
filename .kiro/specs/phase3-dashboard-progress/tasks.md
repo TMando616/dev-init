@@ -5,7 +5,7 @@
 - [x] 1.2 中間テーブル `category_lesson` の作成と多対多リレーションの定義
 - [x] 1.3 `CategoryController` の作成 (管理者用CRUD)
 - [x] 1.4 `DashboardController` の作成と進捗集計ロジックの実装
-- [ ] 1.5 `SubmissionController` の拡張 (完了ステータス更新機能)
+- [x] 1.5 `SubmissionController` の拡張 (完了ステータス更新機能)
 
 ## 2. Admin UI (Frontend)
 - [ ] 2.1 カテゴリ管理画面 (`/admin/categories`) の構築
