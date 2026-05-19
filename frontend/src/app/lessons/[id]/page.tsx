@@ -7,7 +7,7 @@ import { Button } from '@/components/ui';
 import api from '@/lib/api';
 import Editor from '@monaco-editor/react';
 import ReactMarkdown from 'react-markdown';
-import { ChevronLeft, Save, Play, Eye, EyeOff, CloudCheck, CloudUpload } from 'lucide-react';
+import { ChevronLeft, Save, Play, Eye, EyeOff, CloudCheck, CloudUpload, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { runner } from '@/lib/codeRunner';
 import { Console } from '@/components/Console';
@@ -27,6 +27,7 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [code, setCode] = useState<string>('// ここにコードを書いてください\n');
   const [lastSavedCode, setLastSavedCode] = useState<string>('');
+  const [isCompleted, setIsCompleted] = useState(false);
   
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -49,6 +50,7 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
         if (submissionRes.data && submissionRes.data.code) {
           setCode(submissionRes.data.code);
           setLastSavedCode(submissionRes.data.code);
+          setIsCompleted(submissionRes.data.status === 'completed');
         }
       } catch (error) {
         console.error('Failed to fetch lesson data', error);
@@ -105,6 +107,22 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
   const handleClearConsole = () => {
     setLogs([]);
     setError(undefined);
+  };
+
+  const handleComplete = async () => {
+    if (isCompleted) return;
+    
+    try {
+      await api.post('/submissions/complete', {
+        lesson_id: id,
+        code: code,
+      });
+      setIsCompleted(true);
+      setLastSavedCode(code);
+    } catch (error) {
+      console.error('Failed to complete lesson', error);
+      alert('完了処理に失敗しました。');
+    }
   };
 
   if (authLoading || isLoading) {
@@ -177,6 +195,15 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
           >
             <Play size={18} className="mr-2" />
             {isExecuting ? '実行中...' : '実行'}
+          </Button>
+          <Button 
+            size="sm" 
+            className={`${isCompleted ? 'bg-slate-700 text-emerald-400 cursor-default' : 'bg-blue-600 hover:bg-blue-500 text-white'} border-none`}
+            onClick={handleComplete}
+            disabled={isCompleted}
+          >
+            <CheckCircle2 size={18} className="mr-2" />
+            {isCompleted ? '完了済み' : '完了にする'}
           </Button>
         </div>
       </header>
