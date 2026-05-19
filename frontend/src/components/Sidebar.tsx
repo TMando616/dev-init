@@ -12,7 +12,8 @@ import {
   LogOut, 
   Code2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Tag
 } from 'lucide-react';
 
 // Since I don't see a lib/utils.ts, I'll use a simple conditional class joiner
@@ -34,6 +35,7 @@ export default function Sidebar() {
 
   const adminItems = [
     { name: '管理者ダッシュボード', href: '/admin', icon: Settings },
+    { name: 'カテゴリ管理', href: '/admin/categories', icon: Tag },
     { name: 'ユーザー管理', href: '/admin/users', icon: Users },
   ];
 

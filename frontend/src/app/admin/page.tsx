@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui';
 import api from '@/lib/api';
-import { Plus, Edit2, Trash2, ArrowLeft, BookOpen, Users } from 'lucide-react';
+import { Plus, Edit2, Trash2, ArrowLeft, BookOpen, Users, Tag } from 'lucide-react';
 
 interface Lesson {
   id: number;
@@ -68,6 +68,12 @@ export default function AdminDashboard() {
           <h1 className="text-xl font-bold">管理者ダッシュボード</h1>
         </div>
         <div className="flex items-center gap-2">
+          <Link href="/admin/categories">
+            <Button variant="outline" className="flex items-center gap-2">
+              <Tag size={18} />
+              カテゴリ管理
+            </Button>
+          </Link>
           <Link href="/admin/users">
             <Button variant="outline" className="flex items-center gap-2">
               <Users size={18} />
