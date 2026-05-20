@@ -52,7 +52,7 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
           setTitle(lesson.title);
           setContent(lesson.content);
           setModelAnswer(lesson.model_answer || '');
-          setSelectedCategoryIds(lesson.categories?.map((c: any) => c.id) || []);
+          setSelectedCategoryIds(lesson.categories?.map((c: Category) => c.id) || []);
         } catch (error) {
           console.error('Failed to fetch lesson', error);
           alert('レッスンの取得に失敗しました。');

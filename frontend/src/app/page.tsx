@@ -8,7 +8,6 @@ import {
   ChevronRight, 
   BookOpen, 
   BarChart2, 
-  CheckCircle2, 
   Clock, 
   ArrowRight,
   Tag
