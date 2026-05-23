@@ -1,9 +1,9 @@
 # Tasks: Phase 4 - Multi-Language Code Execution
 
 ## 1. Infrastructure & Database
-- [ ] 1.1 `docker-compose.yml` の修正: Laravelコンテナへの `/var/run/docker.sock` のマウント設定追加
-- [ ] 1.2 `lessons` テーブルへの `language` カラム追加（マイグレーション）
-- [ ] 1.3 `Lesson` モデルおよびファクトリの更新
+- [x] 1.1 `docker-compose.yml` の修正: Laravelコンテナへの `/var/run/docker.sock` のマウント設定追加
+- [x] 1.2 `lessons` テーブルへの `language` カラム追加（マイグレーション）
+- [x] 1.3 `Lesson` モデルおよびファクトリの更新
 
 ## 2. Backend Implementation (Code Execution)
 - [ ] 2.1 `CodeExecutionService` の作成: Dockerコマンドの生成、プロセス実行、タイムアウト処理の実装
