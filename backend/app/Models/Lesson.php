@@ -13,6 +13,7 @@ class Lesson extends Model
         'title',
         'content',
         'model_answer',
+        'language',
     ];
 
     public function categories()

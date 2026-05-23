@@ -20,6 +20,7 @@ class LessonFactory extends Factory
             'title' => $this->faker->sentence(),
             'content' => $this->faker->paragraphs(3, true),
             'model_answer' => "console.log('Hello, World!');",
+            'language' => 'php',
         ];
     }
 }
