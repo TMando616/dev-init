@@ -16,6 +16,7 @@ services:
       dockerfile: docker/php/Dockerfile
     volumes:
       - ./backend:/var/www/backend
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       DB_CONNECTION: pgsql
       DB_HOST: db
