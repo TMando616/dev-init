@@ -8,8 +8,8 @@
 ## 2. Backend Implementation (Code Execution)
 - [x] 2.1 `CodeExecutionService` の作成: Dockerコマンドの生成、プロセス実行、タイムアウト処理の実装
 - [x] 2.2 `ExecutionController` の作成: `POST /api/execute` エンドポイントの実装
-- [ ] 2.3 各言語（PHP, Python, JS, Ruby, Java）の実行確認テスト（フィーチャーテスト）の実装
-- [ ] 2.4 セキュリティ制限（ネットワーク遮断、メモリ制限）の動作検証
+- [x] 2.3 各言語（PHP, Python, JS, Ruby, Java）의 実行確認テスト（フィーチャーテスト）の実装
+- [x] 2.4 セキュリティ制限（ネットワーク遮断、メモリ制限）の動作検証
 
 ## 3. Admin UI Extension (Frontend)
 - [ ] 3.1 レッスン作成・編集画面への「言語選択」プルダウンの追加

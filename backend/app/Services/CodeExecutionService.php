@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\File;
 
 class CodeExecutionService
 {
-    protected const TIMEOUT = 3; // seconds
+    protected const TIMEOUT = 5; // seconds
     protected const MEMORY_LIMIT = '128m';
 
     /**
@@ -19,27 +19,27 @@ class CodeExecutionService
     protected array $languages = [
         'php' => [
             'image' => 'php:8.4-cli-alpine',
-            'command' => 'php',
+            'command' => ['php', '-d', 'display_errors=On'],
             'extension' => 'php',
         ],
         'python' => [
             'image' => 'python:3.12-alpine',
-            'command' => 'python',
+            'command' => ['python'],
             'extension' => 'py',
         ],
         'javascript' => [
             'image' => 'node:22-alpine',
-            'command' => 'node',
+            'command' => ['node'],
             'extension' => 'js',
         ],
         'ruby' => [
             'image' => 'ruby:3.3-alpine',
-            'command' => 'ruby',
+            'command' => ['ruby'],
             'extension' => 'rb',
         ],
         'java' => [
             'image' => 'amazoncorretto:21-alpine',
-            'command' => 'java',
+            'command' => ['java'],
             'extension' => 'java',
         ],
     ];
@@ -66,20 +66,28 @@ class CodeExecutionService
 
         $fileName = Str::random(10) . '.' . $config['extension'];
         $filePath = $tempDir . '/' . $fileName;
+
+        // Ensure PHP code has opening tag if missing, but be careful with existing ones
+        if ($language === 'php' && !str_contains($code, '<?php')) {
+            $code = "<?php\n" . $code;
+        }
+
         File::put($filePath, $code);
 
+        // We need the host path for Docker volume mounting because we're running inside Docker (DinD/Docker Socket)
+        // The path /var/www/backend inside this container corresponds to a specific path on the host.
+        // Assuming the project is at /home/mandokoro/dev/dev-init/backend based on the environment.
+        $hostPath = '/home/mandokoro/dev/dev-init/backend/storage/app/temp_code/' . $fileName;
+
         // Docker command construction
-        // Note: Using --rm to clean up container after exit
-        // Using --network none for security
-        // Using -v to mount the temporary file
         $dockerCommand = [
             'docker', 'run', '--rm',
             '--network', 'none',
             '--memory', self::MEMORY_LIMIT,
             '--read-only',
-            '-v', "{$filePath}:/tmp/code.{$config['extension']}:ro",
+            '-v', "{$hostPath}:/tmp/code.{$config['extension']}:ro",
             $config['image'],
-            $config['command'], "/tmp/code.{$config['extension']}"
+            ...$config['command'], "/tmp/code.{$config['extension']}"
         ];
 
         $process = new Process($dockerCommand);
