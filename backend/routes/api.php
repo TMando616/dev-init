@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExecutionController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\SubmissionController;
 use Illuminate\Http\Request;
@@ -25,6 +26,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index']);
+
+    // Code Execution
+    Route::post('/execute', ExecutionController::class);
 
     // Submissions
     Route::post('/submissions', [SubmissionController::class, 'store']);
