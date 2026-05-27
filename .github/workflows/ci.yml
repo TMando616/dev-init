@@ -31,6 +31,12 @@ jobs:
         run: php artisan key:generate
         working-directory: backend
 
+      - name: Pre-pull Docker images
+        run: |
+          docker pull php:8.4-cli-alpine
+          docker pull python:3.12-alpine
+          docker pull node:22-alpine
+
       - name: Run Tests
         run: php artisan test
         working-directory: backend

@@ -74,10 +74,12 @@ class CodeExecutionService
 
         File::put($filePath, $code);
 
-        // We need the host path for Docker volume mounting because we're running inside Docker (DinD/Docker Socket)
-        // The path /var/www/backend inside this container corresponds to a specific path on the host.
-        // Assuming the project is at /home/mandokoro/dev/dev-init/backend based on the environment.
-        $hostPath = '/home/mandokoro/dev/dev-init/backend/storage/app/temp_code/' . $fileName;
+        // We need the host path for Docker volume mounting.
+        // If we're running inside Docker (like in local dev), the container's path (/var/www/backend)
+        // doesn't match the host's path. We use DOCKER_HOST_PATH to bridge this.
+        // In CI or environments where we run directly on the host, storage_path() is sufficient.
+        $hostBasePath = env('DOCKER_HOST_PATH', storage_path('app/temp_code'));
+        $hostPath = rtrim($hostBasePath, '/') . '/' . $fileName;
 
         // Docker command construction
         $dockerCommand = [

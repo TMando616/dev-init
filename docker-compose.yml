@@ -24,6 +24,7 @@ services:
       DB_DATABASE: ${DB_DATABASE:-devinit}
       DB_USERNAME: ${DB_USERNAME:-user}
       DB_PASSWORD: ${DB_PASSWORD:-password}
+      DOCKER_HOST_PATH: ${PWD}/backend/storage/app/temp_code
 
   node:
     build:
