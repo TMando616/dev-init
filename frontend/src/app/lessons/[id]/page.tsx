@@ -15,6 +15,7 @@ import { Console } from '@/components/Console';
 interface Lesson {
   id: number;
   title: string;
+  language: string;
   content: string;
   model_answer?: string;
 }
@@ -25,7 +26,7 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
   const { user, loading: authLoading } = useAuth();
   
   const [lesson, setLesson] = useState<Lesson | null>(null);
-  const [code, setCode] = useState<string>('// ここにコードを書いてください\n');
+  const [code, setCode] = useState<string>('');
   const [lastSavedCode, setLastSavedCode] = useState<string>('');
   const [isCompleted, setIsCompleted] = useState(false);
   
@@ -46,11 +47,19 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
           api.get(`/submissions/lesson/${id}`).catch(() => ({ data: null }))
         ]);
 
-        setLesson(lessonRes.data);
+        const lessonData = lessonRes.data;
+        setLesson(lessonData);
+        
         if (submissionRes.data && submissionRes.data.code) {
           setCode(submissionRes.data.code);
           setLastSavedCode(submissionRes.data.code);
           setIsCompleted(submissionRes.data.status === 'completed');
+        } else {
+          // Set default code based on language
+          const defaultCode = lessonData.language === 'php' ? '<?php\n\necho "Hello, World!";\n' : 
+                             lessonData.language === 'python' ? 'print("Hello, World!")\n' :
+                             '// ここにコードを書いてください\n';
+          setCode(defaultCode);
         }
       } catch (error) {
         console.error('Failed to fetch lesson data', error);
@@ -93,15 +102,40 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
   }, [code, lastSavedCode, handleSave, isLoading]);
 
   const handleRun = async () => {
+    if (!lesson) return;
+    
     setIsExecuting(true);
-    // Clear previous logs when running
     setLogs([]);
     setError(undefined);
     
-    const result = await runner.run(code);
-    setLogs(result.logs);
-    setError(result.error);
-    setIsExecuting(false);
+    try {
+      const response = await api.post('/execute', {
+        language: lesson.language,
+        code: code
+      });
+      
+      const { status, stdout, stderr, execution_time_ms } = response.data;
+      
+      if (stdout) {
+        setLogs(stdout.split('\n').filter((l: string) => l !== ''));
+      }
+      
+      if (status === 'error' || status === 'timeout') {
+        setError(stderr || `Execution ${status}`);
+      } else if (stderr) {
+        // Warning or other info in stderr but status is success
+        setLogs(prev => [...prev, `stderr: ${stderr}`]);
+      }
+
+      if (execution_time_ms !== undefined) {
+        console.log(`Execution time: ${execution_time_ms}ms`);
+      }
+    } catch (err: any) {
+      console.error('Execution failed', err);
+      setError(err.response?.data?.message || '実行中にエラーが発生しました。');
+    } finally {
+      setIsExecuting(false);
+    }
   };
 
   const handleClearConsole = () => {
@@ -222,13 +256,18 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
             {/* Your Editor */}
             <div className="flex-1 flex flex-col border-r border-slate-700">
               <div className="h-8 bg-slate-800 border-b border-slate-700 px-4 flex items-center text-xs font-mono text-slate-400 justify-between">
-                <span>main.js</span>
+                <span>
+                  {lesson.language === 'php' ? 'main.php' : 
+                   lesson.language === 'python' ? 'main.py' :
+                   lesson.language === 'ruby' ? 'main.rb' :
+                   lesson.language === 'java' ? 'Main.java' : 'main.js'}
+                </span>
                 <span className="text-[10px] text-slate-500 uppercase tracking-wider font-sans">あなたのコード</span>
               </div>
               <div className="flex-1">
                 <Editor
                   height="100%"
-                  defaultLanguage="javascript"
+                  language={lesson.language || 'javascript'}
                   theme="vs-dark"
                   value={code}
                   onChange={(value) => setCode(value || '')}
@@ -248,13 +287,18 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
             {showModelAnswer && (
               <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-right-4 duration-300 border-l border-slate-700">
                 <div className="h-8 bg-slate-800 border-b border-slate-700 px-4 flex items-center text-xs font-mono text-slate-400 justify-between">
-                  <span>solution.js</span>
+                  <span>
+                    {lesson.language === 'php' ? 'solution.php' : 
+                     lesson.language === 'python' ? 'solution.py' :
+                     lesson.language === 'ruby' ? 'solution.rb' :
+                     lesson.language === 'java' ? 'Solution.java' : 'solution.js'}
+                  </span>
                   <span className="text-[10px] text-amber-500 uppercase tracking-wider font-sans font-bold">模範解答</span>
                 </div>
                 <div className="flex-1 opacity-80">
                   <Editor
                     height="100%"
-                    defaultLanguage="javascript"
+                    language={lesson.language || 'javascript'}
                     theme="vs-dark"
                     value={lesson.model_answer || '// 模範解答は用意されていません'}
                     options={{
