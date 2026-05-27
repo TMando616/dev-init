@@ -9,8 +9,8 @@ import Editor from '@monaco-editor/react';
 import ReactMarkdown from 'react-markdown';
 import { ChevronLeft, Save, Play, Eye, EyeOff, CloudCheck, CloudUpload, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
-import { runner } from '@/lib/codeRunner';
 import { Console } from '@/components/Console';
+import { isAxiosError } from 'axios';
 
 interface Lesson {
   id: number;
@@ -130,9 +130,13 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
       if (execution_time_ms !== undefined) {
         console.log(`Execution time: ${execution_time_ms}ms`);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('Execution failed', err);
-      setError(err.response?.data?.message || '実行中にエラーが発生しました。');
+      let message = '実行中にエラーが発生しました。';
+      if (isAxiosError(err) && err.response?.data?.message) {
+        message = err.response.data.message;
+      }
+      setError(message);
     } finally {
       setIsExecuting(false);
     }

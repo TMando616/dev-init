@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui';
 import api from '@/lib/api';
-import { Plus, Edit2, Trash2, ArrowLeft, BookOpen, Users, Tag } from 'lucide-react';
+import { Edit2, Trash2, ArrowLeft, BookOpen } from 'lucide-react';
 
 interface Lesson {
   id: number;
