@@ -65,27 +65,7 @@ export default function AdminDashboard() {
           <Link href="/" className="text-slate-500 hover:text-slate-900 transition-colors">
             <ArrowLeft size={20} />
           </Link>
-          <h1 className="text-xl font-bold">管理者ダッシュボード</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link href="/admin/categories">
-            <Button variant="outline" className="flex items-center gap-2">
-              <Tag size={18} />
-              カテゴリ管理
-            </Button>
-          </Link>
-          <Link href="/admin/users">
-            <Button variant="outline" className="flex items-center gap-2">
-              <Users size={18} />
-              ユーザー管理
-            </Button>
-          </Link>
-          <Link href="/admin/lessons/new">
-            <Button className="flex items-center gap-2">
-              <Plus size={18} />
-              新規レッスン作成
-            </Button>
-          </Link>
+          <h1 className="text-xl font-bold">レッスン管理</h1>
         </div>
       </header>
 
