@@ -4,7 +4,7 @@ import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { Button, Input } from '@/components/ui';
+import { Button, Input, Select } from '@/components/ui';
 import api from '@/lib/api';
 import Editor from '@monaco-editor/react';
 import { ArrowLeft, Save } from 'lucide-react';
@@ -14,6 +14,14 @@ interface Category {
   name: string;
 }
 
+const SUPPORTED_LANGUAGES = [
+  { label: 'JavaScript', value: 'javascript' },
+  { label: 'PHP', value: 'php' },
+  { label: 'Python', value: 'python' },
+  { label: 'Ruby', value: 'ruby' },
+  { label: 'Java', value: 'java' },
+];
+
 export default function LessonEditor({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const isNew = id === 'new';
@@ -21,6 +29,7 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
   const { user, loading: authLoading } = useAuth();
 
   const [title, setTitle] = useState('');
+  const [language, setLanguage] = useState('javascript');
   const [content, setContent] = useState('');
   const [modelAnswer, setModelAnswer] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
@@ -50,6 +59,7 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
           const response = await api.get(`/lessons/${id}`);
           const lesson = response.data;
           setTitle(lesson.title);
+          setLanguage(lesson.language || 'javascript');
           setContent(lesson.content);
           setModelAnswer(lesson.model_answer || '');
           setSelectedCategoryIds(lesson.categories?.map((c: Category) => c.id) || []);
@@ -71,6 +81,7 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
 
     const payload = {
       title,
+      language,
       content,
       model_answer: modelAnswer,
       category_ids: selectedCategoryIds,
@@ -119,7 +130,7 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
 
       <main className="p-8 max-w-6xl mx-auto space-y-8">
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div className="lg:col-span-2">
               <label className="block text-sm font-semibold text-slate-700 mb-2">
                 レッスンタイトル
@@ -130,6 +141,21 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
                 placeholder="例: JavaScriptの基礎"
                 required
               />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                実行言語
+              </label>
+              <Select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+              >
+                {SUPPORTED_LANGUAGES.map((lang) => (
+                  <option key={lang.value} value={lang.value}>
+                    {lang.label}
+                  </option>
+                ))}
+              </Select>
             </div>
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
@@ -184,12 +210,12 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
 
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-slate-700">
-                模範解答 (JavaScript)
+                模範解答 ({SUPPORTED_LANGUAGES.find(l => l.value === language)?.label})
               </label>
               <div className="border border-slate-200 rounded-md overflow-hidden h-[500px]">
                 <Editor
                   height="100%"
-                  defaultLanguage="javascript"
+                  language={language}
                   theme="vs-dark"
                   value={modelAnswer}
                   onChange={(value) => setModelAnswer(value || '')}
