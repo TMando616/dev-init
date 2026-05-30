@@ -32,6 +32,7 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
   const [language, setLanguage] = useState('javascript');
   const [content, setContent] = useState('');
   const [modelAnswer, setModelAnswer] = useState('');
+  const [expectedOutput, setExpectedOutput] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(!isNew);
@@ -62,6 +63,7 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
           setLanguage(lesson.language || 'javascript');
           setContent(lesson.content);
           setModelAnswer(lesson.model_answer || '');
+          setExpectedOutput(lesson.expected_output || '');
           setSelectedCategoryIds(lesson.categories?.map((c: Category) => c.id) || []);
         } catch (error) {
           console.error('Failed to fetch lesson', error);
@@ -84,6 +86,7 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
       language,
       content,
       model_answer: modelAnswer,
+      expected_output: expectedOutput,
       category_ids: selectedCategoryIds,
     };
 
@@ -208,22 +211,36 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-700">
-                模範解答 ({SUPPORTED_LANGUAGES.find(l => l.value === language)?.label})
-              </label>
-              <div className="border border-slate-200 rounded-md overflow-hidden h-[500px]">
-                <Editor
-                  height="100%"
-                  language={language}
-                  theme="vs-dark"
-                  value={modelAnswer}
-                  onChange={(value) => setModelAnswer(value || '')}
-                  options={{
-                    fontSize: 14,
-                    minimap: { enabled: false },
-                    padding: { top: 16 }
-                  }}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-slate-700">
+                  模範解答 ({SUPPORTED_LANGUAGES.find(l => l.value === language)?.label})
+                </label>
+                <div className="border border-slate-200 rounded-md overflow-hidden h-[360px]">
+                  <Editor
+                    height="100%"
+                    language={language}
+                    theme="vs-dark"
+                    value={modelAnswer}
+                    onChange={(value) => setModelAnswer(value || '')}
+                    options={{
+                      fontSize: 14,
+                      minimap: { enabled: false },
+                      padding: { top: 16 }
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-slate-700">
+                  期待される出力 <span className="text-xs font-normal text-slate-500">(自動判定に使用。空白の場合は判定しない)</span>
+                </label>
+                <textarea
+                  value={expectedOutput}
+                  onChange={(e) => setExpectedOutput(e.target.value)}
+                  placeholder="例: Hello, World!"
+                  rows={4}
+                  className="w-full font-mono text-sm border border-slate-200 rounded-md px-3 py-2 bg-slate-900 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-400 resize-none"
                 />
               </div>
             </div>

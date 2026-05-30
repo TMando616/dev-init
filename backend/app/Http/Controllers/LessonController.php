@@ -28,6 +28,7 @@ class LessonController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'model_answer' => 'nullable|string',
+            'expected_output' => 'nullable|string',
             'category_ids' => 'nullable|array',
             'category_ids.*' => 'exists:categories,id',
         ]);
@@ -60,6 +61,7 @@ class LessonController extends Controller
             'title' => 'sometimes|required|string|max:255',
             'content' => 'sometimes|required|string',
             'model_answer' => 'nullable|string',
+            'expected_output' => 'nullable|string',
             'category_ids' => 'nullable|array',
             'category_ids.*' => 'exists:categories,id',
         ]);

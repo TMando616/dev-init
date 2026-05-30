@@ -18,6 +18,7 @@ interface Lesson {
   language: string;
   content: string;
   model_answer?: string;
+  expected_output?: string;
 }
 
 export default function LessonPage({ params }: { params: Promise<{ id: string }> }) {
@@ -38,6 +39,7 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
   const [logs, setLogs] = useState<string[]>([]);
   const [error, setError] = useState<string | undefined>(undefined);
   const [isExecuting, setIsExecuting] = useState(false);
+  const [judgeResult, setJudgeResult] = useState<'pass' | 'fail' | null>(null);
 
   useEffect(() => {
     const fetchLessonAndSubmission = async () => {
@@ -107,6 +109,7 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
     setIsExecuting(true);
     setLogs([]);
     setError(undefined);
+    setJudgeResult(null);
     
     try {
       const response = await api.post('/execute', {
@@ -116,19 +119,23 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
       
       const { status, stdout, stderr, execution_time_ms } = response.data;
       
-      if (stdout) {
-        setLogs(stdout.split('\n').filter((l: string) => l !== ''));
-      }
-      
+      const outputLines = stdout ? stdout.split('\n').filter((l: string) => l !== '') : [];
+      setLogs(outputLines);
+
       if (status === 'error' || status === 'timeout') {
         setError(stderr || `Execution ${status}`);
       } else if (stderr) {
-        // Warning or other info in stderr but status is success
         setLogs(prev => [...prev, `stderr: ${stderr}`]);
       }
 
       if (execution_time_ms !== undefined) {
         console.log(`Execution time: ${execution_time_ms}ms`);
+      }
+
+      if (lesson.expected_output && status === 'success') {
+        const actual = (stdout || '').trim();
+        const expected = lesson.expected_output.trim();
+        setJudgeResult(actual === expected ? 'pass' : 'fail');
       }
     } catch (err) {
       console.error('Execution failed', err);
@@ -145,6 +152,7 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
   const handleClearConsole = () => {
     setLogs([]);
     setError(undefined);
+    setJudgeResult(null);
   };
 
   const handleComplete = async () => {
@@ -320,12 +328,19 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
             )}
           </div>
 
+          {/* Judge Result Banner */}
+          {judgeResult && (
+            <div className={`px-4 py-2 flex items-center gap-2 text-sm font-bold ${judgeResult === 'pass' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`}>
+              {judgeResult === 'pass' ? '✓ PASS — 期待される出力と一致しました' : '✗ FAIL — 期待される出力と一致しませんでした'}
+            </div>
+          )}
+
           {/* Console Area */}
           <div className="h-1/3 min-h-[150px]">
-            <Console 
-              logs={logs} 
-              error={error} 
-              onClear={handleClearConsole} 
+            <Console
+              logs={logs}
+              error={error}
+              onClear={handleClearConsole}
             />
           </div>
         </div>
