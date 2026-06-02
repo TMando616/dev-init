@@ -20,7 +20,10 @@ class CategoryRepository
      */
     public function find(int $id): ?Category
     {
-        return Category::with('lessons.categories')->find($id);
+        return Category::with([
+            'lessons.categories',
+            'materials' => fn($q) => $q->ordered(),
+        ])->find($id);
     }
 
     /**

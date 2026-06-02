@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExecutionController;
 use App\Http\Controllers\LessonController;
+use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\SubmissionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +24,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Categories
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::get('/categories/{id}', [CategoryController::class, 'show']);
+
+    // Materials
+    Route::get('/materials', [MaterialController::class, 'index']);
+    Route::get('/materials/{id}', [MaterialController::class, 'show']);
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index']);
@@ -47,5 +52,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/categories', [CategoryController::class, 'store']);
         Route::put('/categories/{id}', [CategoryController::class, 'update']);
         Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+        Route::post('/materials', [MaterialController::class, 'store']);
+        Route::put('/materials/{id}', [MaterialController::class, 'update']);
+        Route::delete('/materials/{id}', [MaterialController::class, 'destroy']);
     });
 });
