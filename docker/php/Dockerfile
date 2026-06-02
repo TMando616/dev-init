@@ -27,5 +27,11 @@ WORKDIR /var/www/backend
 # which blocks writes from the www-data php-fpm workers at runtime.
 RUN mkdir -p storage/app/temp_code && chown -R www-data:www-data storage/app/temp_code
 
+# Allow www-data (php-fpm workers) to access the Docker socket mounted from the host.
+# DOCKER_GID must match the host's docker group GID (check with: getent group docker | cut -d: -f3).
+# php-fpm calls initgroups() when switching to www-data, so the group must exist in /etc/group.
+ARG DOCKER_GID=1001
+RUN addgroup -g ${DOCKER_GID} dockersock && adduser www-data dockersock
+
 EXPOSE 9000
 CMD ["php-fpm"]
