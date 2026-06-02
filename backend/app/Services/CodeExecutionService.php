@@ -61,7 +61,7 @@ class CodeExecutionService
         $config = $this->languages[$language];
         $tempDir = storage_path('app/temp_code');
         if (!File::exists($tempDir)) {
-            File::makeDirectory($tempDir, 0755, true);
+            File::makeDirectory($tempDir, 0775, true);
         }
 
         $fileName = Str::random(10) . '.' . $config['extension'];
