@@ -81,9 +81,13 @@ class CodeExecutionService
         $hostBasePath = env('DOCKER_HOST_PATH', storage_path('app/temp_code'));
         $hostPath = rtrim($hostBasePath, '/') . '/' . $fileName;
 
+        // Give each container a unique name so we can forcibly kill it on timeout.
+        $containerName = 'exec-' . Str::random(8);
+
         // Docker command construction
         $dockerCommand = [
             'docker', 'run', '--rm',
+            '--name', $containerName,
             '--network', 'none',
             '--memory', self::MEMORY_LIMIT,
             '--read-only',
@@ -108,6 +112,11 @@ class CodeExecutionService
                 'execution_time_ms' => $executionTimeMs,
             ];
         } catch (ProcessTimedOutException $e) {
+            // Kill the container first so docker run can exit naturally and --rm cleanup fires.
+            // Killing docker run with SIGKILL bypasses --rm, leaving an orphaned container.
+            (new Process(['docker', 'kill', $containerName]))->run();
+            $process->stop(3);
+
             return [
                 'status' => 'timeout',
                 'stdout' => $process->getOutput(),
