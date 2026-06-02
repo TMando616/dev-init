@@ -4,17 +4,18 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { 
-  Home, 
-  BookOpen, 
-  Users, 
-  Settings, 
-  LogOut, 
+import {
+  Home,
+  BookOpen,
+  Users,
+  Settings,
+  LogOut,
   Code2,
   ChevronLeft,
   ChevronRight,
   Tag,
-  PlusCircle
+  PlusCircle,
+  FileText
 } from 'lucide-react';
 
 // Since I don't see a lib/utils.ts, I'll use a simple conditional class joiner
@@ -36,13 +37,14 @@ export default function Sidebar() {
 
   const adminItems = [
     { name: 'レッスン管理', href: '/admin', icon: Settings },
+    { name: '学習資料管理', href: '/admin/materials', icon: FileText },
     { name: 'カテゴリ管理', href: '/admin/categories', icon: Tag },
     { name: 'ユーザー管理', href: '/admin/users', icon: Users },
   ];
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
-    if (href === '/admin') return pathname === '/admin' || pathname.startsWith('/admin/lessons');
+    if (href === '/admin') return pathname === '/admin' || (pathname.startsWith('/admin/lessons') && !pathname.startsWith('/admin/materials'));
     return pathname.startsWith(href);
   };
 
