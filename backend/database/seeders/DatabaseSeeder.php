@@ -6,6 +6,8 @@ use App\Models\Category;
 use App\Models\Lesson;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Database\Seeders\LessonSeeder;
+use Database\Seeders\MaterialSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,6 +20,10 @@ class DatabaseSeeder extends Seeder
         Category::create([
             'name' => 'JavaScript基礎',
             'description' => 'JavaScriptの基本的な文法と概念を学びます。',
+        ]);
+        Category::create([
+            'name' => 'PHP基礎',
+            'description' => 'PHPの基本的な文法とWeb開発への応用を学びます。',
         ]);
         Category::create([
             'name' => 'React入門',
@@ -40,19 +46,10 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        // Sample Lessons
-        Lesson::factory()->create([
-            'title' => 'Getting Started with JavaScript',
-            'content' => "# Getting Started\n\nWelcome to your first lesson! In this lesson, we will learn how to print 'Hello, World!' to the console.",
-            'model_answer' => "console.log('Hello, World!');",
+        // Structured Lessons & Materials
+        $this->call([
+            LessonSeeder::class,
+            MaterialSeeder::class,
         ]);
-
-        Lesson::factory()->create([
-            'title' => 'Variables and Types',
-            'content' => "# Variables\n\nLearn about `const`, `let`, and basic data types in JavaScript.",
-            'model_answer' => "const message = 'Hello';\nconsole.log(message);",
-        ]);
-
-        Lesson::factory(3)->create();
     }
 }
