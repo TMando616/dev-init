@@ -114,7 +114,7 @@ class CodeExecutionService
         } catch (ProcessTimedOutException $e) {
             // Kill the container first so docker run can exit naturally and --rm cleanup fires.
             // Killing docker run with SIGKILL bypasses --rm, leaving an orphaned container.
-            (new Process(['docker', 'kill', $containerName]))->run();
+            $this->killContainer($containerName);
             $process->stop(3);
 
             return [
@@ -124,6 +124,9 @@ class CodeExecutionService
                 'execution_time_ms' => self::TIMEOUT * 1000,
             ];
         } catch (\Exception $e) {
+            // The container may have started before the failure; reap it explicitly
+            // so it does not leak on non-timeout abort paths where --rm never fired.
+            $this->killContainer($containerName);
             Log::error('Code execution failed: ' . $e->getMessage());
             return [
                 'status' => 'error',
@@ -135,6 +138,22 @@ class CodeExecutionService
             if (File::exists($filePath)) {
                 File::delete($filePath);
             }
+        }
+    }
+
+    /**
+     * Best-effort kill of the named container. Bounded by a timeout so a slow or
+     * hung Docker daemon can never block the php-fpm worker indefinitely.
+     */
+    protected function killContainer(string $containerName): void
+    {
+        try {
+            $kill = new Process(['docker', 'kill', $containerName]);
+            $kill->setTimeout(self::TIMEOUT);
+            $kill->run();
+        } catch (\Throwable $e) {
+            // Container already gone or daemon unavailable; nothing more we can do.
+            Log::debug("docker kill {$containerName} failed: " . $e->getMessage());
         }
     }
 }
