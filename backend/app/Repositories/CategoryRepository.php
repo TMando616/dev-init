@@ -22,7 +22,8 @@ class CategoryRepository
     {
         return Category::with([
             'lessons.categories',
-            'materials' => fn($q) => $q->ordered(),
+            // List view only needs link metadata; skip the heavy `content` body.
+            'materials' => fn($q) => $q->ordered()->select(['id', 'title', 'category_id', 'order']),
         ])->find($id);
     }
 

@@ -7,9 +7,14 @@ use Illuminate\Database\Eloquent\Collection;
 
 class MaterialRepository
 {
+    /**
+     * Columns sufficient for list views; excludes the heavy `content` TEXT body.
+     */
+    private const LIST_COLUMNS = ['id', 'title', 'category_id', 'order', 'created_at', 'updated_at'];
+
     public function all(): Collection
     {
-        return Material::with('category')->ordered()->get();
+        return Material::with('category')->ordered()->get(self::LIST_COLUMNS);
     }
 
     public function find(int $id): ?Material
@@ -22,7 +27,7 @@ class MaterialRepository
         return Material::with('category')
             ->where('category_id', $categoryId)
             ->ordered()
-            ->get();
+            ->get(self::LIST_COLUMNS);
     }
 
     public function create(array $data): Material
