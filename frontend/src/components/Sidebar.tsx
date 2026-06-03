@@ -42,10 +42,22 @@ export default function Sidebar() {
     { name: 'ユーザー管理', href: '/admin/users', icon: Users },
   ];
 
+  // A nav item is active when its href is the most specific (longest) one matching
+  // the current path. This avoids per-item exclusion lists: sibling /admin/* routes
+  // light up their own item, not the parent /admin item, automatically as we add more.
+  const allHrefs = [...navItems, ...adminItems].map((item) => item.href);
+
+  const matchesSegment = (href: string, path: string) =>
+    path === href || path.startsWith(`${href}/`);
+
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
-    if (href === '/admin') return pathname === '/admin' || (pathname.startsWith('/admin/lessons') && !pathname.startsWith('/admin/materials'));
-    return pathname.startsWith(href);
+
+    const best = allHrefs
+      .filter((h) => h !== '/' && matchesSegment(h, pathname))
+      .sort((a, b) => b.length - a.length)[0];
+
+    return href === best;
   };
 
   return (
