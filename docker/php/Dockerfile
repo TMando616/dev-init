@@ -27,13 +27,10 @@ WORKDIR /var/www/backend
 # which blocks writes from the www-data php-fpm workers at runtime.
 RUN mkdir -p storage/app/temp_code && chown -R www-data:www-data storage/app/temp_code
 
-# Allow www-data (php-fpm workers) to access the Docker socket mounted from the host.
-# DOCKER_GID must match the host's docker group GID (check with: getent group docker | cut -d: -f3).
-# php-fpm calls initgroups() when switching to www-data, so the group must exist in /etc/group.
-ARG DOCKER_GID=1001
-RUN addgroup -g ${DOCKER_GID} dockersock && adduser www-data dockersock
+# www-data is granted access to the mounted Docker socket at runtime by the
+# entrypoint (it detects the socket's GID), so no build-time docker group is needed.
 
-# Runtime entrypoint fixes bind-mount-masked ownership before php-fpm starts.
+# Runtime entrypoint fixes bind-mount-masked ownership and socket access before php-fpm starts.
 COPY docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
