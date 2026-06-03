@@ -36,6 +36,13 @@ export default function MaterialPage({ params }: { params: Promise<{ id: string 
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (authLoading) return;
+
+    if (!user) {
+      router.push('/');
+      return;
+    }
+
     const fetchMaterial = async () => {
       try {
         const response = await api.get(`/materials/${id}`);
@@ -47,9 +54,7 @@ export default function MaterialPage({ params }: { params: Promise<{ id: string 
       }
     };
 
-    if (!authLoading && user) {
-      fetchMaterial();
-    }
+    fetchMaterial();
   }, [id, authLoading, user, router]);
 
   if (authLoading || isLoading) {
