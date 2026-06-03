@@ -33,5 +33,10 @@ RUN mkdir -p storage/app/temp_code && chown -R www-data:www-data storage/app/tem
 ARG DOCKER_GID=1001
 RUN addgroup -g ${DOCKER_GID} dockersock && adduser www-data dockersock
 
+# Runtime entrypoint fixes bind-mount-masked ownership before php-fpm starts.
+COPY docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 EXPOSE 9000
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php-fpm"]
