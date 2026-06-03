@@ -46,6 +46,8 @@ class MaterialRepository
 
         if ($material->category_id) {
             $base->where('category_id', $material->category_id);
+        } else {
+            $base->whereNull('category_id');
         }
 
         $prev = (clone $base)

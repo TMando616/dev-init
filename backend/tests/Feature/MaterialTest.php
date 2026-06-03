@@ -49,6 +49,41 @@ class MaterialTest extends TestCase
             ->assertJsonPath('next.id', $m3->id);
     }
 
+    public function test_prev_next_does_not_cross_category_boundary(): void
+    {
+        $catA = Category::factory()->create();
+        $catB = Category::factory()->create();
+
+        $a1 = Material::factory()->create(['category_id' => $catA->id, 'order' => 1]);
+        $a2 = Material::factory()->create(['category_id' => $catA->id, 'order' => 2]);
+        // 別カテゴリ・未分類の資料が prev/next に混入しないことを確認する
+        Material::factory()->create(['category_id' => $catB->id, 'order' => 1]);
+        Material::factory()->create(['category_id' => null, 'order' => 1]);
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->getJson("/api/materials/{$a1->id}");
+
+        $response->assertStatus(200)
+            ->assertJsonPath('prev', null)
+            ->assertJsonPath('next.id', $a2->id);
+    }
+
+    public function test_prev_next_for_uncategorized_material_stays_within_uncategorized(): void
+    {
+        $category = Category::factory()->create();
+        Material::factory()->create(['category_id' => $category->id, 'order' => 1]);
+
+        $u1 = Material::factory()->create(['category_id' => null, 'order' => 1]);
+        $u2 = Material::factory()->create(['category_id' => null, 'order' => 2]);
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->getJson("/api/materials/{$u1->id}");
+
+        $response->assertStatus(200)
+            ->assertJsonPath('prev', null)
+            ->assertJsonPath('next.id', $u2->id);
+    }
+
     public function test_show_returns_404_for_missing_material(): void
     {
         $response = $this->actingAs($this->user, 'sanctum')
