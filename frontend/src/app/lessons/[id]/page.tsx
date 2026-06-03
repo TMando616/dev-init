@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui';
 import api from '@/lib/api';
 import Editor from '@monaco-editor/react';
-import ReactMarkdown from 'react-markdown';
+import MarkdownRenderer from '@/components/MarkdownRenderer';
 import { ChevronLeft, Save, Play, Eye, EyeOff, CloudCheck, CloudUpload, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { Console } from '@/components/Console';
@@ -257,8 +257,8 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
       {/* Main Content */}
       <main className="flex-1 flex overflow-hidden">
         {/* Left Pane: Instructions */}
-        <div className={`${showModelAnswer ? 'w-1/3' : 'w-1/2'} overflow-y-auto bg-white text-slate-900 p-8 border-r border-slate-200 prose prose-slate max-w-none transition-all`}>
-          <ReactMarkdown>{lesson.content}</ReactMarkdown>
+        <div className={`${showModelAnswer ? 'w-1/3' : 'w-1/2'} overflow-y-auto bg-white text-slate-900 p-8 border-r border-slate-200 transition-all`}>
+          <MarkdownRenderer content={lesson.content} />
         </div>
 
         {/* Right Pane: Editor(s) & Console */}
