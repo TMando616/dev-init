@@ -1,7 +1,26 @@
 {
-  "feature": "phase5-study-materials",
-  "title": "学習資料機能",
+  "feature_name": "phase5-study-materials",
+  "created_at": "2026-05-31T00:00:00Z",
+  "updated_at": "2026-06-04T00:00:00Z",
   "language": "ja",
-  "status": "requirements",
-  "created_at": "2026-05-31"
+  "phase": "completed",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    },
+    "implementation": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "ready_for_implementation": false
 }
