@@ -31,11 +31,19 @@ jobs:
         run: php artisan key:generate
         working-directory: backend
 
-      - name: Pre-pull Docker images
+      - name: Pre-pull and warm up Docker images
         run: |
           docker pull php:8.4-cli-alpine
           docker pull python:3.12-alpine
           docker pull node:22-alpine
+          # `docker pull` only extracts layers; the first `docker run` still pays
+          # the snapshot/container-creation cost. For the larger node image this
+          # can exceed the 5s execution timeout on CI runners and flake the JS
+          # test. Warm each image with a throwaway run so the test under test
+          # only ever pays warm-start cost.
+          docker run --rm php:8.4-cli-alpine php -r 'echo 1;'
+          docker run --rm python:3.12-alpine python -c 'pass'
+          docker run --rm node:22-alpine node -e ''
 
       - name: Run Tests
         run: php artisan test
