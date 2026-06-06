@@ -50,4 +50,7 @@
 - [x] 8.1 バックエンドテスト実行（`php artisan test`）— MaterialTest 7/7パス、既存テスト40/40パス
 - [x] 8.2 フロントエンドlint実行（`npm run lint`）— エラーなし
 - [x] 8.3 シーダー実行確認（`php artisan migrate:fresh --seed`）— 正常完了
-- [ ] 8.4 ブラウザで学習→演習フローの動作確認
+- [x] 8.4 ブラウザで学習→演習フローの動作確認
+  - 実機検証（2026-06-06）: docker compose 起動済み環境で、ブラウザが叩く実サーフェス（`http://localhost:8080/api`）をend-to-end駆動
+  - カテゴリ詳細→学習資料→演習の遷移、資料prev/nextのカテゴリ内スコープ（先頭prev無/末尾next無）、未認証401・存在しない資料404、各ページのHTML 200配信を確認
+  - 注記: 環境にブラウザ自動化（chromium/playwright）が無く、実DOM描画・Monacoエディタ・MarkdownRendererの視覚確認は未実施（API＋ページ配信レベルでの確認）
