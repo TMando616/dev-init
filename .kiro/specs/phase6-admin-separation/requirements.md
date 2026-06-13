@@ -117,6 +117,14 @@
 
 ---
 
+## 技術的負債・クリーンアップ（本フェーズで併せて対応）
+
+- [ ] **未使用の iframe コード実行ロジックを削除する**。`frontend/src/lib/codeRunner.ts`（`CodeRunner` クラス / `runner`）は設計当初の「軽い JS はフロント iframe で即実行」案の名残だが、現在どこからも import されていないデッドコード。実際の実行は全言語が `lessons/[id]/page.tsx` の `handleRun` から `api.post('/execute')` 経由で **バックエンドの Docker サンドボックスに一本化**されている（`expected_output` との突合をサーバー側で統一するため）。
+  - 対応: `codeRunner.ts` を削除。import 参照が無いことを `grep -rn "codeRunner\|CodeRunner\|runner"` で再確認してから消す。
+  - 補足: もし将来クライアント実行を復活させる場合でも、合否判定はサーバー側に残す前提（クライアント実行は結果改竄が可能なため）。
+
+---
+
 ## ギャップ分析（既存コードベースとの乖離）
 
 現状実装と本要件の差分。設計フェーズで対応方針を具体化する。
