@@ -52,10 +52,10 @@
 - [ ] ⚠️ テスト実行は環境準備待ち（ホストPHPに `pdo_sqlite` 無し／Docker未起動）。`php8.4-sqlite3` 導入後 or docker で要実行（→ 11.1）
 
 ## 7. Frontend: 認証・APIクライアント分離
-- [ ] 7.1 `src/lib/adminApi.ts` 作成（`admin_token` を Bearer 付与、401→`/admin/login`）（design §3.4）
-- [ ] 7.2 `AdminAuthContext.tsx` 作成（login/logout/me、localStorage `admin_token` ＋ Cookie `admin_token` 保存、`/admin/me` 取得）（design §3.2）
-- [ ] 7.3 `AuthContext.tsx` から `role` を除去（`User` 型を `{id,name,email}` に）
-- [ ] 7.4 `src/middleware.ts` 作成（`/admin/:path*` で Cookie `admin_token` 無→`/admin/login` リダイレクト、`/admin/login` は除外）（design §3.3）
+- [x] 7.1 `src/lib/adminApi.ts` 作成（`admin_token` を Bearer 付与、401→`/admin/login`）（design §3.4）
+- [x] 7.2 `AdminAuthContext.tsx` 作成（login/logout/me、localStorage `admin_token` ＋ Cookie `admin_token` 保存、`/admin/me` 取得）（design §3.2）
+- [x] 7.3 `AuthContext.tsx` から `role` を除去（`User` 型を `{id,name,email}` に）
+- [x] 7.4 `src/proxy.ts` 作成（design §3.3）。※Next.js 16 で `middleware` 規約は `proxy` に改称されたため `middleware.ts` ではなく `proxy.ts` を採用
 
 ## 8. Frontend: route group 再編
 - [ ] 8.1 ルート `layout.tsx` を html/body/globals のみに縮小（Provider を各 group へ移譲）（design §3.1）
