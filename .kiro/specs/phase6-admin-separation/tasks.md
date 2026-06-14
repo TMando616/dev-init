@@ -16,10 +16,10 @@
 - [x] 2.1 `config/auth.php` に `admins` provider と `admin` ガード（driver=sanctum, provider=admins）を追加（design §2.1）
 
 ## 3. Backend: Repository・Service
-- [ ] 3.1 `AdminRepository` 作成（all/find/findByEmail/create/delete）
-- [ ] 3.2 `UserRepository` 作成（all/find/create/update/delete）— AuthController のベタ書きCRUDを移設する受け皿
-- [ ] 3.3 `AdminService` 作成（list/create〔Hash::make〕/delete〔self-delete 防止〕）（design §2.6）
-- [ ] 3.4 `UserService` 作成（list/create/update/delete、パスワードは値があるときのみ Hash::make）
+- [x] 3.1 `AdminRepository` 作成（all/find/findByEmail/create/delete）
+- [x] 3.2 `UserRepository` 作成（all/find/create/update/delete）— AuthController のベタ書きCRUDを移設する受け皿
+- [x] 3.3 `AdminService` 作成（list/create〔Hash::make〕/delete〔self-delete 防止〕）（design §2.6）
+- [x] 3.4 `UserService` 作成（list/create/update/delete、パスワードは値があるときのみ Hash::make）
 
 ## 4. Backend: Controller・ルート
 - [ ] 4.1 `AdminAuthController` 作成（login / logout / me）。register は設けない（design §2.7）
