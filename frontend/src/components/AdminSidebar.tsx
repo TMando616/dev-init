@@ -3,45 +3,47 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
+import { useAdminAuth } from '@/context/AdminAuthContext';
 import {
-  Home,
-  BookOpen,
+  Settings,
+  FileText,
+  Tag,
+  Users,
+  ShieldCheck,
   LogOut,
   Code2,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
 
-// Since I don't see a lib/utils.ts, I'll use a simple conditional class joiner
 const classNames = (...classes: (string | boolean | undefined)[]) => {
   return classes.filter(Boolean).join(' ');
 };
 
-export default function Sidebar() {
-  const { user, logout } = useAuth();
+export default function AdminSidebar() {
+  const { admin, logout } = useAdminAuth();
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = React.useState(false);
 
-  if (!user) return null;
+  if (!admin) return null;
 
+  // Admin-only navigation. No student-facing links (dashboard / lessons / exercises).
   const navItems = [
-    { name: 'ダッシュボード', href: '/', icon: Home },
-    { name: 'レッスン一覧', href: '/lessons/list', icon: BookOpen },
+    { name: 'レッスン管理', href: '/admin', icon: Settings },
+    { name: '学習資料管理', href: '/admin/materials', icon: FileText },
+    { name: 'カテゴリ管理', href: '/admin/categories', icon: Tag },
+    { name: '生徒管理', href: '/admin/users', icon: Users },
+    { name: '管理者管理', href: '/admin/admins', icon: ShieldCheck },
   ];
 
-  // A nav item is active when its href is the most specific (longest) one matching
-  // the current path. This avoids per-item exclusion lists.
   const allHrefs = navItems.map((item) => item.href);
 
   const matchesSegment = (href: string, path: string) =>
     path === href || path.startsWith(`${href}/`);
 
   const isActive = (href: string) => {
-    if (href === '/') return pathname === '/';
-
     const best = allHrefs
-      .filter((h) => h !== '/' && matchesSegment(h, pathname))
+      .filter((h) => matchesSegment(h, pathname))
       .sort((a, b) => b.length - a.length)[0];
 
     return href === best;
@@ -57,14 +59,14 @@ export default function Sidebar() {
       <div className="p-6 flex items-center justify-between border-b border-slate-50">
         {!isCollapsed && (
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-white">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
               <Code2 size={20} />
             </div>
-            <span className="font-bold text-xl tracking-tight">DevInit</span>
+            <span className="font-bold text-xl tracking-tight">DevInit <span className="text-blue-600">Admin</span></span>
           </div>
         )}
         {isCollapsed && (
-          <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-white mx-auto">
+          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white mx-auto">
             <Code2 size={20} />
           </div>
         )}
@@ -98,12 +100,12 @@ export default function Sidebar() {
           isCollapsed ? "justify-center" : ""
         )}>
           <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs">
-            {user.name.charAt(0).toUpperCase()}
+            {admin.name.charAt(0).toUpperCase()}
           </div>
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-slate-900 truncate">{user.name}</p>
-              <p className="text-xs text-slate-500 truncate">{user.email}</p>
+              <p className="text-sm font-bold text-slate-900 truncate">{admin.name}</p>
+              <p className="text-xs text-slate-500 truncate">{admin.email}</p>
             </div>
           )}
         </div>

@@ -58,24 +58,24 @@
 - [x] 7.4 `src/proxy.ts` 作成（design §3.3）。※Next.js 16 で `middleware` 規約は `proxy` に改称されたため `middleware.ts` ではなく `proxy.ts` を採用
 
 ## 8. Frontend: route group 再編
-- [ ] 8.1 ルート `layout.tsx` を html/body/globals のみに縮小（Provider を各 group へ移譲）（design §3.1）
-- [ ] 8.2 `(student)` group 作成＋既存生徒ページ移設（page/login/register/lessons/categories/materials）、`(student)/layout.tsx` に AuthProvider+MainLayout
-- [ ] 8.3 `(admin)` group 作成＋既存管理ページ移設、`(admin)/admin/layout.tsx` に AdminAuthProvider+Adminシェルをラップ。URL が変わらないこと（group 名は括弧でURLに出ない）を確認
+- [x] 8.1 ルート `layout.tsx` を html/body/globals のみに縮小（Provider を各 group へ移譲）（design §3.1）
+- [x] 8.2 `(student)` group 作成＋既存生徒ページ移設（page/login/register/lessons/categories/materials）、`(student)/layout.tsx` に AuthProvider+MainLayout
+- [x] 8.3 `(admin)` group 作成＋既存管理ページ移設、`(admin)/admin/layout.tsx` に AdminAuthProvider+AdminLayout をラップ。URL不変（group 名は括弧）
 
 ## 9. Frontend: 管理シェル・UI
-- [ ] 9.1 `AdminSidebar`（または AdminLayout 内ナビ）作成。メニューは管理機能のみ（生徒導線を置かない）（design §3.5）
-- [ ] 9.2 `src/app/(admin)/admin/login/page.tsx` 作成（管理者ログイン、AdminAuthProvider 保護外）
-- [ ] 9.3 `src/app/(admin)/admin/admins/page.tsx` 作成（管理者一覧＋招待作成フォーム、自分の削除ボタン無効化）（design §3.7）
-- [ ] 9.4 既存管理ページの API 呼び出しを `adminApi` ＋新URL（`/admin/...`）に差し替え（users 管理含む）
-- [ ] 9.5 `Sidebar.tsx` から `adminItems`・`user.role==='admin'` 分岐を削除（生徒メニューのみ）（design §3.6）
+- [x] 9.1 `AdminSidebar` ＋ `AdminLayout` 作成。メニューは管理機能のみ（生徒導線を置かない）（design §3.5）
+- [x] 9.2 `src/app/(admin)/admin/login/page.tsx` 作成（管理者ログイン、AdminLayout がシェルを出さない）
+- [x] 9.3 `src/app/(admin)/admin/admins/page.tsx` 作成（管理者一覧＋招待作成、自分の削除ボタン無効化）（design §3.7）
+- [x] 9.4 既存管理ページの API 呼び出しを `adminApi` ＋新URL（`/admin/...`）に差し替え（users→生徒管理含む、role UI 撤去）
+- [x] 9.5 `Sidebar.tsx` から `adminItems`・`user.role==='admin'` 分岐を削除（生徒メニューのみ）（design §3.6）
 
 ## 10. クリーンアップ（技術的負債）
-- [ ] 10.1 `frontend/src/lib/codeRunner.ts` 削除（事前に `grep -rn "codeRunner\|CodeRunner\|runner" frontend/src` で参照ゼロ確認）（design §4）
+- [x] 10.1 `frontend/src/lib/codeRunner.ts` 削除（参照ゼロ確認済み）（design §4）
 
 ## 11. 動作確認・lint
-- [ ] 11.1 バックエンドテスト実行（`php artisan test`）— 新規・既存すべてパス
-- [ ] 11.2 `php artisan migrate:fresh --seed` が通り、admin が `admins`・生徒が `users` に入ることを確認
-- [ ] 11.3 フロントエンド lint・build（`npm run lint` / `npm run build`）
-- [ ] 11.4 ブラウザ／API で end-to-end 確認
+- [ ] 11.1 バックエンドテスト実行（`php artisan test`）— ⚠️ 環境ブロック中（ホストPHPに `pdo_sqlite` 無し／Docker未起動）。`php8.4-sqlite3` 導入 or docker で要実行
+- [ ] 11.2 `php artisan migrate:fresh --seed` が通り、admin が `admins`・生徒が `users` に入ることを確認 — ⚠️ 同上（要DB環境）
+- [x] 11.3 フロントエンド lint（`npm run lint`）パス。build は ⚠️ 環境ブロック（`next build` が WSL2 で Bus error／`.next` が稼働中 dev サーバ所有でクリーン不可）。要クリーン環境で `npm run build`
+- [ ] 11.4 ブラウザ／API で end-to-end 確認 — 環境準備後に実施
   - 管理者ログイン→管理画面操作、生徒ログイン→学習フロー
   - 生徒トークンで `/admin/*` 拒否、未認証で `/admin` →`/admin/login` リダイレクト

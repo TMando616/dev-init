@@ -3,9 +3,9 @@
 import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@/context/AuthContext';
+import { useAdminAuth } from '@/context/AdminAuthContext';
 import { Button, Input, Select } from '@/components/ui';
-import api from '@/lib/api';
+import adminApi from '@/lib/adminApi';
 import Editor from '@monaco-editor/react';
 import { ArrowLeft, Save } from 'lucide-react';
 
@@ -26,7 +26,7 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
   const { id } = use(params);
   const isNew = id === 'new';
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { admin, loading: authLoading } = useAdminAuth();
 
   const [title, setTitle] = useState('');
   const [language, setLanguage] = useState('javascript');
@@ -39,14 +39,11 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && (!user || user.role !== 'admin')) {
-      router.push('/');
-      return;
-    }
+    if (!admin) return;
 
     const fetchCategories = async () => {
       try {
-        const response = await api.get('/categories');
+        const response = await adminApi.get('/categories');
         setCategories(response.data);
       } catch (error) {
         console.error('Failed to fetch categories', error);
@@ -57,7 +54,7 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
     if (!isNew) {
       const fetchLesson = async () => {
         try {
-          const response = await api.get(`/lessons/${id}`);
+          const response = await adminApi.get(`/lessons/${id}`);
           const lesson = response.data;
           setTitle(lesson.title);
           setLanguage(lesson.language || 'javascript');
@@ -75,7 +72,7 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
       };
       fetchLesson();
     }
-  }, [id, isNew, user, authLoading, router]);
+  }, [id, isNew, admin, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,9 +89,9 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
 
     try {
       if (isNew) {
-        await api.post('/lessons', payload);
+        await adminApi.post('/admin/lessons', payload);
       } else {
-        await api.put(`/lessons/${id}`, payload);
+        await adminApi.put(`/admin/lessons/${id}`, payload);
       }
       router.push('/admin');
     } catch (error) {

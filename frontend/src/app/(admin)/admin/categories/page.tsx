@@ -2,10 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
+import { useAdminAuth } from '@/context/AdminAuthContext';
 import { Button, Input } from '@/components/ui';
-import api from '@/lib/api';
+import adminApi from '@/lib/adminApi';
 import { Tag, Edit2, Trash2, X, Check, Plus, ArrowLeft } from 'lucide-react';
 
 interface Category {
@@ -16,8 +15,7 @@ interface Category {
 }
 
 export default function AdminCategories() {
-  const { user: currentUser, loading: authLoading } = useAuth();
-  const router = useRouter();
+  const { admin, loading: authLoading } = useAdminAuth();
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
@@ -33,14 +31,11 @@ export default function AdminCategories() {
   const [newDescription, setNewDescription] = useState('');
 
   useEffect(() => {
-    if (!authLoading && (!currentUser || currentUser.role !== 'admin')) {
-      router.push('/');
-      return;
-    }
+    if (!admin) return;
 
-    const fetchCategoriesData = async () => {
+    const loadCategories = async () => {
       try {
-        const response = await api.get('/categories');
+        const response = await adminApi.get('/categories');
         setCategories(response.data);
       } catch (error) {
         console.error('Failed to fetch categories', error);
@@ -48,16 +43,13 @@ export default function AdminCategories() {
         setIsLoading(false);
       }
     };
-
-    if (currentUser?.role === 'admin') {
-      fetchCategoriesData();
-    }
-  }, [currentUser, authLoading, router]);
+    loadCategories();
+  }, [admin]);
 
   const fetchCategories = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get('/categories');
+      const response = await adminApi.get('/categories');
       setCategories(response.data);
     } catch (error) {
       console.error('Failed to fetch categories', error);
@@ -76,7 +68,7 @@ export default function AdminCategories() {
     if (!editingId) return;
     setIsUpdating(true);
     try {
-      await api.put(`/categories/${editingId}`, {
+      await adminApi.put(`/admin/categories/${editingId}`, {
         name: editName,
         description: editDescription,
       });
@@ -94,7 +86,7 @@ export default function AdminCategories() {
     if (!confirm('このカテゴリを削除してもよろしいですか？')) return;
 
     try {
-      await api.delete(`/categories/${id}`);
+      await adminApi.delete(`/admin/categories/${id}`);
       setCategories(categories.filter(c => c.id !== id));
     } catch (error) {
       console.error('Delete failed', error);
@@ -105,7 +97,7 @@ export default function AdminCategories() {
   const handleAddCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post('/categories', {
+      await adminApi.post('/admin/categories', {
         name: newName,
         description: newDescription,
       });

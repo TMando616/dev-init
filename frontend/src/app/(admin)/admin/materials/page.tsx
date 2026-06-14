@@ -2,11 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
+import { useAdminAuth } from '@/context/AdminAuthContext';
 import { Button } from '@/components/ui';
-import api from '@/lib/api';
-import { Edit2, Trash2, ArrowLeft, FileText, PlusCircle } from 'lucide-react';
+import adminApi from '@/lib/adminApi';
+import { Edit2, Trash2, FileText, PlusCircle } from 'lucide-react';
 
 interface Material {
   id: number;
@@ -17,20 +16,16 @@ interface Material {
 }
 
 export default function AdminMaterials() {
-  const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
+  const { admin, loading: authLoading } = useAdminAuth();
   const [materials, setMaterials] = useState<Material[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!authLoading && (!user || user.role !== 'admin')) {
-      router.push('/');
-      return;
-    }
+    if (!admin) return;
 
     const fetchMaterials = async () => {
       try {
-        const response = await api.get('/materials');
+        const response = await adminApi.get('/materials');
         setMaterials(response.data);
       } catch (error) {
         console.error('Failed to fetch materials', error);
@@ -39,16 +34,14 @@ export default function AdminMaterials() {
       }
     };
 
-    if (user?.role === 'admin') {
-      fetchMaterials();
-    }
-  }, [user, authLoading, router]);
+    fetchMaterials();
+  }, [admin]);
 
   const handleDelete = async (id: number) => {
     if (!confirm('この学習資料を削除してもよろしいですか？')) return;
 
     try {
-      await api.delete(`/materials/${id}`);
+      await adminApi.delete(`/admin/materials/${id}`);
       setMaterials(materials.filter((m) => m.id !== id));
     } catch {
       alert('削除に失敗しました。');
@@ -63,9 +56,6 @@ export default function AdminMaterials() {
     <div className="min-h-screen bg-slate-50">
       <header className="bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/" className="text-slate-500 hover:text-slate-900 transition-colors">
-            <ArrowLeft size={20} />
-          </Link>
           <h1 className="text-xl font-bold">学習資料管理</h1>
         </div>
         <Link href="/admin/materials/new">

@@ -3,9 +3,9 @@
 import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@/context/AuthContext';
+import { useAdminAuth } from '@/context/AdminAuthContext';
 import { Button, Input, Select } from '@/components/ui';
-import api from '@/lib/api';
+import adminApi from '@/lib/adminApi';
 import Editor from '@monaco-editor/react';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 import { ArrowLeft, Save } from 'lucide-react';
@@ -19,7 +19,7 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
   const { id } = use(params);
   const isNew = id === 'new';
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { admin, loading: authLoading } = useAdminAuth();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -30,14 +30,11 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && (!user || user.role !== 'admin')) {
-      router.push('/');
-      return;
-    }
+    if (!admin) return;
 
     const fetchCategories = async () => {
       try {
-        const response = await api.get('/categories');
+        const response = await adminApi.get('/categories');
         setCategories(response.data);
       } catch {
         console.error('Failed to fetch categories');
@@ -48,7 +45,7 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
     if (!isNew) {
       const fetchMaterial = async () => {
         try {
-          const response = await api.get(`/materials/${id}`);
+          const response = await adminApi.get(`/materials/${id}`);
           const { material } = response.data;
           setTitle(material.title);
           setContent(material.content);
@@ -63,7 +60,7 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
       };
       fetchMaterial();
     }
-  }, [id, isNew, user, authLoading, router]);
+  }, [id, isNew, admin, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,9 +75,9 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
 
     try {
       if (isNew) {
-        await api.post('/materials', payload);
+        await adminApi.post('/admin/materials', payload);
       } else {
-        await api.put(`/materials/${id}`, payload);
+        await adminApi.put(`/admin/materials/${id}`, payload);
       }
       router.push('/admin/materials');
     } catch {

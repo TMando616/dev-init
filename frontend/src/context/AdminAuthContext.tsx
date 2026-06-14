@@ -56,7 +56,20 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    checkAuth();
+    let isMounted = true;
+
+    const initAuth = async () => {
+      await checkAuth();
+      if (isMounted) {
+        // state already updated inside checkAuth
+      }
+    };
+
+    initAuth();
+
+    return () => {
+      isMounted = false;
+    };
   }, [checkAuth]);
 
   useEffect(() => {

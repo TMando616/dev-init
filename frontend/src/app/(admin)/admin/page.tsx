@@ -2,11 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
+import { useAdminAuth } from '@/context/AdminAuthContext';
 import { Button } from '@/components/ui';
-import api from '@/lib/api';
-import { Edit2, Trash2, ArrowLeft, BookOpen } from 'lucide-react';
+import adminApi from '@/lib/adminApi';
+import { Edit2, Trash2, BookOpen } from 'lucide-react';
 
 interface Lesson {
   id: number;
@@ -15,20 +14,16 @@ interface Lesson {
 }
 
 export default function AdminDashboard() {
-  const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
+  const { admin, loading: authLoading } = useAdminAuth();
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!authLoading && (!user || user.role !== 'admin')) {
-      router.push('/');
-      return;
-    }
+    if (!admin) return;
 
     const fetchLessons = async () => {
       try {
-        const response = await api.get('/lessons');
+        const response = await adminApi.get('/lessons');
         setLessons(response.data);
       } catch (error) {
         console.error('Failed to fetch lessons', error);
@@ -37,16 +32,14 @@ export default function AdminDashboard() {
       }
     };
 
-    if (user?.role === 'admin') {
-      fetchLessons();
-    }
-  }, [user, authLoading, router]);
+    fetchLessons();
+  }, [admin]);
 
   const handleDelete = async (id: number) => {
     if (!confirm('このレッスンを削除してもよろしいですか？')) return;
 
     try {
-      await api.delete(`/lessons/${id}`);
+      await adminApi.delete(`/admin/lessons/${id}`);
       setLessons(lessons.filter(l => l.id !== id));
     } catch (error) {
       console.error('Delete failed', error);
@@ -62,9 +55,6 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-slate-50">
       <header className="bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/" className="text-slate-500 hover:text-slate-900 transition-colors">
-            <ArrowLeft size={20} />
-          </Link>
           <h1 className="text-xl font-bold">レッスン管理</h1>
         </div>
       </header>
