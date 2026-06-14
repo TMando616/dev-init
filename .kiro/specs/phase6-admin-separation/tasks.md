@@ -13,7 +13,7 @@
   - email ユニーク、password はデフォルトハッシュ
 
 ## 2. Backend: 認証ガード
-- [ ] 2.1 `config/auth.php` に `admins` provider と `admin` ガード（driver=sanctum, provider=admins）を追加（design §2.1）
+- [x] 2.1 `config/auth.php` に `admins` provider と `admin` ガード（driver=sanctum, provider=admins）を追加（design §2.1）
 
 ## 3. Backend: Repository・Service
 - [ ] 3.1 `AdminRepository` 作成（all/find/findByEmail/create/delete）
