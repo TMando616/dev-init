@@ -4,12 +4,12 @@
 各サブタスク完了ごとにコミットする。`design.md` の §番号を適宜参照。
 
 ## 1. Backend: モデル・DB（admins 新設）
-- [ ] 1.1 `admins` テーブルのマイグレーション作成（`create_admins_table`）
+- [x] 1.1 `admins` テーブルのマイグレーション作成（`create_admins_table`）
   - カラム: `id`, `name`, `email`(unique), `password`, `remember_token`(nullable), timestamps（design §1.1）
-- [ ] 1.2 `Admin` モデルの作成（`app/Models/Admin.php`）
+- [x] 1.2 `Admin` モデルの作成（`app/Models/Admin.php`）
   - `Authenticatable` 継承＋`HasApiTokens, HasFactory, Notifiable`、`#[Fillable(['name','email','password'])]`、`#[Hidden([...])]`、`casts: password=>hashed`
   - submissions リレーション・role 判定は **持たない**（design §2.2）
-- [ ] 1.3 `AdminFactory` の作成（`database/factories/AdminFactory.php`）
+- [x] 1.3 `AdminFactory` の作成（`database/factories/AdminFactory.php`）
   - email ユニーク、password はデフォルトハッシュ
 
 ## 2. Backend: 認証ガード
