@@ -42,12 +42,14 @@
 - [x] 5.3 `UserFactory` から `admin()` state を削除
 
 ## 6. Backend: テスト
-- [ ] 6.1 既存テスト更新（`role` 前提・`User::factory()->admin()`・旧 `/users` を新方式へ）（design §6.1）
-- [ ] 6.2 `AdminAuthTest`（管理者ログイン成功 / 生徒資格情報での管理者ログイン拒否）
-- [ ] 6.3 `AdminGuardIsolationTest`（生徒トークン→管理API 401 / 管理者トークン→生徒専用API 401）
-- [ ] 6.4 `AdminManagementTest`（管理者作成 / `/admin/register` が404 / self-delete 400）
-- [ ] 6.5 `StudentManagementTest`（生徒CRUD、一覧に管理者が混ざらない）
-- [ ] 6.6 （任意）`MigrationTest`（`migrate:fresh --seed` 後 admin が admins に存在・users に role 列が無い）
+- [x] 6.1 既存テスト更新（`role` 前提・`User::factory()->admin()`・旧 `/users` を新方式へ）（design §6.1）
+  - Lesson/Category/MaterialTest: admin を `Admin::factory()`＋`actingAs(...,'admin')`、書き込みを `/api/admin/*` に、生徒の不可テストは 401 に更新
+- [x] 6.2 `AdminAuthTest`（管理者ログイン成功 / 生徒資格情報での管理者ログイン拒否 / me / logout）
+- [x] 6.3 `AdminGuardIsolationTest`（生徒トークン→管理API 401 / 管理者トークン→生徒専用API 401 / 共有GETは両方200）
+- [x] 6.4 `AdminManagementTest`（管理者作成 / `/admin/register` が404 / self-delete 400）
+- [x] 6.5 `StudentManagementTest`（生徒CRUD、一覧に管理者が混ざらない）
+- [ ] 6.6 （任意）`MigrationTest` — 未着手（任意のため後回し可）
+- [ ] ⚠️ テスト実行は環境準備待ち（ホストPHPに `pdo_sqlite` 無し／Docker未起動）。`php8.4-sqlite3` 導入後 or docker で要実行（→ 11.1）
 
 ## 7. Frontend: 認証・APIクライアント分離
 - [ ] 7.1 `src/lib/adminApi.ts` 作成（`admin_token` を Bearer 付与、401→`/admin/login`）（design §3.4）

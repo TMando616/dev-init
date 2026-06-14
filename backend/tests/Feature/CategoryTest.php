@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Admin;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -12,13 +13,13 @@ class CategoryTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
-    protected User $admin;
+    protected Admin $admin;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = User::factory()->create(['role' => 'user']);
-        $this->admin = User::factory()->create(['role' => 'admin']);
+        $this->user = User::factory()->create();
+        $this->admin = Admin::factory()->create();
     }
 
     public function test_user_can_list_categories()
@@ -43,20 +44,20 @@ class CategoryTest extends TestCase
             ->assertJsonPath('name', $category->name);
     }
 
-    public function test_user_cannot_create_category()
+    public function test_student_cannot_create_category()
     {
         $response = $this->actingAs($this->user, 'sanctum')
-            ->postJson('/api/categories', [
+            ->postJson('/api/admin/categories', [
                 'name' => 'New Category',
             ]);
 
-        $response->assertStatus(403);
+        $response->assertStatus(401);
     }
 
     public function test_admin_can_create_category()
     {
-        $response = $this->actingAs($this->admin, 'sanctum')
-            ->postJson('/api/categories', [
+        $response = $this->actingAs($this->admin, 'admin')
+            ->postJson('/api/admin/categories', [
                 'name' => 'Admin Category',
                 'description' => 'Description',
             ]);
@@ -71,8 +72,8 @@ class CategoryTest extends TestCase
     {
         $category = Category::factory()->create();
 
-        $response = $this->actingAs($this->admin, 'sanctum')
-            ->putJson("/api/categories/{$category->id}", [
+        $response = $this->actingAs($this->admin, 'admin')
+            ->putJson("/api/admin/categories/{$category->id}", [
                 'name' => 'Updated Category',
             ]);
 
@@ -84,8 +85,8 @@ class CategoryTest extends TestCase
     {
         $category = Category::factory()->create();
 
-        $response = $this->actingAs($this->admin, 'sanctum')
-            ->deleteJson("/api/categories/{$category->id}");
+        $response = $this->actingAs($this->admin, 'admin')
+            ->deleteJson("/api/admin/categories/{$category->id}");
 
         $response->assertStatus(204);
         $this->assertDatabaseMissing('categories', ['id' => $category->id]);

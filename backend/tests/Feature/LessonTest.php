@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Admin;
 use App\Models\Lesson;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -12,13 +13,13 @@ class LessonTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
-    protected User $admin;
+    protected Admin $admin;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = User::factory()->create(['role' => 'user']);
-        $this->admin = User::factory()->create(['role' => 'admin']);
+        $this->user = User::factory()->create();
+        $this->admin = Admin::factory()->create();
     }
 
     public function test_user_can_list_lessons()
@@ -43,21 +44,21 @@ class LessonTest extends TestCase
             ->assertJsonPath('title', $lesson->title);
     }
 
-    public function test_user_cannot_create_lesson()
+    public function test_student_cannot_create_lesson()
     {
         $response = $this->actingAs($this->user, 'sanctum')
-            ->postJson('/api/lessons', [
+            ->postJson('/api/admin/lessons', [
                 'title' => 'New Lesson',
                 'content' => 'Content',
             ]);
 
-        $response->assertStatus(403);
+        $response->assertStatus(401);
     }
 
     public function test_admin_can_create_lesson()
     {
-        $response = $this->actingAs($this->admin, 'sanctum')
-            ->postJson('/api/lessons', [
+        $response = $this->actingAs($this->admin, 'admin')
+            ->postJson('/api/admin/lessons', [
                 'title' => 'Admin Lesson',
                 'content' => 'Admin Content',
                 'model_answer' => 'console.log(1)',
@@ -73,8 +74,8 @@ class LessonTest extends TestCase
     {
         $lesson = Lesson::factory()->create();
 
-        $response = $this->actingAs($this->admin, 'sanctum')
-            ->putJson("/api/lessons/{$lesson->id}", [
+        $response = $this->actingAs($this->admin, 'admin')
+            ->putJson("/api/admin/lessons/{$lesson->id}", [
                 'title' => 'Updated Title',
             ]);
 
@@ -86,8 +87,8 @@ class LessonTest extends TestCase
     {
         $lesson = Lesson::factory()->create();
 
-        $response = $this->actingAs($this->admin, 'sanctum')
-            ->deleteJson("/api/lessons/{$lesson->id}");
+        $response = $this->actingAs($this->admin, 'admin')
+            ->deleteJson("/api/admin/lessons/{$lesson->id}");
 
         $response->assertStatus(204);
         $this->assertDatabaseMissing('lessons', ['id' => $lesson->id]);

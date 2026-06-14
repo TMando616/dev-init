@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Admin;
 use App\Models\Category;
 use App\Models\Material;
 use App\Models\User;
@@ -13,13 +14,13 @@ class MaterialTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
-    protected User $admin;
+    protected Admin $admin;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user  = User::factory()->create(['role' => 'user']);
-        $this->admin = User::factory()->create(['role' => 'admin']);
+        $this->user  = User::factory()->create();
+        $this->admin = Admin::factory()->create();
     }
 
     public function test_user_can_list_materials(): void
@@ -92,23 +93,23 @@ class MaterialTest extends TestCase
         $response->assertStatus(404);
     }
 
-    public function test_user_cannot_create_material(): void
+    public function test_student_cannot_create_material(): void
     {
         $response = $this->actingAs($this->user, 'sanctum')
-            ->postJson('/api/materials', [
+            ->postJson('/api/admin/materials', [
                 'title'   => 'Test',
                 'content' => 'Content',
             ]);
 
-        $response->assertStatus(403);
+        $response->assertStatus(401);
     }
 
     public function test_admin_can_create_material(): void
     {
         $category = Category::factory()->create();
 
-        $response = $this->actingAs($this->admin, 'sanctum')
-            ->postJson('/api/materials', [
+        $response = $this->actingAs($this->admin, 'admin')
+            ->postJson('/api/admin/materials', [
                 'title'       => 'New Material',
                 'content'     => '# Hello',
                 'category_id' => $category->id,
@@ -125,8 +126,8 @@ class MaterialTest extends TestCase
     {
         $material = Material::factory()->create();
 
-        $response = $this->actingAs($this->admin, 'sanctum')
-            ->putJson("/api/materials/{$material->id}", [
+        $response = $this->actingAs($this->admin, 'admin')
+            ->putJson("/api/admin/materials/{$material->id}", [
                 'title' => 'Updated Title',
             ]);
 
@@ -138,8 +139,8 @@ class MaterialTest extends TestCase
     {
         $material = Material::factory()->create();
 
-        $response = $this->actingAs($this->admin, 'sanctum')
-            ->deleteJson("/api/materials/{$material->id}");
+        $response = $this->actingAs($this->admin, 'admin')
+            ->deleteJson("/api/admin/materials/{$material->id}");
 
         $response->assertStatus(204);
         $this->assertDatabaseMissing('materials', ['id' => $material->id]);
