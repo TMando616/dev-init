@@ -10,7 +10,7 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     /**
-     * Register a new user.
+     * Register a new student.
      */
     public function register(Request $request)
     {
@@ -24,7 +24,6 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'user',
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -37,7 +36,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Login user and create token.
+     * Login a student and create a token.
      */
     public function login(Request $request)
     {
@@ -64,7 +63,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Logout user (revoke token).
+     * Logout the student (revoke token).
      */
     public function logout(Request $request)
     {
@@ -76,86 +75,10 @@ class AuthController extends Controller
     }
 
     /**
-     * Get the authenticated user.
+     * Get the authenticated student.
      */
     public function user(Request $request)
     {
         return response()->json($request->user());
-    }
-
-    /**
-     * Create a new user (Admin only).
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|string|in:admin,user',
-        ]);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-        ]);
-
-        return response()->json($user, 201);
-    }
-
-    /**
-     * Display a listing of users (Admin only).
-     */
-    public function index()
-    {
-        return response()->json(User::all());
-    }
-
-    /**
-     * Update user information (Admin only).
-     */
-    public function update(Request $request, string $id)
-    {
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
-
-        $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $id,
-            'role' => 'sometimes|required|string|in:admin,user',
-            'password' => 'sometimes|nullable|string|min:8|confirmed',
-        ]);
-
-        if (isset($validated['password'])) {
-            $validated['password'] = Hash::make($validated['password']);
-        }
-
-        $user->update($validated);
-
-        return response()->json($user);
-    }
-
-    /**
-     * Remove the user from storage (Admin only).
-     */
-    public function destroy(string $id)
-    {
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
-
-        // Prevent self-deletion
-        if (auth()->id() == $id) {
-            return response()->json(['message' => 'Cannot delete yourself'], 400);
-        }
-
-        $user->delete();
-
-        return response()->json(null, 204);
     }
 }

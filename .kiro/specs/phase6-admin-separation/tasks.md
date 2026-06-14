@@ -22,17 +22,17 @@
 - [x] 3.4 `UserService` 作成（list/create/update/delete、パスワードは値があるときのみ Hash::make）
 
 ## 4. Backend: Controller・ルート
-- [ ] 4.1 `AdminAuthController` 作成（login / logout / me）。register は設けない（design §2.7）
-- [ ] 4.2 `Admin\AdminController` 作成（index / store / destroy）— 管理者アカウント管理（US-4）
-- [ ] 4.3 `Admin\UserController` 作成（index / store / update / destroy）— 生徒アカウント管理（US-3、`role` 無し）
-- [ ] 4.4 `AuthController` を生徒用に縮小（register/login/logout/user のみ、`role` 除去、CRUD系メソッド削除）
-- [ ] 4.5 `User` モデルから `role`（Fillable）と `isAdmin()` を削除（design §2.3）
-- [ ] 4.6 `routes/api.php` 再編（design §2.8）
+- [x] 4.1 `AdminAuthController` 作成（login / logout / me）。register は設けない（design §2.7）
+- [x] 4.2 `Admin\AdminController` 作成（index / store / destroy）— 管理者アカウント管理（US-4）
+- [x] 4.3 `Admin\UserController` 作成（index / store / update / destroy）— 生徒アカウント管理（US-3、`role` 無し）
+- [x] 4.4 `AuthController` を生徒用に縮小（register/login/logout/user のみ、`role` 除去、CRUD系メソッド削除）
+- [x] 4.5 `User` モデルから `role`（Fillable）と `isAdmin()` を削除（design §2.3）
+- [x] 4.6 `routes/api.php` 再編（design §2.8）
   - `POST /admin/login` 公開追加
   - `auth:admin` prefix `admin` グループ: me/logout、`/admins` CRUD、`/users` CRUD、lessons/categories/materials の書き込み系を移設
   - 参照系 GET（lessons/categories/materials index・show）を `auth:sanctum,admin` の複数ガードに変更
   - 旧 `admin` ミドルウェア配下の CRUD ブロックを撤去
-- [ ] 4.7 `AdminMiddleware` 削除＋`bootstrap/app.php` の `admin` alias 削除（design §2.4）
+- [x] 4.7 `AdminMiddleware` 削除＋`bootstrap/app.php` の `admin` alias 削除（design §2.4）
 
 ## 5. Backend: 移行・シーダー
 - [ ] 5.1 `remove_role_from_users` マイグレーション作成（design §2.10）
