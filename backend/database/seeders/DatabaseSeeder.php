@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Admin;
 use App\Models\Category;
 use App\Models\Lesson;
 use App\Models\User;
@@ -34,13 +35,13 @@ class DatabaseSeeder extends Seeder
             'description' => 'HTML, CSSを使用したモダンなWebデザインを学びます。',
         ]);
 
-        // Admin user
-        User::factory()->admin()->create([
+        // Admin (managed separately from students)
+        Admin::factory()->create([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
         ]);
 
-        // Regular user
+        // Student
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',

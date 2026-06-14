@@ -35,11 +35,11 @@
 - [x] 4.7 `AdminMiddleware` 削除＋`bootstrap/app.php` の `admin` alias 削除（design §2.4）
 
 ## 5. Backend: 移行・シーダー
-- [ ] 5.1 `remove_role_from_users` マイグレーション作成（design §2.10）
+- [x] 5.1 `remove_role_from_users` マイグレーション作成（design §2.10）
   - up: `users.role='admin'` を `admins` へコピー（**パスワードハッシュそのまま・再ハッシュしない**、email 重複skip）→ 該当 user 行削除 → `role` 列 drop
   - down: `users.role`(string default 'user') を再追加
-- [ ] 5.2 `DatabaseSeeder` 更新（admin を `Admin::factory()` で作成、生徒の `->admin()` state 利用を除去）（design §2.11）
-- [ ] 5.3 `UserFactory` から `admin()` state を削除
+- [x] 5.2 `DatabaseSeeder` 更新（admin を `Admin::factory()` で作成、生徒の `->admin()` state 利用を除去）（design §2.11）
+- [x] 5.3 `UserFactory` から `admin()` state を削除
 
 ## 6. Backend: テスト
 - [ ] 6.1 既存テスト更新（`role` 前提・`User::factory()->admin()`・旧 `/users` を新方式へ）（design §6.1）
