@@ -43,6 +43,14 @@ return [
             'provider' => 'users',
         ],
 
+        // Pin the default Sanctum guard to the users provider. Without this,
+        // Sanctum registers it with provider=null, which accepts ANY token
+        // (including admin tokens) — letting admins reach student-only routes.
+        'sanctum' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
+
         'admin' => [
             'driver' => 'sanctum',
             'provider' => 'admins',

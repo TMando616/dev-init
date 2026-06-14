@@ -73,9 +73,12 @@
 - [x] 10.1 `frontend/src/lib/codeRunner.ts` 削除（参照ゼロ確認済み）（design §4）
 
 ## 11. 動作確認・lint
-- [ ] 11.1 バックエンドテスト実行（`php artisan test`）— ⚠️ 環境ブロック中（ホストPHPに `pdo_sqlite` 無し／Docker未起動）。`php8.4-sqlite3` 導入 or docker で要実行
-- [ ] 11.2 `php artisan migrate:fresh --seed` が通り、admin が `admins`・生徒が `users` に入ることを確認 — ⚠️ 同上（要DB環境）
-- [x] 11.3 フロントエンド lint（`npm run lint`）パス。build は ⚠️ 環境ブロック（`next build` が WSL2 で Bus error／`.next` が稼働中 dev サーバ所有でクリーン不可）。要クリーン環境で `npm run build`
-- [ ] 11.4 ブラウザ／API で end-to-end 確認 — 環境準備後に実施
+- [x] 11.1 バックエンドテスト実行（docker `php artisan test`）— **57 passed**（CodeExecution の php/python はイメージ warm 後パス）
+- [x] 11.2 `php artisan migrate:fresh --seed` 成功。admins=1(admin@example.com)／users=1(test@example.com)／users.role 列なし を確認（US-6）
+- [x] 11.3 フロントエンド lint パス。build は **クリーンな `.next` で成功**（13ページ生成・route group URL 正常・Proxy 認識）。※`docker compose exec` での build は稼働中 dev サーバと `.next` 競合で誤エラーになるため、独立 `.next` でビルドすること
+- [ ] 11.4 ブラウザでの最終 e2e（任意）— API/ガードレベルはテストで担保済み。実ブラウザ確認は任意
   - 管理者ログイン→管理画面操作、生徒ログイン→学習フロー
   - 生徒トークンで `/admin/*` 拒否、未認証で `/admin` →`/admin/login` リダイレクト
+
+## 12. 実装中に判明した修正
+- [x] 12.1 **Sanctum ガード分離の穴を修正**: 既定 `sanctum` ガードは provider=null で登録されany トークンを通すため、Admin トークンで生徒専用APIに到達できた（`AdminGuardIsolationTest` が検出）。`config/auth.php` に `sanctum` ガードを `provider => 'users'` で明示して是正。
