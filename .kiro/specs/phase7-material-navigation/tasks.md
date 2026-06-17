@@ -5,14 +5,14 @@
 
 ## 1. Backend: LessonRepository の拡張
 
-- [ ] 1.1 `LessonRepository::find()` の eager load を `categories` → `categories.materials` に変更する（design §1.1）
+- [x] 1.1 `LessonRepository::find()` の eager load を `categories` → `categories.materials` に変更する（design §1.1）
   - 対象: `backend/app/Repositories/LessonRepository.php`
   - `Lesson::with(['categories.materials'])->find($id)`
   - `all()` は変更しない
 
 ## 2. Frontend: MaterialModal コンポーネント新規作成
 
-- [ ] 2.1 `MaterialModal.tsx` を作成する（design §2.2）
+- [x] 2.1 `MaterialModal.tsx` を作成する（design §2.2）
   - 対象: `frontend/src/components/MaterialModal.tsx`
   - props: `material: { id: number; title: string; content: string } | null`, `onClose: () => void`
   - `material === null` のとき何も返さない
