@@ -7,10 +7,23 @@ import { Button } from '@/components/ui';
 import api from '@/lib/api';
 import Editor from '@monaco-editor/react';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
-import { ChevronLeft, Save, Play, Eye, EyeOff, CloudCheck, CloudUpload, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, Save, Play, Eye, EyeOff, CloudCheck, CloudUpload, CheckCircle2, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { Console } from '@/components/Console';
 import { isAxiosError } from 'axios';
+import MaterialModal from '@/components/MaterialModal';
+
+interface Material {
+  id: number;
+  title: string;
+  content: string;
+}
+
+interface Category {
+  id: number;
+  name: string;
+  materials: Material[];
+}
 
 interface Lesson {
   id: number;
@@ -19,6 +32,7 @@ interface Lesson {
   content: string;
   model_answer?: string;
   expected_output?: string;
+  categories: Category[];
 }
 
 export default function LessonPage({ params }: { params: Promise<{ id: string }> }) {
@@ -34,6 +48,7 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [showModelAnswer, setShowModelAnswer] = useState(false);
+  const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
 
   // Execution State
   const [logs, setLogs] = useState<string[]>([]);
@@ -190,12 +205,17 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
     );
   }
 
+  const relatedMaterials = lesson.categories.flatMap(c => c.materials);
+  const backHref = lesson.categories.length > 0
+    ? `/categories/${lesson.categories[0].id}`
+    : '/';
+
   return (
     <div className="flex flex-col h-screen bg-slate-900 text-slate-100">
       {/* Header */}
       <header className="h-14 border-b border-slate-700 bg-slate-800 px-4 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center gap-4">
-          <Link href="/" className="p-2 hover:bg-slate-700 rounded-lg transition-colors text-slate-400 hover:text-slate-100">
+          <Link href={backHref} className="p-2 hover:bg-slate-700 rounded-lg transition-colors text-slate-400 hover:text-slate-100">
             <ChevronLeft size={20} />
           </Link>
           <h1 className="font-bold text-lg truncate max-w-[300px] md:max-w-md">
@@ -258,6 +278,25 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
       <main className="flex-1 flex overflow-hidden">
         {/* Left Pane: Instructions */}
         <div className={`${showModelAnswer ? 'w-1/3' : 'w-1/2'} overflow-y-auto bg-white text-slate-900 p-8 border-r border-slate-200 transition-all`}>
+          {relatedMaterials.length > 0 && (
+            <div className="mb-6">
+              <h2 className="flex items-center gap-2 text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
+                <FileText size={14} />
+                参考資料
+              </h2>
+              <div className="flex flex-col gap-2">
+                {relatedMaterials.map(material => (
+                  <button
+                    key={material.id}
+                    onClick={() => setSelectedMaterial(material)}
+                    className="text-left px-4 py-2.5 rounded-lg border border-slate-200 hover:border-blue-400 hover:bg-blue-50 transition-colors text-sm text-slate-700 font-medium"
+                  >
+                    {material.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <MarkdownRenderer content={lesson.content} />
         </div>
 
@@ -345,6 +384,8 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
           </div>
         </div>
       </main>
+
+      <MaterialModal material={selectedMaterial} onClose={() => setSelectedMaterial(null)} />
     </div>
   );
 }

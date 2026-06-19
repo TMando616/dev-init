@@ -22,34 +22,34 @@
 
 ## 3. Frontend: 演習ページの変更
 
-- [ ] 3.1 `Lesson` interface を拡張する（design §2.1）
+- [x] 3.1 `Lesson` interface を拡張する（design §2.1）
   - 対象: `(student)/lessons/[id]/page.tsx`
   - `Material` / `Category` interface を追加
   - `Lesson.categories: Category[]` フィールドを追加
 
-- [ ] 3.2 参考資料セクションを左ペイン上部に追加する（US-1、design §2.3.1）
+- [x] 3.2 参考資料セクションを左ペイン上部に追加する（US-1、design §2.3.1）
   - `relatedMaterials = lesson.categories.flatMap(c => c.materials)` を導出
   - `relatedMaterials.length > 0` のときのみセクションを描画
   - 資料カードクリックで `setSelectedMaterial(material)`
   - `MaterialModal` を描画（`selectedMaterial` が null でなければ表示）
 
-- [ ] 3.3 Backボタンのリンク先をカテゴリページに修正する（US-2、design §2.3.2）
+- [x] 3.3 Backボタンのリンク先をカテゴリページに修正する（US-2、design §2.3.2）
   - `lesson.categories[0]` が存在する場合は `/categories/${lesson.categories[0].id}` へ
   - 存在しない場合は `/` へ（フォールバック）
 
 ## 4. Frontend: レッスン一覧ページの変更
 
-- [ ] 4.1 `/categories` と `/lessons` を並列フェッチする（design §2.4）
+- [x] 4.1 `/categories` と `/lessons` を並列フェッチする（design §2.4）
   - 対象: `(student)/lessons/list/page.tsx`
   - `Promise.all([api.get('/categories'), api.get('/lessons')])`
   - state: `categories` と `lessons` を分けて管理
 
-- [ ] 4.2 カテゴリ別グルーピングロジックを実装する（US-3、design §2.4）
+- [x] 4.2 カテゴリ別グルーピングロジックを実装する（US-3、design §2.4）
   - `grouped`: カテゴリ順に並んだ `{ category, lessons[] }` の配列
   - `uncategorized`: `categories` が空のレッスン
   - `categories.length === 0` のときはフラット表示にフォールバック
 
-- [ ] 4.3 カテゴリ別セクション UI を実装する（US-3）
+- [x] 4.3 カテゴリ別セクション UI を実装する（US-3）
   - カテゴリ見出し（カテゴリ名）→ レッスンカード一覧（既存カードデザインを再利用）
   - `uncategorized.length > 0` のとき「その他」セクションを末尾に追加
   - 空のカテゴリセクション（対象レッスン0件）は表示しない
