@@ -22,6 +22,11 @@ class Lesson extends Model
         return $this->belongsToMany(Category::class);
     }
 
+    public function materials()
+    {
+        return $this->hasMany(Material::class)->orderBy('order')->orderBy('id');
+    }
+
     public function submissions()
     {
         return $this->hasMany(Submission::class);

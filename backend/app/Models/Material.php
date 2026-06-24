@@ -13,13 +13,13 @@ class Material extends Model
     protected $fillable = [
         'title',
         'content',
-        'category_id',
+        'lesson_id',
         'order',
     ];
 
-    public function category()
+    public function lesson()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Lesson::class);
     }
 
     public function scopeOrdered(Builder $query): Builder

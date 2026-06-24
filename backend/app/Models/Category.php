@@ -20,8 +20,5 @@ class Category extends Model
         return $this->belongsToMany(Lesson::class);
     }
 
-    public function materials()
-    {
-        return $this->hasMany(Material::class);
-    }
+
 }
