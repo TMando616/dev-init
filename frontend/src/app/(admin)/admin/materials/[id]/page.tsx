@@ -10,9 +10,9 @@ import Editor from '@monaco-editor/react';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 import { ArrowLeft, Save } from 'lucide-react';
 
-interface Category {
+interface Lesson {
   id: number;
-  name: string;
+  title: string;
 }
 
 export default function MaterialEditor({ params }: { params: Promise<{ id: string }> }) {
@@ -24,23 +24,23 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [order, setOrder] = useState(0);
-  const [categoryId, setCategoryId] = useState<string>('');
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [lessonId, setLessonId] = useState<string>('');
+  const [lessons, setLessons] = useState<Lesson[]>([]);
   const [isLoading, setIsLoading] = useState(!isNew);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (!admin) return;
 
-    const fetchCategories = async () => {
+    const fetchLessons = async () => {
       try {
-        const response = await adminApi.get('/categories');
-        setCategories(response.data);
+        const response = await adminApi.get('/lessons');
+        setLessons(response.data);
       } catch {
-        console.error('Failed to fetch categories');
+        console.error('Failed to fetch lessons');
       }
     };
-    fetchCategories();
+    fetchLessons();
 
     if (!isNew) {
       const fetchMaterial = async () => {
@@ -50,7 +50,7 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
           setTitle(material.title);
           setContent(material.content);
           setOrder(material.order);
-          setCategoryId(material.category_id ? String(material.category_id) : '');
+          setLessonId(material.lesson_id ? String(material.lesson_id) : '');
         } catch {
           alert('資料の取得に失敗しました。');
           router.push('/admin/materials');
@@ -64,13 +64,17 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!lessonId) {
+      alert('レッスンを選択してください');
+      return;
+    }
     setIsSaving(true);
 
     const payload = {
       title,
       content,
       order,
-      category_id: categoryId ? Number(categoryId) : null,
+      lesson_id: Number(lessonId),
     };
 
     try {
@@ -134,12 +138,14 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">カテゴリ</label>
-              <Select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-                <option value="">— なし —</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={String(cat.id)}>
-                    {cat.name}
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                レッスン <span className="text-red-500">*</span>
+              </label>
+              <Select value={lessonId} onChange={(e) => setLessonId(e.target.value)} required>
+                <option value="" disabled>— レッスンを選択 —</option>
+                {lessons.map((lesson) => (
+                  <option key={lesson.id} value={String(lesson.id)}>
+                    {lesson.title}
                   </option>
                 ))}
               </Select>

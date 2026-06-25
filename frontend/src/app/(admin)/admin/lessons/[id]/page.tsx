@@ -37,6 +37,7 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(!isNew);
   const [isSaving, setIsSaving] = useState(false);
+  const [categoryError, setCategoryError] = useState('');
 
   useEffect(() => {
     if (!admin) return;
@@ -76,6 +77,11 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (selectedCategoryIds.length === 0) {
+      setCategoryError('カテゴリを1つ以上選択してください');
+      return;
+    }
+    setCategoryError('');
     setIsSaving(true);
 
     const payload = {
@@ -159,9 +165,9 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
             </div>
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
-                カテゴリ (複数選択可)
+                カテゴリ <span className="text-red-500">*</span>
               </label>
-              <div className="flex flex-wrap gap-2 p-3 border border-slate-200 rounded-md bg-slate-50/50 min-h-[42px]">
+              <div className={`flex flex-wrap gap-2 p-3 border rounded-md bg-slate-50/50 min-h-[42px] ${categoryError ? 'border-red-400' : 'border-slate-200'}`}>
                 {categories.map((category) => (
                   <label key={category.id} className="flex items-center gap-2 cursor-pointer bg-white px-2 py-1 rounded border border-slate-200 hover:border-slate-300 transition-colors">
                     <input
@@ -183,6 +189,9 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
                   <span className="text-xs text-slate-500 italic">カテゴリ未登録</span>
                 )}
               </div>
+              {categoryError && (
+                <p className="mt-1 text-xs text-red-500">{categoryError}</p>
+              )}
             </div>
           </div>
 

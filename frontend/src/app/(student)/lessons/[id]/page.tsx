@@ -22,7 +22,6 @@ interface Material {
 interface Category {
   id: number;
   name: string;
-  materials: Material[];
 }
 
 interface Lesson {
@@ -33,6 +32,7 @@ interface Lesson {
   model_answer?: string;
   expected_output?: string;
   categories: Category[];
+  materials: Material[];
 }
 
 export default function LessonPage({ params }: { params: Promise<{ id: string }> }) {
@@ -205,7 +205,7 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
     );
   }
 
-  const relatedMaterials = lesson.categories.flatMap(c => c.materials);
+  const relatedMaterials = lesson.materials;
   const backHref = lesson.categories.length > 0
     ? `/categories/${lesson.categories[0].id}`
     : '/';

@@ -5,20 +5,26 @@ import Link from 'next/link';
 import { useAdminAuth } from '@/context/AdminAuthContext';
 import { Button, Input } from '@/components/ui';
 import adminApi from '@/lib/adminApi';
-import { Tag, Edit2, Trash2, X, Check, Plus, ArrowLeft } from 'lucide-react';
+import { Tag, Edit2, Trash2, X, Check, Plus, ArrowLeft, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Category {
   id: number;
   name: string;
   description: string | null;
+  lessons_count: number;
   created_at: string;
+}
+
+interface Lesson {
+  id: number;
+  title: string;
 }
 
 export default function AdminCategories() {
   const { admin, loading: authLoading } = useAdminAuth();
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Edit State
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editName, setEditName] = useState('');
@@ -29,6 +35,11 @@ export default function AdminCategories() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newName, setNewName] = useState('');
   const [newDescription, setNewDescription] = useState('');
+
+  // Expand State
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [expandedLessons, setExpandedLessons] = useState<Lesson[]>([]);
+  const [isLoadingLessons, setIsLoadingLessons] = useState(false);
 
   useEffect(() => {
     if (!admin) return;
@@ -55,6 +66,25 @@ export default function AdminCategories() {
       console.error('Failed to fetch categories', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleToggleExpand = async (categoryId: number) => {
+    if (expandedId === categoryId) {
+      setExpandedId(null);
+      setExpandedLessons([]);
+      return;
+    }
+    setExpandedId(categoryId);
+    setIsLoadingLessons(true);
+    try {
+      const response = await adminApi.get(`/categories/${categoryId}`);
+      setExpandedLessons(response.data.lessons ?? []);
+    } catch (error) {
+      console.error('Failed to fetch category lessons', error);
+      setExpandedLessons([]);
+    } finally {
+      setIsLoadingLessons(false);
     }
   };
 
@@ -88,6 +118,10 @@ export default function AdminCategories() {
     try {
       await adminApi.delete(`/admin/categories/${id}`);
       setCategories(categories.filter(c => c.id !== id));
+      if (expandedId === id) {
+        setExpandedId(null);
+        setExpandedLessons([]);
+      }
     } catch (error) {
       console.error('Delete failed', error);
       alert('削除に失敗しました。レッスンが紐付いている可能性があります。');
@@ -137,90 +171,129 @@ export default function AdminCategories() {
               <tr>
                 <th className="px-6 py-4 font-semibold text-slate-700">カテゴリ名</th>
                 <th className="px-6 py-4 font-semibold text-slate-700">説明</th>
+                <th className="px-6 py-4 font-semibold text-slate-700">レッスン数</th>
                 <th className="px-6 py-4 font-semibold text-slate-700 text-right">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {categories.length > 0 ? (
                 categories.map((c) => (
-                  <tr key={c.id} className={`hover:bg-slate-50 transition-colors ${editingId === c.id ? 'bg-blue-50/50' : ''}`}>
-                    <td className="px-6 py-4">
-                      {editingId === c.id ? (
-                        <Input 
-                          value={editName} 
-                          onChange={(e) => setEditName(e.target.value)} 
-                          className="h-9 bg-white"
-                          placeholder="カテゴリ名"
-                        />
-                      ) : (
-                        <div className="flex items-center gap-3">
-                          <Tag size={18} className="text-slate-400" />
-                          <span className="font-medium text-slate-900">{c.name}</span>
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-slate-600 text-sm">
-                      {editingId === c.id ? (
-                        <Input 
-                          value={editDescription} 
-                          onChange={(e) => setEditDescription(e.target.value)} 
-                          className="h-9 bg-white"
-                          placeholder="説明 (任意)"
-                        />
-                      ) : (
-                        <span className="text-slate-500">{c.description || '-'}</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2">
+                  <React.Fragment key={c.id}>
+                    <tr className={`hover:bg-slate-50 transition-colors ${editingId === c.id ? 'bg-blue-50/50' : ''}`}>
+                      <td className="px-6 py-4">
                         {editingId === c.id ? (
-                          <>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                              onClick={handleUpdate}
-                              disabled={isUpdating}
-                            >
-                              <Check size={16} />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="text-slate-500 hover:text-slate-600 hover:bg-slate-100"
-                              onClick={() => setEditingId(null)}
-                              disabled={isUpdating}
-                            >
-                              <X size={16} />
-                            </Button>
-                          </>
+                          <Input
+                            value={editName}
+                            onChange={(e) => setEditName(e.target.value)}
+                            className="h-9 bg-white"
+                            placeholder="カテゴリ名"
+                          />
                         ) : (
-                          <>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                              onClick={() => handleEditStart(c)}
-                            >
-                              <Edit2 size={16} />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                              onClick={() => handleDelete(c.id)}
-                            >
-                              <Trash2 size={16} />
-                            </Button>
-                          </>
+                          <div className="flex items-center gap-3">
+                            <Tag size={18} className="text-slate-400" />
+                            <span className="font-medium text-slate-900">{c.name}</span>
+                          </div>
                         )}
-                      </div>
-                    </td>
-                  </tr>
+                      </td>
+                      <td className="px-6 py-4 text-slate-600 text-sm">
+                        {editingId === c.id ? (
+                          <Input
+                            value={editDescription}
+                            onChange={(e) => setEditDescription(e.target.value)}
+                            className="h-9 bg-white"
+                            placeholder="説明 (任意)"
+                          />
+                        ) : (
+                          <span className="text-slate-500">{c.description || '-'}</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <button
+                          onClick={() => handleToggleExpand(c.id)}
+                          className="flex items-center gap-1.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+                        >
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                            <BookOpen size={12} />
+                            {c.lessons_count}
+                          </span>
+                          {expandedId === c.id ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                        </button>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex justify-end gap-2">
+                          {editingId === c.id ? (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                onClick={handleUpdate}
+                                disabled={isUpdating}
+                              >
+                                <Check size={16} />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-slate-500 hover:text-slate-600 hover:bg-slate-100"
+                                onClick={() => setEditingId(null)}
+                                disabled={isUpdating}
+                              >
+                                <X size={16} />
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                onClick={() => handleEditStart(c)}
+                              >
+                                <Edit2 size={16} />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                onClick={() => handleDelete(c.id)}
+                              >
+                                <Trash2 size={16} />
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                    {expandedId === c.id && (
+                      <tr>
+                        <td colSpan={4} className="px-6 py-3 bg-slate-50 border-b border-slate-100">
+                          {isLoadingLessons ? (
+                            <p className="text-sm text-slate-400">読み込み中...</p>
+                          ) : expandedLessons.length > 0 ? (
+                            <div className="flex flex-wrap gap-2">
+                              {expandedLessons.map((lesson) => (
+                                <Link
+                                  key={lesson.id}
+                                  href={`/admin/lessons/${lesson.id}`}
+                                  className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-200 bg-white text-sm text-slate-700 hover:border-slate-400 transition-colors"
+                                >
+                                  <BookOpen size={12} className="text-slate-400" />
+                                  {lesson.title}
+                                </Link>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-slate-400">このカテゴリにはレッスンが登録されていません。</p>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={3} className="px-6 py-12 text-center text-slate-500">
+                  <td colSpan={4} className="px-6 py-12 text-center text-slate-500">
                     カテゴリが登録されていません。
                   </td>
                 </tr>

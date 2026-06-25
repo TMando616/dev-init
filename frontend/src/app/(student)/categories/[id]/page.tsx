@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
-import { ChevronRight, BookOpen, ArrowLeft, Tag, FileText } from 'lucide-react';
+import { ChevronRight, BookOpen, ArrowLeft, Tag } from 'lucide-react';
 
 interface Lesson {
   id: number;
@@ -13,18 +13,11 @@ interface Lesson {
   categories: { id: number; name: string }[];
 }
 
-interface Material {
-  id: number;
-  title: string;
-  order: number;
-}
-
 interface Category {
   id: number;
   name: string;
   description: string | null;
   lessons: Lesson[];
-  materials: Material[];
 }
 
 export default function CategoryLessons({ params }: { params: Promise<{ id: string }> }) {
@@ -79,33 +72,6 @@ export default function CategoryLessons({ params }: { params: Promise<{ id: stri
           )}
         </div>
       </div>
-
-      {/* 学習資料セクション */}
-      {category.materials && category.materials.length > 0 && (
-        <section className="mb-10">
-          <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-            <FileText size={20} />
-            学習資料
-          </h3>
-          <div className="grid grid-cols-1 gap-3">
-            {category.materials.map((material) => (
-              <Link
-                key={material.id}
-                href={`/materials/${material.id}`}
-                className="group bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:border-slate-300 hover:shadow-md transition-all flex items-center justify-between"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                    <FileText size={20} />
-                  </div>
-                  <span className="text-base font-bold text-slate-900">{material.title}</span>
-                </div>
-                <ChevronRight className="text-slate-400 group-hover:text-slate-900 transition-colors" />
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
 
       {/* 演習問題セクション */}
       <div className="mb-4 flex items-center gap-2">

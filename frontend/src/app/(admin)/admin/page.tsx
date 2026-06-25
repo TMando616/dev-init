@@ -7,9 +7,15 @@ import { Button } from '@/components/ui';
 import adminApi from '@/lib/adminApi';
 import { Edit2, Trash2, BookOpen } from 'lucide-react';
 
+interface Category {
+  id: number;
+  name: string;
+}
+
 interface Lesson {
   id: number;
   title: string;
+  categories: Category[];
   created_at: string;
 }
 
@@ -65,6 +71,7 @@ export default function AdminDashboard() {
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 <th className="px-6 py-4 font-semibold text-slate-700">タイトル</th>
+                <th className="px-6 py-4 font-semibold text-slate-700">カテゴリ</th>
                 <th className="px-6 py-4 font-semibold text-slate-700">作成日</th>
                 <th className="px-6 py-4 font-semibold text-slate-700 text-right">操作</th>
               </tr>
@@ -79,6 +86,22 @@ export default function AdminDashboard() {
                         <span className="font-medium text-slate-900">{lesson.title}</span>
                       </div>
                     </td>
+                    <td className="px-6 py-4">
+                      {lesson.categories && lesson.categories.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {lesson.categories.map((cat) => (
+                            <span
+                              key={cat.id}
+                              className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-medium"
+                            >
+                              {cat.name}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-slate-400 text-sm">—</span>
+                      )}
+                    </td>
                     <td className="px-6 py-4 text-slate-500 text-sm">
                       {new Date(lesson.created_at).toLocaleDateString('ja-JP')}
                     </td>
@@ -89,9 +112,9 @@ export default function AdminDashboard() {
                             <Edit2 size={16} />
                           </Button>
                         </Link>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           className="text-red-600 hover:text-red-700 hover:bg-red-50"
                           onClick={() => handleDelete(lesson.id)}
                         >
@@ -103,7 +126,7 @@ export default function AdminDashboard() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={3} className="px-6 py-12 text-center text-slate-500">
+                  <td colSpan={4} className="px-6 py-12 text-center text-slate-500">
                     レッスンが登録されていません。
                   </td>
                 </tr>

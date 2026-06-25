@@ -11,7 +11,7 @@ interface Material {
   id: number;
   title: string;
   order: number;
-  category: { id: number; name: string } | null;
+  lesson: { id: number; title: string } | null;
   created_at: string;
 }
 
@@ -72,7 +72,7 @@ export default function AdminMaterials() {
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 <th className="px-6 py-4 font-semibold text-slate-700">タイトル</th>
-                <th className="px-6 py-4 font-semibold text-slate-700">カテゴリ</th>
+                <th className="px-6 py-4 font-semibold text-slate-700">レッスン</th>
                 <th className="px-6 py-4 font-semibold text-slate-700">順序</th>
                 <th className="px-6 py-4 font-semibold text-slate-700 text-right">操作</th>
               </tr>
@@ -88,7 +88,7 @@ export default function AdminMaterials() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-slate-500 text-sm">
-                      {material.category?.name ?? '—'}
+                      {material.lesson?.title ?? '—'}
                     </td>
                     <td className="px-6 py-4 text-slate-500 text-sm">{material.order}</td>
                     <td className="px-6 py-4 text-right">
