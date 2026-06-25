@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Category;
+use App\Models\Lesson;
 use App\Models\Material;
 use Illuminate\Database\Seeder;
 
@@ -10,8 +10,8 @@ class MaterialSeeder extends Seeder
 {
     public function run(): void
     {
-        $js  = Category::where('name', 'JavaScript基礎')->first();
-        $php = Category::where('name', 'PHP基礎')->first();
+        $jsLesson  = Lesson::where('language', 'javascript')->first();
+        $phpLesson = Lesson::where('language', 'php')->first();
 
         $jsMaterials = [
             [
@@ -776,19 +776,19 @@ MD,
 
         foreach ($jsMaterials as $data) {
             Material::create([
-                'title'       => $data['title'],
-                'content'     => $data['content'],
-                'category_id' => $js?->id,
-                'order'       => $data['order'],
+                'title'     => $data['title'],
+                'content'   => $data['content'],
+                'lesson_id' => $jsLesson?->id,
+                'order'     => $data['order'],
             ]);
         }
 
         foreach ($phpMaterials as $data) {
             Material::create([
-                'title'       => $data['title'],
-                'content'     => $data['content'],
-                'category_id' => $php?->id,
-                'order'       => $data['order'],
+                'title'     => $data['title'],
+                'content'   => $data['content'],
+                'lesson_id' => $phpLesson?->id,
+                'order'     => $data['order'],
             ]);
         }
     }

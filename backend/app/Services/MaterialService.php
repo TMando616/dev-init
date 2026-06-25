@@ -33,9 +33,9 @@ class MaterialService
         ];
     }
 
-    public function getMaterialsByCategoryId(int $categoryId): Collection
+    public function getMaterialsByLessonId(int $lessonId): Collection
     {
-        return $this->repository->findByCategory($categoryId);
+        return $this->repository->findByLesson($lessonId);
     }
 
     public function createMaterial(array $data): Material

@@ -7,45 +7,26 @@ use Illuminate\Database\Eloquent\Collection;
 
 class CategoryRepository
 {
-    /**
-     * Get all categories.
-     */
     public function all(): Collection
     {
-        return Category::all();
+        return Category::withCount('lessons')->get();
     }
 
-    /**
-     * Find a category by ID with lessons.
-     */
     public function find(int $id): ?Category
     {
-        return Category::with([
-            'lessons.categories',
-            // List view only needs link metadata; skip the heavy `content` body.
-            'materials' => fn($q) => $q->ordered()->select(['id', 'title', 'category_id', 'order']),
-        ])->find($id);
+        return Category::with(['lessons.categories'])->find($id);
     }
 
-    /**
-     * Create a new category.
-     */
     public function create(array $data): Category
     {
         return Category::create($data);
     }
 
-    /**
-     * Update an existing category.
-     */
     public function update(Category $category, array $data): bool
     {
         return $category->update($data);
     }
 
-    /**
-     * Delete a category.
-     */
     public function delete(Category $category): bool
     {
         return $category->delete();

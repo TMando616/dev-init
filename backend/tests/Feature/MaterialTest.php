@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Admin;
-use App\Models\Category;
+use App\Models\Lesson;
 use App\Models\Material;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -36,10 +36,10 @@ class MaterialTest extends TestCase
 
     public function test_user_can_show_material_with_prev_next(): void
     {
-        $category = Category::factory()->create();
-        $m1 = Material::factory()->create(['category_id' => $category->id, 'order' => 1]);
-        $m2 = Material::factory()->create(['category_id' => $category->id, 'order' => 2]);
-        $m3 = Material::factory()->create(['category_id' => $category->id, 'order' => 3]);
+        $lesson = Lesson::factory()->create();
+        $m1 = Material::factory()->create(['lesson_id' => $lesson->id, 'order' => 1]);
+        $m2 = Material::factory()->create(['lesson_id' => $lesson->id, 'order' => 2]);
+        $m3 = Material::factory()->create(['lesson_id' => $lesson->id, 'order' => 3]);
 
         $response = $this->actingAs($this->user, 'sanctum')
             ->getJson("/api/materials/{$m2->id}");
@@ -50,16 +50,15 @@ class MaterialTest extends TestCase
             ->assertJsonPath('next.id', $m3->id);
     }
 
-    public function test_prev_next_does_not_cross_category_boundary(): void
+    public function test_prev_next_does_not_cross_lesson_boundary(): void
     {
-        $catA = Category::factory()->create();
-        $catB = Category::factory()->create();
+        $lessonA = Lesson::factory()->create();
+        $lessonB = Lesson::factory()->create();
 
-        $a1 = Material::factory()->create(['category_id' => $catA->id, 'order' => 1]);
-        $a2 = Material::factory()->create(['category_id' => $catA->id, 'order' => 2]);
-        // 別カテゴリ・未分類の資料が prev/next に混入しないことを確認する
-        Material::factory()->create(['category_id' => $catB->id, 'order' => 1]);
-        Material::factory()->create(['category_id' => null, 'order' => 1]);
+        $a1 = Material::factory()->create(['lesson_id' => $lessonA->id, 'order' => 1]);
+        $a2 = Material::factory()->create(['lesson_id' => $lessonA->id, 'order' => 2]);
+        // 別レッスンの資料が prev/next に混入しないことを確認する
+        Material::factory()->create(['lesson_id' => $lessonB->id, 'order' => 1]);
 
         $response = $this->actingAs($this->user, 'sanctum')
             ->getJson("/api/materials/{$a1->id}");
@@ -67,22 +66,6 @@ class MaterialTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonPath('prev', null)
             ->assertJsonPath('next.id', $a2->id);
-    }
-
-    public function test_prev_next_for_uncategorized_material_stays_within_uncategorized(): void
-    {
-        $category = Category::factory()->create();
-        Material::factory()->create(['category_id' => $category->id, 'order' => 1]);
-
-        $u1 = Material::factory()->create(['category_id' => null, 'order' => 1]);
-        $u2 = Material::factory()->create(['category_id' => null, 'order' => 2]);
-
-        $response = $this->actingAs($this->user, 'sanctum')
-            ->getJson("/api/materials/{$u1->id}");
-
-        $response->assertStatus(200)
-            ->assertJsonPath('prev', null)
-            ->assertJsonPath('next.id', $u2->id);
     }
 
     public function test_show_returns_404_for_missing_material(): void
@@ -106,14 +89,14 @@ class MaterialTest extends TestCase
 
     public function test_admin_can_create_material(): void
     {
-        $category = Category::factory()->create();
+        $lesson = Lesson::factory()->create();
 
         $response = $this->actingAs($this->admin, 'admin')
             ->postJson('/api/admin/materials', [
-                'title'       => 'New Material',
-                'content'     => '# Hello',
-                'category_id' => $category->id,
-                'order'       => 1,
+                'title'     => 'New Material',
+                'content'   => '# Hello',
+                'lesson_id' => $lesson->id,
+                'order'     => 1,
             ]);
 
         $response->assertStatus(201)
@@ -124,11 +107,13 @@ class MaterialTest extends TestCase
 
     public function test_admin_can_update_material(): void
     {
-        $material = Material::factory()->create();
+        $lesson   = Lesson::factory()->create();
+        $material = Material::factory()->create(['lesson_id' => $lesson->id]);
 
         $response = $this->actingAs($this->admin, 'admin')
             ->putJson("/api/admin/materials/{$material->id}", [
-                'title' => 'Updated Title',
+                'title'     => 'Updated Title',
+                'lesson_id' => $lesson->id,
             ]);
 
         $response->assertStatus(200)

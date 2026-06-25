@@ -30,24 +30,24 @@ class MaterialController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'       => 'required|string|max:255',
-            'content'     => 'required|string',
-            'category_id' => 'nullable|exists:categories,id',
-            'order'       => 'nullable|integer|min:0',
+            'title'     => 'required|string|max:255',
+            'content'   => 'required|string',
+            'lesson_id' => 'required|exists:lessons,id',
+            'order'     => 'nullable|integer|min:0',
         ]);
 
         $material = $this->service->createMaterial($validated);
 
-        return response()->json($material->load('category'), 201);
+        return response()->json($material->load('lesson:id,title'), 201);
     }
 
     public function update(Request $request, string $id)
     {
         $validated = $request->validate([
-            'title'       => 'sometimes|required|string|max:255',
-            'content'     => 'sometimes|required|string',
-            'category_id' => 'nullable|exists:categories,id',
-            'order'       => 'nullable|integer|min:0',
+            'title'     => 'sometimes|required|string|max:255',
+            'content'   => 'sometimes|required|string',
+            'lesson_id' => 'required|exists:lessons,id',
+            'order'     => 'nullable|integer|min:0',
         ]);
 
         $material = $this->service->updateMaterial((int)$id, $validated);
@@ -55,7 +55,7 @@ class MaterialController extends Controller
             return response()->json(['message' => 'Material not found'], 404);
         }
 
-        return response()->json($material->load('category'));
+        return response()->json($material->load('lesson:id,title'));
     }
 
     public function destroy(string $id)

@@ -57,11 +57,14 @@ class LessonTest extends TestCase
 
     public function test_admin_can_create_lesson()
     {
+        $category = \App\Models\Category::factory()->create();
+
         $response = $this->actingAs($this->admin, 'admin')
             ->postJson('/api/admin/lessons', [
-                'title' => 'Admin Lesson',
-                'content' => 'Admin Content',
+                'title'        => 'Admin Lesson',
+                'content'      => 'Admin Content',
                 'model_answer' => 'console.log(1)',
+                'category_ids' => [$category->id],
             ]);
 
         $response->assertStatus(201)
@@ -72,11 +75,14 @@ class LessonTest extends TestCase
 
     public function test_admin_can_update_lesson()
     {
-        $lesson = Lesson::factory()->create();
+        $category = \App\Models\Category::factory()->create();
+        $lesson   = Lesson::factory()->create();
+        $lesson->categories()->attach($category->id);
 
         $response = $this->actingAs($this->admin, 'admin')
             ->putJson("/api/admin/lessons/{$lesson->id}", [
-                'title' => 'Updated Title',
+                'title'        => 'Updated Title',
+                'category_ids' => [$category->id],
             ]);
 
         $response->assertStatus(200)

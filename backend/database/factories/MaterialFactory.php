@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Lesson;
 use App\Models\Material;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -13,10 +14,10 @@ class MaterialFactory extends Factory
     public function definition(): array
     {
         return [
-            'title'       => fake()->sentence(4),
-            'content'     => fake()->paragraphs(3, true),
-            'category_id' => null,
-            'order'       => fake()->numberBetween(0, 100),
+            'title'     => fake()->sentence(4),
+            'content'   => fake()->paragraphs(3, true),
+            'lesson_id' => Lesson::factory(),
+            'order'     => fake()->numberBetween(0, 100),
         ];
     }
 }

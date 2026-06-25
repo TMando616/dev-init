@@ -7,25 +7,22 @@ use Illuminate\Database\Eloquent\Collection;
 
 class MaterialRepository
 {
-    /**
-     * Columns sufficient for list views; excludes the heavy `content` TEXT body.
-     */
-    private const LIST_COLUMNS = ['id', 'title', 'category_id', 'order', 'created_at', 'updated_at'];
+    private const LIST_COLUMNS = ['id', 'title', 'lesson_id', 'order', 'created_at', 'updated_at'];
 
     public function all(): Collection
     {
-        return Material::with('category')->ordered()->get(self::LIST_COLUMNS);
+        return Material::with('lesson:id,title')->ordered()->get(self::LIST_COLUMNS);
     }
 
     public function find(int $id): ?Material
     {
-        return Material::with('category')->find($id);
+        return Material::with('lesson:id,title')->find($id);
     }
 
-    public function findByCategory(int $categoryId): Collection
+    public function findByLesson(int $lessonId): Collection
     {
-        return Material::with('category')
-            ->where('category_id', $categoryId)
+        return Material::with('lesson:id,title')
+            ->where('lesson_id', $lessonId)
             ->ordered()
             ->get(self::LIST_COLUMNS);
     }
@@ -47,13 +44,7 @@ class MaterialRepository
 
     public function findPrevNext(Material $material): array
     {
-        $base = Material::query();
-
-        if ($material->category_id) {
-            $base->where('category_id', $material->category_id);
-        } else {
-            $base->whereNull('category_id');
-        }
+        $base = Material::query()->where('lesson_id', $material->lesson_id);
 
         $prev = (clone $base)
             ->where(function ($q) use ($material) {

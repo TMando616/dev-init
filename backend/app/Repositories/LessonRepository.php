@@ -12,15 +12,15 @@ class LessonRepository
      */
     public function all(): Collection
     {
-        return Lesson::with('categories')->get();
+        return Lesson::with('categories:id,name')->get();
     }
 
     /**
-     * Find a lesson by ID with categories.
+     * Find a lesson by ID with categories and materials.
      */
     public function find(int $id): ?Lesson
     {
-        return Lesson::with(['categories.materials'])->find($id);
+        return Lesson::with(['categories', 'materials'])->find($id);
     }
 
     /**
