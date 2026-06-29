@@ -54,6 +54,13 @@ docker compose exec php php artisan migrate:fresh --seed
 
 `.env` で `APP_PORT`・`DB_DATABASE`・`DB_USERNAME`・`DB_PASSWORD` を変更できる。
 
+### シード後の初期アカウント
+
+| ロール | メール | パスワード | ログイン URL |
+|--------|--------|-----------|-------------|
+| 学習者 | test@example.com | password | /login |
+| 管理者 | admin@example.com | password | /admin/login |
+
 ## 主要コマンド
 
 ```bash
