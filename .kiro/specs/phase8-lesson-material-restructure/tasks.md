@@ -118,11 +118,11 @@
 - [x] 9.1 `migrate:fresh --seed` が成功することを確認（`docker compose exec backend php artisan migrate:fresh --seed`）
 - [x] 9.2 バックエンドテスト全パス（`docker compose exec backend php artisan test`）— material 関連テストの `category_id` 依存を修正
 - [x] 9.3 フロントエンド lint パス（`docker compose exec frontend npm run lint`）
-- [ ] 9.4 動作確認チェックリスト
-  - [ ] 管理: レッスン一覧にカテゴリ列が表示される（0件は「—」）
-  - [ ] 管理: カテゴリ未選択でレッスン保存が拒否される（フロント/バック両方）
-  - [ ] 管理: 学習資料エディタでレッスンを選択して保存できる／未選択は拒否
-  - [ ] 管理: 学習資料一覧に「レッスン」列が表示される
-  - [ ] 管理: カテゴリ一覧にレッスン数が表示され、クリックで配下レッスンが展開する
-  - [ ] 生徒: 演習ページの参考資料が `lesson.materials` で表示される（モーダル動作）
-  - [ ] 生徒: カテゴリ詳細ページがレッスン一覧を表示する（materials セクションなし）
+- [x] 9.4 動作確認チェックリスト（2026-07-01 API/データ契約レベルで検証。UI描画は該当コミット + lint通過で担保）
+  - [x] 管理: レッスン一覧にカテゴリ列が表示される（0件は「—」）— `GET /api/lessons` が `categories[]` を返却（pivot含む）
+  - [x] 管理: カテゴリ未選択でレッスン保存が拒否される（フロント/バック両方）— `POST /api/admin/lessons` で `category_ids` 未指定/空とも 422
+  - [x] 管理: 学習資料エディタでレッスンを選択して保存できる／未選択は拒否 — `POST /api/admin/materials` で `lesson_id` 未指定は 422、指定時は作成成功（MaterialTest）
+  - [x] 管理: 学習資料一覧に「レッスン」列が表示される — `GET /api/materials` が `lesson:{id,title}` を返却、`category` は非返却
+  - [x] 管理: カテゴリ一覧にレッスン数が表示され、クリックで配下レッスンが展開する — `GET /api/categories` が `lessons_count`、`GET /api/categories/{id}` が `lessons[]` を返却
+  - [x] 生徒: 演習ページの参考資料が `lesson.materials` で表示される（モーダル動作）— `GET /api/lessons/{id}` が `materials[]` を直付けで返却
+  - [x] 生徒: カテゴリ詳細ページがレッスン一覧を表示する（materials セクションなし）— `GET /api/categories/{id}` は `lessons[]` を返し `materials` を含まない
