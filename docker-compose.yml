@@ -18,10 +18,12 @@ services:
       - ./backend:/var/www/backend
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      DB_CONNECTION: pgsql
+      # DB_CONNECTION / DB_DATABASE はここで OS 環境変数として注入しない。
+      # 注入すると phpunit.xml / .env の sqlite 設定を上書きしてしまい、
+      # `artisan test` が開発用 pgsql を RefreshDatabase で破壊するため。
+      # 接続先は backend/.env（実行時）と phpunit.xml（テスト時）で解決する。
       DB_HOST: db
       DB_PORT: 5432
-      DB_DATABASE: ${DB_DATABASE:-devinit}
       DB_USERNAME: ${DB_USERNAME:-user}
       DB_PASSWORD: ${DB_PASSWORD:-password}
       DOCKER_HOST_PATH: ${PWD}/backend/storage/app/temp_code
