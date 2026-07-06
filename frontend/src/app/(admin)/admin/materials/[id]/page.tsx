@@ -10,9 +10,15 @@ import Editor from '@monaco-editor/react';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 import { ArrowLeft, Save } from 'lucide-react';
 
+interface Category {
+  id: number;
+  name: string;
+}
+
 interface Lesson {
   id: number;
   title: string;
+  categories: Category[];
 }
 
 export default function MaterialEditor({ params }: { params: Promise<{ id: string }> }) {
@@ -26,6 +32,10 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
   const [order, setOrder] = useState(0);
   const [lessonId, setLessonId] = useState<string>('');
   const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryFilterId, setCategoryFilterId] = useState<string>('');
+  const [allMaterials, setAllMaterials] = useState<{ id: number; lesson_id: number; order: number }[]>([]);
+  const [orderError, setOrderError] = useState('');
   const [isLoading, setIsLoading] = useState(!isNew);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -41,6 +51,26 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
       }
     };
     fetchLessons();
+
+    const fetchCategories = async () => {
+      try {
+        const response = await adminApi.get('/categories');
+        setCategories(response.data);
+      } catch {
+        console.error('Failed to fetch categories');
+      }
+    };
+    fetchCategories();
+
+    const fetchMaterials = async () => {
+      try {
+        const response = await adminApi.get('/materials');
+        setAllMaterials(response.data);
+      } catch {
+        console.error('Failed to fetch materials');
+      }
+    };
+    fetchMaterials();
 
     if (!isNew) {
       const fetchMaterial = async () => {
@@ -62,12 +92,36 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
     }
   }, [id, isNew, admin, router]);
 
+  const filteredLessons = categoryFilterId
+    ? lessons.filter((l) => l.categories.some((c) => String(c.id) === categoryFilterId))
+    : lessons;
+
+  const handleCategoryFilterChange = (newCategoryFilterId: string) => {
+    setCategoryFilterId(newCategoryFilterId);
+    const newFilteredLessons = newCategoryFilterId
+      ? lessons.filter((l) => l.categories.some((c) => String(c.id) === newCategoryFilterId))
+      : lessons;
+    if (lessonId && !newFilteredLessons.some((l) => String(l.id) === lessonId)) {
+      setLessonId('');
+    }
+  };
+
+  const siblingOrders = allMaterials
+    .filter((m) => String(m.lesson_id) === lessonId && (isNew || m.id !== Number(id)))
+    .map((m) => m.order)
+    .sort((a, b) => a - b);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!lessonId) {
       alert('レッスンを選択してください');
       return;
     }
+    if (siblingOrders.includes(order)) {
+      setOrderError(`表示順 ${order} は同じレッスン内の他の資料と重複しています。`);
+      return;
+    }
+    setOrderError('');
     setIsSaving(true);
 
     const payload = {
@@ -127,7 +181,7 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
       <main className="p-8 max-w-7xl mx-auto space-y-6">
         {/* メタ情報 */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div className="lg:col-span-1">
               <label className="block text-sm font-semibold text-slate-700 mb-2">タイトル</label>
               <Input
@@ -139,11 +193,24 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
             </div>
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
+                カテゴリで絞り込む
+              </label>
+              <Select value={categoryFilterId} onChange={(e) => handleCategoryFilterChange(e.target.value)}>
+                <option value="">— すべて —</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={String(category.id)}>
+                    {category.name}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
                 レッスン <span className="text-red-500">*</span>
               </label>
               <Select value={lessonId} onChange={(e) => setLessonId(e.target.value)} required>
                 <option value="" disabled>— レッスンを選択 —</option>
-                {lessons.map((lesson) => (
+                {filteredLessons.map((lesson) => (
                   <option key={lesson.id} value={String(lesson.id)}>
                     {lesson.title}
                   </option>
@@ -158,6 +225,14 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
                 value={order}
                 onChange={(e) => setOrder(Number(e.target.value))}
               />
+              {lessonId && (
+                <p className="mt-1 text-xs text-slate-500">
+                  このレッスン内の既存の表示順: {siblingOrders.length ? siblingOrders.join(', ') : 'なし'}
+                </p>
+              )}
+              {orderError && (
+                <p className="mt-1 text-xs text-red-500">{orderError}</p>
+              )}
             </div>
           </div>
         </div>
