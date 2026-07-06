@@ -11,12 +11,12 @@ class MaterialRepository
 
     public function all(): Collection
     {
-        return Material::with('lesson:id,title')->ordered()->get(self::LIST_COLUMNS);
+        return Material::with(['lesson:id,title', 'lesson.categories:id,name'])->ordered()->get(self::LIST_COLUMNS);
     }
 
     public function find(int $id): ?Material
     {
-        return Material::with('lesson:id,title')->find($id);
+        return Material::with(['lesson:id,title', 'lesson.categories:id,name'])->find($id);
     }
 
     public function findByLesson(int $lessonId): Collection

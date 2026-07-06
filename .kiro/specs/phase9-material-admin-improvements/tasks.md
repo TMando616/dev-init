@@ -5,14 +5,14 @@
 
 ## 1. Backend: Repository（US-2）
 
-- [ ] 1.1 `MaterialRepository` の eager load に `lesson.categories` を追加する（design §US-2）
+- [x] 1.1 `MaterialRepository` の eager load に `lesson.categories` を追加する（design §US-2）
   - 対象: `backend/app/Repositories/MaterialRepository.php`
   - `all()` / `find()` の `with('lesson:id,title')` を `with(['lesson:id,title', 'lesson.categories:id,name'])` に変更
   - `findByLesson()` は管理画面で未使用のため変更しない
 
 ## 2. Frontend: 学習資料エディタ（US-1, US-4）
 
-- [ ] 2.1 カテゴリ絞り込みセレクトを追加する（US-1、design §US-1）
+- [x] 2.1 カテゴリ絞り込みセレクトを追加する（US-1、design §US-1）
   - 対象: `frontend/src/app/(admin)/admin/materials/[id]/page.tsx`
   - `Category` / `Lesson`（`categories: Category[]` を含む）の型を追加
   - `categories` / `categoryFilterId` の state を追加し、`GET /categories` を並行取得
@@ -20,7 +20,7 @@
   - カテゴリ切り替え時、選択中レッスンが `filteredLessons` から外れたら `lessonId` をリセットする `useEffect` を追加
   - レッスン選択は引き続き必須（未選択時は保存拒否、既存挙動を変更しない）
 
-- [ ] 2.2 order重複のインラインバリデーションを追加する（US-4、design §US-4）
+- [x] 2.2 order重複のインラインバリデーションを追加する（US-4、design §US-4）
   - 対象: `frontend/src/app/(admin)/admin/materials/[id]/page.tsx`
   - `allMaterials` / `orderError` の state を追加し、`GET /materials` を並行取得
   - `siblingOrders`（同一 `lessonId` 内・自分自身を除く既存 order 一覧）を算出し、表示順入力の下にヒント表示
@@ -28,12 +28,12 @@
 
 ## 3. Frontend: 学習資料一覧（US-2, US-3）
 
-- [ ] 3.1 カテゴリ列を追加する（US-2、design §US-2）
+- [x] 3.1 カテゴリ列を追加する（US-2、design §US-2）
   - 対象: `frontend/src/app/(admin)/admin/materials/page.tsx`
   - `Material` interface の `lesson` に `categories: { id; name }[]` を追加
   - 「カテゴリ」列を追加し、`admin/page.tsx` と同じタグ表示パターンでカテゴリ名を表示（0件は「—」）
 
-- [ ] 3.2 検索・絞り込みUIを追加する（US-3、design §US-3）
+- [x] 3.2 検索・絞り込みUIを追加する（US-3、design §US-3）
   - 対象: `frontend/src/app/(admin)/admin/materials/page.tsx`
   - `titleQuery` / `lessonFilterId` / `categoryFilterId` の state を追加
   - 取得済み `materials` から `lessonOptions` / `categoryOptions` を重複排除して導出（追加API呼び出しなし）
