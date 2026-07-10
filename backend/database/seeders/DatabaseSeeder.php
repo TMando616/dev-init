@@ -34,6 +34,14 @@ class DatabaseSeeder extends Seeder
             'name' => 'Webデザイン',
             'description' => 'HTML, CSSを使用したモダンなWebデザインを学びます。',
         ]);
+        Category::create([
+            'name' => 'Python基礎',
+            'description' => 'Pythonの基本的な文法とデータ処理への応用を学びます。',
+        ]);
+        Category::create([
+            'name' => 'Java基礎',
+            'description' => 'Javaの基本的な文法とオブジェクト指向の考え方を学びます。',
+        ]);
 
         // Admin (managed separately from students)
         Admin::factory()->create([

@@ -10,8 +10,10 @@ class LessonSeeder extends Seeder
 {
     public function run(): void
     {
-        $js  = Category::where('name', 'JavaScript基礎')->first();
-        $php = Category::where('name', 'PHP基礎')->first();
+        $js     = Category::where('name', 'JavaScript基礎')->first();
+        $php    = Category::where('name', 'PHP基礎')->first();
+        $python = Category::where('name', 'Python基礎')->first();
+        $java   = Category::where('name', 'Java基礎')->first();
 
         $jsLessons = [
             [
@@ -159,6 +161,152 @@ class LessonSeeder extends Seeder
             ],
         ];
 
+        $pythonLessons = [
+            [
+                'title'           => 'Hello, World! を表示しよう',
+                'content'         => "# 演習1: Hello, World!\n\n`print()` を使って `Hello, World!` を表示してください。",
+                'model_answer'    => "print('Hello, World!')",
+                'expected_output' => "Hello, World!",
+                'language'        => 'python',
+            ],
+            [
+                'title'           => '変数に値を代入して表示しよう',
+                'content'         => "# 演習2: 変数\n\n変数 `name` に自分の名前を代入し、表示してください。",
+                'model_answer'    => "name = 'Alice'\nprint(name)",
+                'expected_output' => "Alice",
+                'language'        => 'python',
+            ],
+            [
+                'title'           => '2つの数値を足し算しよう',
+                'content'         => "# 演習3: 算術演算子\n\n変数 `a = 5`、`b = 3` を定義して、その合計を表示してください。",
+                'model_answer'    => "a = 5\nb = 3\nprint(a + b)",
+                'expected_output' => "8",
+                'language'        => 'python',
+            ],
+            [
+                'title'           => 'if文で条件分岐しよう',
+                'content'         => "# 演習4: 条件分岐\n\n変数 `score = 75` を定義し、60以上なら `合格`、未満なら `不合格` を表示してください。",
+                'model_answer'    => "score = 75\nif score >= 60:\n    print('合格')\nelse:\n    print('不合格')",
+                'expected_output' => "合格",
+                'language'        => 'python',
+            ],
+            [
+                'title'           => 'for文で1から5を表示しよう',
+                'content'         => "# 演習5: ループ\n\n`for` 文と `range` を使って1から5までの数値を1行ずつ表示してください。",
+                'model_answer'    => "for i in range(1, 6):\n    print(i)",
+                'expected_output' => "1\n2\n3\n4\n5",
+                'language'        => 'python',
+            ],
+            [
+                'title'           => '関数を定義して呼び出そう',
+                'content'         => "# 演習6: 関数\n\n2つの数値を受け取り、その合計を返す関数 `add` を定義して、`add(3, 5)` の結果を表示してください。",
+                'model_answer'    => "def add(a, b):\n    return a + b\n\nprint(add(3, 5))",
+                'expected_output' => "8",
+                'language'        => 'python',
+            ],
+            [
+                'title'           => 'リストの要素を表示しよう',
+                'content'         => "# 演習7: リスト\n\n`fruits = ['apple', 'banana', 'cherry']` を定義し、`for` 文で1行ずつ表示してください。",
+                'model_answer'    => "fruits = ['apple', 'banana', 'cherry']\nfor fruit in fruits:\n    print(fruit)",
+                'expected_output' => "apple\nbanana\ncherry",
+                'language'        => 'python',
+            ],
+            [
+                'title'           => 'リスト内包表記でリストを変換しよう',
+                'content'         => "# 演習8: リスト内包表記\n\n`[1, 2, 3, 4, 5]` の各要素を2倍にしたリストを作り、1行ずつ表示してください。",
+                'model_answer'    => "nums = [1, 2, 3, 4, 5]\ndoubled = [n * 2 for n in nums]\nprint('\\n'.join(map(str, doubled)))",
+                'expected_output' => "2\n4\n6\n8\n10",
+                'language'        => 'python',
+            ],
+            [
+                'title'           => '辞書のプロパティを表示しよう',
+                'content'         => "# 演習9: 辞書\n\n`{'name': 'Alice', 'age': 25}` の辞書を定義し、`name` と `age` を表示してください。",
+                'model_answer'    => "user = {'name': 'Alice', 'age': 25}\nprint(user['name'])\nprint(user['age'])",
+                'expected_output' => "Alice\n25",
+                'language'        => 'python',
+            ],
+            [
+                'title'           => 'クラスを定義してインスタンスを作ろう',
+                'content'         => "# 演習10: クラス\n\n`name` 属性を持つ `User` クラスを定義し、`greet()` メソッドで `こんにちは、Alice！` を返すようにしてください。",
+                'model_answer'    => "class User:\n    def __init__(self, name):\n        self.name = name\n\n    def greet(self):\n        return f'こんにちは、{self.name}！'\n\nuser = User('Alice')\nprint(user.greet())",
+                'expected_output' => "こんにちは、Alice！",
+                'language'        => 'python',
+            ],
+        ];
+
+        $javaLessons = [
+            [
+                'title'           => 'Hello, World! を表示しよう',
+                'content'         => "# 演習1: Hello, World!\n\n`System.out.println()` を使って `Hello, World!` を表示してください。",
+                'model_answer'    => "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}",
+                'expected_output' => "Hello, World!",
+                'language'        => 'java',
+            ],
+            [
+                'title'           => '変数に値を代入して表示しよう',
+                'content'         => "# 演習2: 変数\n\n変数 `name` に自分の名前を代入し、表示してください。",
+                'model_answer'    => "public class Main {\n    public static void main(String[] args) {\n        String name = \"Alice\";\n        System.out.println(name);\n    }\n}",
+                'expected_output' => "Alice",
+                'language'        => 'java',
+            ],
+            [
+                'title'           => '2つの数値を足し算しよう',
+                'content'         => "# 演習3: 算術演算子\n\n変数 `a = 5`、`b = 3` を定義して、その合計を表示してください。",
+                'model_answer'    => "public class Main {\n    public static void main(String[] args) {\n        int a = 5;\n        int b = 3;\n        System.out.println(a + b);\n    }\n}",
+                'expected_output' => "8",
+                'language'        => 'java',
+            ],
+            [
+                'title'           => 'if文で条件分岐しよう',
+                'content'         => "# 演習4: 条件分岐\n\n変数 `score = 75` を定義し、60以上なら `合格`、未満なら `不合格` を表示してください。",
+                'model_answer'    => "public class Main {\n    public static void main(String[] args) {\n        int score = 75;\n        if (score >= 60) {\n            System.out.println(\"合格\");\n        } else {\n            System.out.println(\"不合格\");\n        }\n    }\n}",
+                'expected_output' => "合格",
+                'language'        => 'java',
+            ],
+            [
+                'title'           => 'for文で1から5を表示しよう',
+                'content'         => "# 演習5: ループ\n\n`for` 文を使って1から5までの数値を1行ずつ表示してください。",
+                'model_answer'    => "public class Main {\n    public static void main(String[] args) {\n        for (int i = 1; i <= 5; i++) {\n            System.out.println(i);\n        }\n    }\n}",
+                'expected_output' => "1\n2\n3\n4\n5",
+                'language'        => 'java',
+            ],
+            [
+                'title'           => 'メソッドを定義して呼び出そう',
+                'content'         => "# 演習6: メソッド\n\n2つの数値を受け取り、その合計を返す静的メソッド `add` を定義して、`add(3, 5)` の結果を表示してください。",
+                'model_answer'    => "public class Main {\n    static int add(int a, int b) {\n        return a + b;\n    }\n\n    public static void main(String[] args) {\n        System.out.println(add(3, 5));\n    }\n}",
+                'expected_output' => "8",
+                'language'        => 'java',
+            ],
+            [
+                'title'           => '配列の要素を表示しよう',
+                'content'         => "# 演習7: 配列\n\n`String[] fruits = {\"apple\", \"banana\", \"cherry\"}` を定義し、拡張for文で1行ずつ表示してください。",
+                'model_answer'    => "public class Main {\n    public static void main(String[] args) {\n        String[] fruits = {\"apple\", \"banana\", \"cherry\"};\n        for (String fruit : fruits) {\n            System.out.println(fruit);\n        }\n    }\n}",
+                'expected_output' => "apple\nbanana\ncherry",
+                'language'        => 'java',
+            ],
+            [
+                'title'           => '配列の要素を変換しよう',
+                'content'         => "# 演習8: 配列の変換\n\n`int[] nums = {1, 2, 3, 4, 5}` の各要素を2倍にして1行ずつ表示してください。",
+                'model_answer'    => "public class Main {\n    public static void main(String[] args) {\n        int[] nums = {1, 2, 3, 4, 5};\n        for (int n : nums) {\n            System.out.println(n * 2);\n        }\n    }\n}",
+                'expected_output' => "2\n4\n6\n8\n10",
+                'language'        => 'java',
+            ],
+            [
+                'title'           => 'Mapのプロパティを表示しよう',
+                'content'         => "# 演習9: Map\n\n`HashMap<String, Object>` を使って `name` と `age` を格納し、それぞれ表示してください。",
+                'model_answer'    => "import java.util.HashMap;\nimport java.util.Map;\n\npublic class Main {\n    public static void main(String[] args) {\n        Map<String, Object> user = new HashMap<>();\n        user.put(\"name\", \"Alice\");\n        user.put(\"age\", 25);\n        System.out.println(user.get(\"name\"));\n        System.out.println(user.get(\"age\"));\n    }\n}",
+                'expected_output' => "Alice\n25",
+                'language'        => 'java',
+            ],
+            [
+                'title'           => 'クラスを定義してインスタンスを作ろう',
+                'content'         => "# 演習10: クラス\n\n`name` フィールドを持つ `User` クラスを定義し、`greet()` メソッドで `こんにちは、Alice！` を返すようにしてください。",
+                'model_answer'    => "public class Main {\n    static class User {\n        private String name;\n\n        public User(String name) {\n            this.name = name;\n        }\n\n        public String greet() {\n            return \"こんにちは、\" + name + \"！\";\n        }\n    }\n\n    public static void main(String[] args) {\n        User user = new User(\"Alice\");\n        System.out.println(user.greet());\n    }\n}",
+                'expected_output' => "こんにちは、Alice！",
+                'language'        => 'java',
+            ],
+        ];
+
         foreach ($jsLessons as $data) {
             $lesson = Lesson::create($data);
             if ($js) {
@@ -170,6 +318,20 @@ class LessonSeeder extends Seeder
             $lesson = Lesson::create($data);
             if ($php) {
                 $lesson->categories()->sync([$php->id]);
+            }
+        }
+
+        foreach ($pythonLessons as $data) {
+            $lesson = Lesson::create($data);
+            if ($python) {
+                $lesson->categories()->sync([$python->id]);
+            }
+        }
+
+        foreach ($javaLessons as $data) {
+            $lesson = Lesson::create($data);
+            if ($java) {
+                $lesson->categories()->sync([$java->id]);
             }
         }
     }

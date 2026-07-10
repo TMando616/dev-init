@@ -10,8 +10,10 @@ class MaterialSeeder extends Seeder
 {
     public function run(): void
     {
-        $jsLesson  = Lesson::where('language', 'javascript')->first();
-        $phpLesson = Lesson::where('language', 'php')->first();
+        $jsLesson     = Lesson::where('language', 'javascript')->first();
+        $phpLesson    = Lesson::where('language', 'php')->first();
+        $pythonLesson = Lesson::where('language', 'python')->first();
+        $javaLesson   = Lesson::where('language', 'java')->first();
 
         $jsMaterials = [
             [
@@ -774,6 +776,758 @@ MD,
             ],
         ];
 
+        $pythonMaterials = [
+            [
+                'title'   => 'Pythonとは？',
+                'order'   => 1,
+                'content' => <<<'MD'
+# Pythonとは？
+
+Pythonはシンプルな文法と豊富なライブラリで人気のプログラミング言語です。データ分析・AI・Web開発など幅広い分野で使われています。
+
+## 特徴
+
+- **可読性の高さ**: インデントでブロックを表現するため、コードが自然と整った見た目になります。
+- **インタープリタ型**: コードを1行ずつ解釈して実行します。
+- **豊富なライブラリ**: 標準ライブラリに加え、数値計算・機械学習など多数のパッケージが利用できます。
+
+## はじめてのPython
+
+```python
+print("Hello, World!")
+```
+
+`print()` は標準出力に文字列を表示する組み込み関数です。
+MD,
+            ],
+            [
+                'title'   => '変数とデータ型',
+                'order'   => 2,
+                'content' => <<<'MD'
+# 変数とデータ型
+
+## 変数
+
+Pythonの変数は宣言なしでそのまま代入できます。
+
+```python
+name = "Alice"
+age = 25
+price = 3.14
+is_admin = True
+
+print(name)  # Alice
+```
+
+## 主なデータ型
+
+| 型 | 例 | 説明 |
+|----|-----|------|
+| `str` | `"hello"` | 文字列 |
+| `int` | `42` | 整数 |
+| `float` | `3.14` | 浮動小数点数 |
+| `bool` | `True`, `False` | 真偽値 |
+| `list` | `[1, 2, 3]` | リスト |
+| `dict` | `{"key": "value"}` | 辞書 |
+| `NoneType` | `None` | 値がないことを明示 |
+
+## type() で型を確認
+
+```python
+print(type("hello"))  # <class 'str'>
+print(type(42))       # <class 'int'>
+print(type(True))     # <class 'bool'>
+```
+MD,
+            ],
+            [
+                'title'   => '演算子',
+                'order'   => 3,
+                'content' => <<<'MD'
+# 演算子
+
+## 算術演算子
+
+```python
+print(5 + 3)   # 8
+print(10 - 4)  # 6
+print(3 * 4)   # 12
+print(10 / 2)  # 5.0（常にfloatになる）
+print(10 // 3) # 3（切り捨て除算）
+print(10 % 3)  # 1（余り）
+print(2 ** 8)  # 256（べき乗）
+```
+
+## 比較演算子
+
+```python
+print(5 == 5)   # True
+print(5 != 3)   # True
+print(10 > 5)   # True
+print(3 <= 3)   # True
+```
+
+> **注意**: `/` は常に `float` を返します。整数の除算結果が欲しい場合は `//` を使いましょう。
+MD,
+            ],
+            [
+                'title'   => '条件分岐',
+                'order'   => 4,
+                'content' => <<<'MD'
+# 条件分岐
+
+## if / elif / else
+
+```python
+score = 75
+
+if score >= 90:
+    print("優秀")
+elif score >= 60:
+    print("合格")
+else:
+    print("不合格")
+# → 合格
+```
+
+## 三項演算子（条件式）
+
+```python
+age = 20
+status = "成人" if age >= 18 else "未成年"
+print(status)  # 成人
+```
+
+## match文（Python 3.10以降）
+
+複数の値に対する分岐に便利です。
+
+```python
+day = "月"
+match day:
+    case "土" | "日":
+        print("休日")
+    case _:
+        print("平日")
+```
+MD,
+            ],
+            [
+                'title'   => 'ループ',
+                'order'   => 5,
+                'content' => <<<'MD'
+# ループ
+
+## for文（range）
+
+```python
+for i in range(5):
+    print(i)  # 0 1 2 3 4
+```
+
+## while文
+
+```python
+n = 1
+while n <= 3:
+    print(n)
+    n += 1
+# 1 2 3
+```
+
+## for...in（リストの繰り返し）
+
+```python
+fruits = ["apple", "banana", "cherry"]
+for fruit in fruits:
+    print(fruit)
+```
+
+## リスト内包表記
+
+```python
+doubled = [n * 2 for n in [1, 2, 3]]
+print(doubled)  # [2, 4, 6]
+```
+MD,
+            ],
+            [
+                'title'   => '関数',
+                'order'   => 6,
+                'content' => <<<'MD'
+# 関数
+
+## 関数定義
+
+```python
+def greet(name):
+    return f"こんにちは、{name}！"
+
+print(greet("Alice"))  # こんにちは、Alice！
+```
+
+## デフォルト引数
+
+```python
+def greet(name="ゲスト"):
+    return f"こんにちは、{name}！"
+
+print(greet())       # こんにちは、ゲスト！
+print(greet("Bob"))  # こんにちは、Bob！
+```
+
+## ラムダ式
+
+```python
+add = lambda a, b: a + b
+print(add(3, 5))  # 8
+```
+
+## 可変長引数
+
+```python
+def total(*nums):
+    return sum(nums)
+
+print(total(1, 2, 3, 4))  # 10
+```
+MD,
+            ],
+            [
+                'title'   => 'リスト',
+                'order'   => 7,
+                'content' => <<<'MD'
+# リスト
+
+## 基本操作
+
+```python
+arr = [1, 2, 3]
+arr.append(4)   # 末尾に追加 → [1, 2, 3, 4]
+arr.pop()       # 末尾を削除 → [1, 2, 3]
+arr.insert(0, 0)  # 先頭に追加 → [0, 1, 2, 3]
+arr.pop(0)      # 先頭を削除 → [1, 2, 3]
+```
+
+## スライス
+
+```python
+nums = [1, 2, 3, 4, 5]
+print(nums[1:3])   # [2, 3]
+print(nums[:2])    # [1, 2]
+print(nums[::-1])  # [5, 4, 3, 2, 1]（逆順）
+```
+
+## 高階関数・内包表記
+
+```python
+numbers = [1, 2, 3, 4, 5]
+
+evens = [n for n in numbers if n % 2 == 0]  # [2, 4]
+doubled = [n * 2 for n in numbers]          # [2, 4, 6, 8, 10]
+total = sum(numbers)                        # 15
+```
+MD,
+            ],
+            [
+                'title'   => '辞書',
+                'order'   => 8,
+                'content' => <<<'MD'
+# 辞書
+
+## 基本
+
+```python
+user = {
+    "name": "Alice",
+    "age": 25,
+    "is_admin": False,
+}
+
+print(user["name"])      # Alice
+print(user.get("age"))   # 25
+```
+
+## キーと値の反復
+
+```python
+for key, value in user.items():
+    print(f"{key}: {value}")
+```
+
+## 辞書の更新
+
+```python
+updated = {**user, "age": 26}
+print(updated["age"])  # 26
+```
+
+## 存在確認
+
+```python
+if "name" in user:
+    print("nameキーがあります")
+```
+MD,
+            ],
+            [
+                'title'   => 'クラスとオブジェクト',
+                'order'   => 9,
+                'content' => <<<'MD'
+# クラスとオブジェクト
+
+## クラスの定義
+
+```python
+class User:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def greet(self):
+        return f"こんにちは、{self.name}！"
+
+user = User("Alice", 25)
+print(user.greet())  # こんにちは、Alice！
+print(user.age)       # 25
+```
+
+## 継承
+
+```python
+class AdminUser(User):
+    def greet(self):
+        return super().greet() + "（管理者）"
+
+admin = AdminUser("Bob", 30)
+print(admin.greet())  # こんにちは、Bob！（管理者）
+```
+MD,
+            ],
+            [
+                'title'   => '例外処理',
+                'order'   => 10,
+                'content' => <<<'MD'
+# 例外処理
+
+エラーが発生した場合に備えて、`try/except` で安全に処理します。
+
+## 基本
+
+```python
+def divide(a, b):
+    if b == 0:
+        raise ValueError("ゼロ除算はできません")
+    return a / b
+
+try:
+    print(divide(10, 2))  # 5.0
+    print(divide(10, 0))  # 例外が発生
+except ValueError as e:
+    print(f"エラー: {e}")
+finally:
+    print("処理終了")
+```
+
+## カスタム例外
+
+```python
+class ValidationError(Exception):
+    pass
+
+raise ValidationError("バリデーションエラー")
+```
+MD,
+            ],
+        ];
+
+        $javaMaterials = [
+            [
+                'title'   => 'Javaとは？',
+                'order'   => 1,
+                'content' => <<<'MD'
+# Javaとは？
+
+Javaは「Write Once, Run Anywhere」を掲げるオブジェクト指向プログラミング言語です。JVM（Java仮想マシン）上で動作するため、OSを問わず同じコードを実行できます。
+
+## 特徴
+
+- **静的型付け**: コンパイル時に型が確定するため、実行前にエラーを検出しやすい。
+- **オブジェクト指向**: クラス・継承・インターフェースを中心に設計します。
+- **JVM上で動作**: コンパイルされたバイトコードがJVM上で実行されます。
+
+## はじめてのJava
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+```
+
+Javaのプログラムは `public static void main(String[] args)` から実行が始まります。
+MD,
+            ],
+            [
+                'title'   => '変数とデータ型',
+                'order'   => 2,
+                'content' => <<<'MD'
+# 変数とデータ型
+
+## 変数
+
+Javaの変数は型を明示して宣言します。
+
+```java
+String name = "Alice";
+int age = 25;
+double price = 3.14;
+boolean isAdmin = true;
+
+System.out.println(name); // Alice
+```
+
+## 主なデータ型
+
+| 型 | 例 | 説明 |
+|----|-----|------|
+| `String` | `"hello"` | 文字列 |
+| `int` | `42` | 整数 |
+| `double` | `3.14` | 浮動小数点数 |
+| `boolean` | `true`, `false` | 真偽値 |
+| `int[]` | `{1, 2, 3}` | 配列 |
+
+## 型変換
+
+```java
+int i = 42;
+double d = i;              // 暗黙の型変換（int → double）
+int backToInt = (int) d;   // 明示的なキャスト
+```
+MD,
+            ],
+            [
+                'title'   => '演算子',
+                'order'   => 3,
+                'content' => <<<'MD'
+# 演算子
+
+## 算術演算子
+
+```java
+System.out.println(5 + 3);   // 8
+System.out.println(10 - 4);  // 6
+System.out.println(3 * 4);   // 12
+System.out.println(10 / 2);  // 5
+System.out.println(10 % 3);  // 1（余り）
+```
+
+## 比較演算子
+
+```java
+System.out.println(5 == 5);  // true
+System.out.println(5 != 3);  // true
+System.out.println(10 > 5);  // true
+System.out.println(3 <= 3);  // true
+```
+
+> **注意**: `int` 同士の割り算は小数点以下が切り捨てられます。小数を扱いたい場合は `double` にキャストしましょう。
+MD,
+            ],
+            [
+                'title'   => '条件分岐',
+                'order'   => 4,
+                'content' => <<<'MD'
+# 条件分岐
+
+## if / else if / else
+
+```java
+int score = 75;
+
+if (score >= 90) {
+    System.out.println("優秀");
+} else if (score >= 60) {
+    System.out.println("合格");
+} else {
+    System.out.println("不合格");
+}
+// 合格
+```
+
+## 三項演算子
+
+```java
+int age = 20;
+String status = age >= 18 ? "成人" : "未成年";
+System.out.println(status); // 成人
+```
+
+## switch文
+
+```java
+String day = "月";
+switch (day) {
+    case "土":
+    case "日":
+        System.out.println("休日");
+        break;
+    default:
+        System.out.println("平日");
+}
+```
+MD,
+            ],
+            [
+                'title'   => 'ループ',
+                'order'   => 5,
+                'content' => <<<'MD'
+# ループ
+
+## for文
+
+```java
+for (int i = 0; i < 5; i++) {
+    System.out.println(i); // 0 1 2 3 4
+}
+```
+
+## while文
+
+```java
+int n = 1;
+while (n <= 3) {
+    System.out.println(n);
+    n++;
+}
+// 1 2 3
+```
+
+## 拡張for文（配列の繰り返し）
+
+```java
+String[] fruits = {"apple", "banana", "cherry"};
+for (String fruit : fruits) {
+    System.out.println(fruit);
+}
+```
+MD,
+            ],
+            [
+                'title'   => 'メソッド',
+                'order'   => 6,
+                'content' => <<<'MD'
+# メソッド
+
+## 定義と呼び出し
+
+```java
+static String greet(String name) {
+    return "こんにちは、" + name + "！";
+}
+
+System.out.println(greet("Alice")); // こんにちは、Alice！
+```
+
+## オーバーロード
+
+同じ名前で引数の型・数が異なるメソッドを複数定義できます。
+
+```java
+static int add(int a, int b) {
+    return a + b;
+}
+
+static double add(double a, double b) {
+    return a + b;
+}
+```
+
+## 可変長引数
+
+```java
+static int sum(int... nums) {
+    int total = 0;
+    for (int n : nums) {
+        total += n;
+    }
+    return total;
+}
+
+System.out.println(sum(1, 2, 3, 4)); // 10
+```
+MD,
+            ],
+            [
+                'title'   => '配列',
+                'order'   => 7,
+                'content' => <<<'MD'
+# 配列
+
+## 宣言と初期化
+
+```java
+int[] arr = {1, 2, 3};
+int[] arr2 = new int[5]; // 長さ5の配列（初期値は0）
+```
+
+## 基本操作
+
+```java
+int[] nums = {1, 2, 3, 4, 5};
+System.out.println(nums.length); // 5
+System.out.println(nums[0]);     // 1
+
+for (int i = 0; i < nums.length; i++) {
+    System.out.println(nums[i]);
+}
+```
+
+## Arraysクラス
+
+```java
+import java.util.Arrays;
+
+int[] nums = {3, 1, 4, 1, 5};
+Arrays.sort(nums);
+System.out.println(Arrays.toString(nums)); // [1, 1, 3, 4, 5]
+```
+MD,
+            ],
+            [
+                'title'   => 'コレクション（ArrayList・HashMap）',
+                'order'   => 8,
+                'content' => <<<'MD'
+# コレクション
+
+配列は長さが固定ですが、コレクションは要素数を動的に変更できます。
+
+## ArrayList
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+List<String> fruits = new ArrayList<>();
+fruits.add("apple");
+fruits.add("banana");
+fruits.remove("apple");
+
+for (String fruit : fruits) {
+    System.out.println(fruit);
+}
+```
+
+## HashMap
+
+```java
+import java.util.HashMap;
+import java.util.Map;
+
+Map<String, Integer> scores = new HashMap<>();
+scores.put("Alice", 90);
+scores.put("Bob", 80);
+
+System.out.println(scores.get("Alice")); // 90
+
+for (Map.Entry<String, Integer> entry : scores.entrySet()) {
+    System.out.println(entry.getKey() + ": " + entry.getValue());
+}
+```
+MD,
+            ],
+            [
+                'title'   => 'クラスとオブジェクト',
+                'order'   => 9,
+                'content' => <<<'MD'
+# クラスとオブジェクト
+
+## クラスの定義
+
+```java
+class User {
+    private String name;
+    private int age;
+
+    public User(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public String greet() {
+        return "こんにちは、" + name + "！";
+    }
+}
+
+User user = new User("Alice", 25);
+System.out.println(user.greet());    // こんにちは、Alice！
+System.out.println(user.getAge());   // 25
+```
+
+## 継承
+
+```java
+class AdminUser extends User {
+    public AdminUser(String name, int age) {
+        super(name, age);
+    }
+
+    @Override
+    public String greet() {
+        return super.greet() + "（管理者）";
+    }
+}
+```
+MD,
+            ],
+            [
+                'title'   => '例外処理',
+                'order'   => 10,
+                'content' => <<<'MD'
+# 例外処理
+
+エラーが発生した場合に備えて、`try/catch` で安全に処理します。
+
+## 基本
+
+```java
+static double divide(int a, int b) {
+    if (b == 0) {
+        throw new IllegalArgumentException("ゼロ除算はできません");
+    }
+    return (double) a / b;
+}
+
+try {
+    System.out.println(divide(10, 2)); // 5.0
+    System.out.println(divide(10, 0)); // 例外が発生
+} catch (IllegalArgumentException e) {
+    System.out.println("エラー: " + e.getMessage());
+} finally {
+    System.out.println("処理終了");
+}
+```
+
+## カスタム例外
+
+```java
+class ValidationException extends RuntimeException {
+    public ValidationException(String message) {
+        super(message);
+    }
+}
+
+throw new ValidationException("バリデーションエラー");
+```
+MD,
+            ],
+        ];
+
         foreach ($jsMaterials as $data) {
             Material::create([
                 'title'     => $data['title'],
@@ -788,6 +1542,24 @@ MD,
                 'title'     => $data['title'],
                 'content'   => $data['content'],
                 'lesson_id' => $phpLesson?->id,
+                'order'     => $data['order'],
+            ]);
+        }
+
+        foreach ($pythonMaterials as $data) {
+            Material::create([
+                'title'     => $data['title'],
+                'content'   => $data['content'],
+                'lesson_id' => $pythonLesson?->id,
+                'order'     => $data['order'],
+            ]);
+        }
+
+        foreach ($javaMaterials as $data) {
+            Material::create([
+                'title'     => $data['title'],
+                'content'   => $data['content'],
+                'lesson_id' => $javaLesson?->id,
                 'order'     => $data['order'],
             ]);
         }

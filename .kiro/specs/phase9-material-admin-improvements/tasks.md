@@ -43,32 +43,32 @@
 
 ## 4. Backend: シーダー（US-5）
 
-- [ ] 4.1 `DatabaseSeeder` に Python基礎・Java基礎カテゴリを追加する（design §US-5）
+- [x] 4.1 `DatabaseSeeder` に Python基礎・Java基礎カテゴリを追加する（design §US-5）
   - 対象: `backend/database/seeders/DatabaseSeeder.php`
   - 既存4カテゴリに続けて「Python基礎」「Java基礎」を `name` + `description` で追加
 
-- [ ] 4.2 `LessonSeeder` に Python・Java レッスンを追加する（design §US-5）
+- [x] 4.2 `LessonSeeder` に Python・Java レッスンを追加する（design §US-5）
   - 対象: `backend/database/seeders/LessonSeeder.php`
   - `$jsLessons` / `$phpLessons` と同じ構造で `$pythonLessons`（`language: 'python'`）/ `$javaLessons`（`language: 'java'`）を各10件追加
   - トピック構成: Hello World → 変数 → 算術演算 → 条件分岐 → ループ → 関数 → 配列/リスト → 辞書 → クラス → 応用
   - Java は `public static void main(String[] args)` を持つトップレベルクラス1つで完結させる（`CodeExecutionService` の単一ファイル実行に対応するため）
   - 既存ループ処理と同じパターンで「Python基礎」「Java基礎」カテゴリに `sync`
 
-- [ ] 4.3 `MaterialSeeder` に Python・Java 学習資料を追加する（design §US-5）
+- [x] 4.3 `MaterialSeeder` に Python・Java 学習資料を追加する（design §US-5）
   - 対象: `backend/database/seeders/MaterialSeeder.php`
   - `$jsMaterials` / `$phpMaterials` と同じ構造で `$pythonMaterials` / `$javaMaterials` を各10件追加（`title` / `order` / `content`）
   - 既存パターンに倣い `Lesson::where('language', 'python')->first()` / `'java'` の最初のレッスンに `lesson_id` として紐づける
 
 ## 5. 検証
 
-- [ ] 5.1 `docker compose exec php php artisan migrate:fresh --seed` が成功することを確認する
-- [ ] 5.2 バックエンドテスト全パス（`docker compose exec php php artisan test`）
-- [ ] 5.3 フロントエンド lint パス（`docker compose exec node npm run lint`）
-- [ ] 5.4 動作確認チェックリスト
+- [x] 5.1 `docker compose exec php php artisan migrate:fresh --seed` が成功することを確認する
+- [x] 5.2 バックエンドテスト全パス（`docker compose exec php php artisan test`）
+- [x] 5.3 フロントエンド lint パス（`docker compose exec node npm run lint`）
+- [ ] 5.4 動作確認チェックリスト（US-1〜US-4はブラウザでの目視確認が必要。本環境にブラウザ操作ツールがなくAPIレベルの整合性確認のみ実施済み）
   - [ ] 管理: 学習資料エディタでカテゴリ選択によりレッスン選択肢が絞り込まれる（US-1）
   - [ ] 管理: 学習資料一覧にカテゴリ列がタグ表示される（US-2）
   - [ ] 管理: 学習資料一覧でタイトル・レッスン・カテゴリの検索・絞り込みが組み合わせで動作する（US-3）
   - [ ] 管理: 同一レッスン内でorderが重複する内容の保存が拒否される（US-4）
-  - [ ] 管理: レッスン一覧・学習資料一覧・カテゴリ一覧に Python・Java のデータが表示される（US-5）
-  - [ ] 生徒: Python・Java レッスンが実行でき、`expected_output` と一致する（US-5）
-  - [ ] 既存の JavaScript・PHP のレッスン・資料・カテゴリの内容・件数に回帰がない（US-5）
+  - [x] 管理: レッスン一覧・学習資料一覧・カテゴリ一覧に Python・Java のデータが表示される（US-5）— API応答で確認済み
+  - [x] 生徒: Python・Java レッスンが実行でき、`expected_output` と一致する（US-5）— 全20件をDocker実行し一致確認済み
+  - [x] 既存の JavaScript・PHP のレッスン・資料・カテゴリの内容・件数に回帰がない（US-5）— 各言語10件ずつで回帰なしを確認済み
