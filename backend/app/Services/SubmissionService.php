@@ -36,4 +36,9 @@ class SubmissionService
     {
         return $this->repository->findForUserAndLesson($userId, $lessonId);
     }
+
+    public function getCompletedLessonIds(int $userId): array
+    {
+        return $this->repository->completedLessonIds($userId);
+    }
 }
