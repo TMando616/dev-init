@@ -5,26 +5,26 @@
 
 ## 1. Backend: 完了済みレッスンID取得API（US-1）
 
-- [ ] 1.1 `SubmissionRepository::completedLessonIds()` を追加する（design §US-1）
+- [x] 1.1 `SubmissionRepository::completedLessonIds()` を追加する（design §US-1）
   - 対象: `backend/app/Repositories/SubmissionRepository.php`
   - `Submission::where('user_id', $userId)->where('status', 'completed')->pluck('lesson_id')->toArray()`
 
-- [ ] 1.2 `SubmissionService::getCompletedLessonIds()` を追加する（design §US-1）
+- [x] 1.2 `SubmissionService::getCompletedLessonIds()` を追加する（design §US-1）
   - 対象: `backend/app/Services/SubmissionService.php`
   - repository呼び出しのみの薄いラッパー
 
-- [ ] 1.3 `SubmissionController::completedLessonIds()` アクションとルートを追加する（design §US-1）
+- [x] 1.3 `SubmissionController::completedLessonIds()` アクションとルートを追加する（design §US-1）
   - 対象: `backend/app/Http/Controllers/SubmissionController.php`, `backend/routes/api.php`
   - `GET /submissions/completed-lesson-ids` を student-only（`auth:sanctum`）グループに追加し `{ lesson_ids: number[] }` を返す
   - adminガードには含めない
 
 ## 2. Backend: 次レッスンID（US-2）
 
-- [ ] 2.1 `Lesson::getNextLessonIdAttribute()` アクセサを追加する（design §US-2）
+- [x] 2.1 `Lesson::getNextLessonIdAttribute()` アクセサを追加する（design §US-2）
   - 対象: `backend/app/Models/Lesson.php`
   - `id` 昇順・全体順（カテゴリ非依存）で自分より大きい最小の `id` を返す。存在しなければ `null`
 
-- [ ] 2.2 `LessonRepository::find()` で `next_lesson_id` を append する（design §US-2）
+- [x] 2.2 `LessonRepository::find()` で `next_lesson_id` を append する（design §US-2）
   - 対象: `backend/app/Repositories/LessonRepository.php`
   - `find()` のみ変更する（`all()` は一覧取得時のN+1回避のため変更しない）
 
