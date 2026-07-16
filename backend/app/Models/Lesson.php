@@ -31,4 +31,9 @@ class Lesson extends Model
     {
         return $this->hasMany(Submission::class);
     }
+
+    public function getNextLessonIdAttribute(): ?int
+    {
+        return static::where('id', '>', $this->id)->orderBy('id')->value('id');
+    }
 }
