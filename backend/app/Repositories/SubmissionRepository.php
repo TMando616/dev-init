@@ -23,4 +23,15 @@ class SubmissionRepository
             ->where('lesson_id', $lessonId)
             ->first();
     }
+
+    /**
+     * Get the IDs of lessons completed by a user.
+     */
+    public function completedLessonIds(int $userId): array
+    {
+        return Submission::where('user_id', $userId)
+            ->where('status', 'completed')
+            ->pluck('lesson_id')
+            ->toArray();
+    }
 }
