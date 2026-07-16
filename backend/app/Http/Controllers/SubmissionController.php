@@ -63,4 +63,14 @@ class SubmissionController extends Controller
 
         return response()->json($submission);
     }
+
+    /**
+     * List the IDs of lessons completed by the authenticated user.
+     */
+    public function completedLessonIds(Request $request)
+    {
+        return response()->json([
+            'lesson_ids' => $this->service->getCompletedLessonIds($request->user()->id),
+        ]);
+    }
 }

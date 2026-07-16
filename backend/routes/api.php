@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/submissions', [SubmissionController::class, 'store']);
     Route::post('/submissions/complete', [SubmissionController::class, 'complete']);
     Route::get('/submissions/lesson/{lessonId}', [SubmissionController::class, 'show']);
+    Route::get('/submissions/completed-lesson-ids', [SubmissionController::class, 'completedLessonIds']);
 });
 
 // Admin-only protected endpoints
