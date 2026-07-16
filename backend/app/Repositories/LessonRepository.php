@@ -20,7 +20,10 @@ class LessonRepository
      */
     public function find(int $id): ?Lesson
     {
-        return Lesson::with(['categories', 'materials'])->find($id);
+        $lesson = Lesson::with(['categories', 'materials'])->find($id);
+        $lesson?->append('next_lesson_id');
+
+        return $lesson;
     }
 
     /**
