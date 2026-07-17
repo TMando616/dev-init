@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
-import { ChevronRight, BookOpen, ArrowLeft } from 'lucide-react';
+import { ChevronRight, BookOpen, ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 interface Category {
   id: number;
@@ -21,17 +21,20 @@ export default function LessonsList() {
   const { user, loading: authLoading } = useAuth();
   const [categories, setCategories] = useState<Category[]>([]);
   const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [completedLessonIds, setCompletedLessonIds] = useState<Set<number>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [categoriesRes, lessonsRes] = await Promise.all([
+        const [categoriesRes, lessonsRes, completedRes] = await Promise.all([
           api.get('/categories'),
           api.get('/lessons'),
+          api.get('/submissions/completed-lesson-ids'),
         ]);
         setCategories(categoriesRes.data);
         setLessons(lessonsRes.data);
+        setCompletedLessonIds(new Set(completedRes.data.lesson_ids));
       } catch (error) {
         console.error('Failed to fetch lessons', error);
       } finally {
@@ -78,7 +81,15 @@ export default function LessonsList() {
           </div>
         </div>
       </div>
-      <ChevronRight className="text-slate-400 group-hover:text-slate-900 transition-colors" />
+      <div className="flex items-center gap-3">
+        {completedLessonIds.has(lesson.id) && (
+          <span className="flex items-center gap-1 text-emerald-600 text-xs font-bold">
+            <CheckCircle2 size={16} />
+            完了
+          </span>
+        )}
+        <ChevronRight className="text-slate-400 group-hover:text-slate-900 transition-colors" />
+      </div>
     </Link>
   );
 

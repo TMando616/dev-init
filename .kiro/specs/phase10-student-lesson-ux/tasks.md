@@ -30,12 +30,12 @@
 
 ## 3. Frontend: レッスン一覧・カテゴリ別一覧に完了マーク（US-1）
 
-- [ ] 3.1 `lessons/list/page.tsx` に完了マークを表示する（design §US-1）
+- [x] 3.1 `lessons/list/page.tsx` に完了マークを表示する（design §US-1）
   - 対象: `frontend/src/app/(student)/lessons/list/page.tsx`
   - `completedLessonIds: Set<number>` state を追加し、既存の `Promise.all` に `GET /submissions/completed-lesson-ids` を追加
   - `LessonCard` 内、タイトル右・`ChevronRight` の左に `CheckCircle2` ＋「完了」を条件描画する（未完了レッスンは要素ごと非描画）
 
-- [ ] 3.2 `categories/[id]/page.tsx` に完了マークを表示する（design §US-1）
+- [x] 3.2 `categories/[id]/page.tsx` に完了マークを表示する（design §US-1）
   - 対象: `frontend/src/app/(student)/categories/[id]/page.tsx`
   - 3.1 と同一パターンを適用する
 
