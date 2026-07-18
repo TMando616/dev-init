@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import api from '@/lib/api';
 import {
   Home,
   BookOpen,
@@ -11,6 +12,7 @@ import {
   Code2,
   ChevronLeft,
   ChevronRight,
+  Tag,
 } from 'lucide-react';
 
 // Since I don't see a lib/utils.ts, I'll use a simple conditional class joiner
@@ -22,6 +24,14 @@ export default function Sidebar() {
   const { user, logout } = useAuth();
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const [categories, setCategories] = React.useState<{ id: number; name: string }[]>([]);
+
+  React.useEffect(() => {
+    if (!user) return;
+    api.get('/categories')
+      .then(res => setCategories(res.data))
+      .catch(() => {});
+  }, [user]);
 
   if (!user) return null;
 
@@ -32,7 +42,8 @@ export default function Sidebar() {
 
   // A nav item is active when its href is the most specific (longest) one matching
   // the current path. This avoids per-item exclusion lists.
-  const allHrefs = navItems.map((item) => item.href);
+  const categoryHrefs = categories.map((c) => `/categories/${c.id}`);
+  const allHrefs = [...navItems.map((item) => item.href), ...categoryHrefs];
 
   const matchesSegment = (href: string, path: string) =>
     path === href || path.startsWith(`${href}/`);
@@ -90,6 +101,34 @@ export default function Sidebar() {
             </Link>
           ))}
         </div>
+
+        {categories.length > 0 && (
+          <div className="space-y-1 mt-4">
+            {!isCollapsed && (
+              <p className="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider">カテゴリ</p>
+            )}
+            {categories.map((cat) => {
+              const href = `/categories/${cat.id}`;
+              return (
+                <Link
+                  key={cat.id}
+                  href={href}
+                  className={classNames(
+                    "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors group",
+                    isActive(href)
+                      ? "bg-slate-900 text-white"
+                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  )}
+                >
+                  <Tag size={20} className={classNames(
+                    isActive(href) ? "text-white" : "text-slate-400 group-hover:text-slate-600"
+                  )} />
+                  {!isCollapsed && <span className="font-medium">{cat.name}</span>}
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </nav>
 
       <div className="p-4 border-t border-slate-100 space-y-4">

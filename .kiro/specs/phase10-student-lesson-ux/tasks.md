@@ -52,7 +52,7 @@
 
 ## 5. Frontend: サイドバーへのカテゴリ表示（US-3）
 
-- [ ] 5.1 `Sidebar.tsx` にカテゴリ一覧を動的表示する（design §US-3）
+- [x] 5.1 `Sidebar.tsx` にカテゴリ一覧を動的表示する（design §US-3）
   - 対象: `frontend/src/components/Sidebar.tsx`
   - `categories` state を追加し `GET /categories` を取得
   - `allHrefs` にカテゴリの href を含めて `isActive` ロジックに反映
