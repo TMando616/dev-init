@@ -149,15 +149,16 @@ import { ChevronRight } from 'lucide-react'; // 既存 import に追加
   <Button
     variant="ghost"
     size="sm"
-    className="text-slate-300 hover:bg-slate-700 hover:text-white"
+    className="text-slate-300 hover:bg-slate-700 hover:text-white disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed"
     onClick={() => router.push(`/lessons/${lesson.next_lesson_id}`)}
+    disabled={!isCompleted}
   >
     次のレッスンへ
     <ChevronRight size={18} className="ml-2" />
   </Button>
 )}
 ```
-次のレッスンが存在しない（`null`）場合はボタン自体を描画しない（非表示方式を採用）。完了状態・保存状態に関わらず常に活性。
+次のレッスンが存在しない（`null`）場合はボタン自体を描画しない（非表示方式を採用）。**（US-2要件を後から変更）** 当初は完了状態に関わらず常に活性としていたが、「完了済みの場合のみ活性化する」方針に変更。`isCompleted` は既存の受講状況stateをそのまま利用する。
 
 **重要: レッスン間の状態リセット**
 

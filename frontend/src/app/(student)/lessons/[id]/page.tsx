@@ -290,8 +290,9 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
             <Button
               variant="ghost"
               size="sm"
-              className="text-slate-300 hover:bg-slate-700 hover:text-white"
+              className="text-slate-300 hover:bg-slate-700 hover:text-white disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed"
               onClick={() => router.push(`/lessons/${lesson.next_lesson_id}`)}
+              disabled={!isCompleted}
             >
               次のレッスンへ
               <ChevronRight size={18} className="ml-2" />
