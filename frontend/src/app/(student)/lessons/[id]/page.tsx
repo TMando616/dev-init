@@ -7,7 +7,7 @@ import { Button } from '@/components/ui';
 import api from '@/lib/api';
 import Editor from '@monaco-editor/react';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
-import { ChevronLeft, Save, Play, Eye, EyeOff, CloudCheck, CloudUpload, CheckCircle2, FileText } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Save, Play, Eye, EyeOff, CloudCheck, CloudUpload, CheckCircle2, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { Console } from '@/components/Console';
 import { isAxiosError } from 'axios';
@@ -33,6 +33,7 @@ interface Lesson {
   expected_output?: string;
   categories: Category[];
   materials: Material[];
+  next_lesson_id: number | null;
 }
 
 export default function LessonPage({ params }: { params: Promise<{ id: string }> }) {
@@ -86,6 +87,12 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
     };
 
     if (!authLoading && user) {
+      setLogs([]);
+      setError(undefined);
+      setJudgeResult(null);
+      setShowModelAnswer(false);
+      setSelectedMaterial(null);
+      setIsLoading(true);
       fetchLessonAndSubmission();
     }
   }, [id, authLoading, user]);
@@ -271,6 +278,17 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
             <CheckCircle2 size={18} className="mr-2" />
             {isCompleted ? '完了済み' : '完了にする'}
           </Button>
+          {lesson.next_lesson_id !== null && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-slate-300 hover:bg-slate-700 hover:text-white"
+              onClick={() => router.push(`/lessons/${lesson.next_lesson_id}`)}
+            >
+              次のレッスンへ
+              <ChevronRight size={18} className="ml-2" />
+            </Button>
+          )}
         </div>
       </header>
 

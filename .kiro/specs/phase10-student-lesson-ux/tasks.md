@@ -41,12 +41,12 @@
 
 ## 4. Frontend: レッスン詳細画面の次レッスン遷移（US-2）
 
-- [ ] 4.1 「次のレッスンへ」ボタンを追加する（design §US-2）
+- [x] 4.1 「次のレッスンへ」ボタンを追加する（design §US-2）
   - 対象: `frontend/src/app/(student)/lessons/[id]/page.tsx`
   - `Lesson` interface に `next_lesson_id: number | null` を追加
   - `next_lesson_id !== null` の場合のみ「完了にする」ボタンの右に表示し、押下で `/lessons/{next_lesson_id}` へ `router.push`
 
-- [ ] 4.2 レッスン遷移時のローカルstateリセットを追加する（design §US-2）
+- [x] 4.2 レッスン遷移時のローカルstateリセットを追加する（design §US-2）
   - 対象: 同上
   - `fetchLessonAndSubmission` の `useEffect`（`[id, authLoading, user]` 依存）先頭で `logs` / `error` / `judgeResult` / `showModelAnswer` / `selectedMaterial` をリセットしてから取得処理に入る
 
