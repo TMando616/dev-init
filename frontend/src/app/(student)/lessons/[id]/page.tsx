@@ -57,6 +57,20 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
   const [isExecuting, setIsExecuting] = useState(false);
   const [judgeResult, setJudgeResult] = useState<'pass' | 'fail' | null>(null);
 
+  // Reset lesson-scoped local state during render when navigating between
+  // lessons, since Next.js reuses this component instance across dynamic
+  // segment changes instead of remounting it.
+  const [prevId, setPrevId] = useState(id);
+  if (id !== prevId) {
+    setPrevId(id);
+    setLogs([]);
+    setError(undefined);
+    setJudgeResult(null);
+    setShowModelAnswer(false);
+    setSelectedMaterial(null);
+    setIsLoading(true);
+  }
+
   useEffect(() => {
     const fetchLessonAndSubmission = async () => {
       try {
@@ -87,12 +101,6 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
     };
 
     if (!authLoading && user) {
-      setLogs([]);
-      setError(undefined);
-      setJudgeResult(null);
-      setShowModelAnswer(false);
-      setSelectedMaterial(null);
-      setIsLoading(true);
       fetchLessonAndSubmission();
     }
   }, [id, authLoading, user]);

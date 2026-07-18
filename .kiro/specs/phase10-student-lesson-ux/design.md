@@ -163,20 +163,25 @@ import { ChevronRight } from 'lucide-react'; // 既存 import に追加
 
 Next.js App Router の動的セグメント（`/lessons/[id]`）は、同じ `page.tsx` 内での遷移だとコンポーネントがアンマウントされずに再利用されるため、`id` が変わっても `logs` / `judgeResult` / `showModelAnswer` / `selectedMaterial` 等のローカル state がそのまま次のレッスンに引き継がれてしまう（前のレッスンの実行結果や模範解答表示が残ったまま次のレッスンが表示される不具合になる）。
 
-既存の `fetchLessonAndSubmission` の `useEffect`（`[id, authLoading, user]` 依存）の先頭で、`id` が変わるたびに以下をリセットしてから取得処理に入る:
+**実装時の変更点**: 当初は `fetchLessonAndSubmission` の `useEffect` 先頭でリセットする案だったが、`eslint-config-next`（Next.js 16 / React Compiler連携）の `react-hooks/set-state-in-effect` ルールに抵触するため（effect内での同期的setStateはcascading renderを招くとして禁止されている）、React公式が推奨する「レンダー中に前propと比較してリセットする」パターンに変更した:
 ```typescript
+const [prevId, setPrevId] = useState(id);
+if (id !== prevId) {
+  setPrevId(id);
+  setLogs([]);
+  setError(undefined);
+  setJudgeResult(null);
+  setShowModelAnswer(false);
+  setSelectedMaterial(null);
+  setIsLoading(true);
+}
+
 useEffect(() => {
   const fetchLessonAndSubmission = async () => {
     // 既存の取得処理はそのまま
   };
 
   if (!authLoading && user) {
-    setLogs([]);
-    setError(undefined);
-    setJudgeResult(null);
-    setShowModelAnswer(false);
-    setSelectedMaterial(null);
-    setIsLoading(true);
     fetchLessonAndSubmission();
   }
 }, [id, authLoading, user]);

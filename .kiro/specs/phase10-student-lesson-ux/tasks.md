@@ -60,8 +60,8 @@
 
 ## 6. 検証
 
-- [ ] 6.1 バックエンドテスト全パス（`docker compose exec php php artisan test`）
-- [ ] 6.2 フロントエンド lint パス（`docker compose exec node npm run lint`）
+- [x] 6.1 バックエンドテスト全パス（`docker compose exec php php artisan test`）
+- [x] 6.2 フロントエンド lint パス（`docker compose exec node npm run lint`）
 - [ ] 6.3 動作確認チェックリスト（ブラウザでの目視確認）
   - [ ] レッスン一覧・カテゴリ別一覧で完了済みレッスンに完了マークが表示される（US-1）
   - [ ] 未完了のレッスンには完了マークが表示されない（US-1）
