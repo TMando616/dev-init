@@ -50,7 +50,7 @@ export default function LessonsList() {
   if (authLoading || isLoading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-lg text-slate-600 animate-pulse">読み込み中...</p>
+        <p className="text-lg text-slate-600 dark:text-slate-400 animate-pulse">読み込み中...</p>
       </div>
     );
   }
@@ -64,17 +64,17 @@ export default function LessonsList() {
   const LessonCard = ({ lesson }: { lesson: Lesson }) => (
     <Link
       href={`/lessons/${lesson.id}`}
-      className="group bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:border-slate-300 hover:shadow-md transition-all flex items-center justify-between"
+      className="group bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-md transition-all flex items-center justify-between"
     >
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-slate-600 group-hover:bg-slate-900 group-hover:text-white transition-colors">
+        <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-600 dark:text-slate-400 group-hover:bg-slate-900 dark:group-hover:bg-slate-100 group-hover:text-white dark:group-hover:text-slate-900 transition-colors">
           <BookOpen size={24} />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-slate-900">{lesson.title}</h3>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{lesson.title}</h3>
           <div className="flex flex-wrap gap-2 mt-1">
             {lesson.categories?.map(cat => (
-              <span key={cat.id} className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+              <span key={cat.id} className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
                 {cat.name}
               </span>
             ))}
@@ -83,12 +83,12 @@ export default function LessonsList() {
       </div>
       <div className="flex items-center gap-3">
         {completedLessonIds.has(lesson.id) && (
-          <span className="flex items-center gap-1 text-emerald-600 text-xs font-bold">
+          <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
             <CheckCircle2 size={16} />
             完了
           </span>
         )}
-        <ChevronRight className="text-slate-400 group-hover:text-slate-900 transition-colors" />
+        <ChevronRight className="text-slate-400 dark:text-slate-500 group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors" />
       </div>
     </Link>
   );
@@ -109,17 +109,17 @@ export default function LessonsList() {
   return (
     <main className="flex-1 p-8 max-w-5xl mx-auto w-full">
       <div className="mb-8 flex items-center gap-4">
-        <Link href="/" className="text-slate-500 hover:text-slate-900 transition-colors">
+        <Link href="/" className="text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
           <ArrowLeft size={24} />
         </Link>
         <div>
-          <h2 className="text-3xl font-bold text-slate-900">すべてのレッスン</h2>
-          <p className="text-slate-600 mt-1">学習したいレッスンを選択してください。</p>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">すべてのレッスン</h2>
+          <p className="text-slate-600 dark:text-slate-400 mt-1">学習したいレッスンを選択してください。</p>
         </div>
       </div>
 
       {lessons.length === 0 ? (
-        <div className="bg-white rounded-xl border border-dashed border-slate-300 p-12 text-center">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 p-12 text-center">
           <p className="text-slate-500">利用可能なレッスンがまだありません。</p>
         </div>
       ) : hasCategories ? (
