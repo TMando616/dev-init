@@ -21,14 +21,16 @@ const schema = {
 interface MarkdownRendererProps {
   content: string;
   className?: string;
+  invertOnDark?: boolean;
 }
 
 export default function MarkdownRenderer({
   content,
   className = "",
+  invertOnDark = true,
 }: MarkdownRendererProps) {
   return (
-    <div className={`prose prose-neutral dark:prose-invert max-w-none ${className}`}>
+    <div className={`prose prose-neutral ${invertOnDark ? "dark:prose-invert" : ""} max-w-none ${className}`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeHighlight, [rehypeSanitize, schema]]}
