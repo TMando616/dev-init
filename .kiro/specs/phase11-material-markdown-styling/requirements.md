@@ -57,7 +57,7 @@
 - [x] `docker compose exec node npm run lint` がパスすることを確認
 - [x] `docker compose exec node npm run build` の型チェック相当が今回の変更に起因するエラーを出さないことを確認（`/admin/admins`のプリレンダリングエラーは本変更と無関係な既存の別問題であることを、変更を一時退避した状態でも同じエラーが再現することで確認済み）
 - [x] コンパイル後のCSS（`_next/static/css/app/layout.css`）を直接取得し、`--tw-prose-*`変数・`h1, h2`の`border-bottom`・インラインコードの`background-color`・`pre code`のリセットが出力されていることを確認
-- [ ] ブラウザでの目視確認（本環境にはchromium-cli等のブラウザ操作ツールがなく未実施。次回、環境が整い次第または手動で確認する）
+- [x] ブラウザでの目視確認（学習資料モーダル・レッスン本文で見出し下線・インラインコード背景色を確認済み）
 
 ---
 
