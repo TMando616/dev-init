@@ -53,7 +53,7 @@ export default function CategoryLessons({ params }: { params: Promise<{ id: stri
   if (authLoading || isLoading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-lg text-slate-600 animate-pulse font-medium">読み込み中...</p>
+        <p className="text-lg text-slate-600 dark:text-slate-400 animate-pulse font-medium">読み込み中...</p>
       </div>
     );
   }
@@ -63,7 +63,7 @@ export default function CategoryLessons({ params }: { params: Promise<{ id: stri
   return (
     <main className="flex-1 p-8 max-w-5xl mx-auto w-full">
       <div className="mb-8 flex items-center gap-4">
-        <Link href="/" className="text-slate-500 hover:text-slate-900 transition-colors">
+        <Link href="/" className="text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
           <ArrowLeft size={24} />
         </Link>
         <div>
@@ -71,17 +71,17 @@ export default function CategoryLessons({ params }: { params: Promise<{ id: stri
             <Tag size={16} />
             <span className="text-sm font-bold uppercase tracking-wider">カテゴリ</span>
           </div>
-          <h2 className="text-3xl font-bold text-slate-900">{category.name}</h2>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">{category.name}</h2>
           {category.description && (
-            <p className="text-slate-600 mt-2">{category.description}</p>
+            <p className="text-slate-600 dark:text-slate-400 mt-2">{category.description}</p>
           )}
         </div>
       </div>
 
       {/* 演習問題セクション */}
       <div className="mb-4 flex items-center gap-2">
-        <BookOpen size={20} />
-        <h3 className="text-lg font-bold text-slate-900">演習問題</h3>
+        <BookOpen size={20} className="text-slate-900 dark:text-slate-100" />
+        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">演習問題</h3>
       </div>
       <div className="grid grid-cols-1 gap-4">
         {category.lessons && category.lessons.length > 0 ? (
@@ -89,22 +89,22 @@ export default function CategoryLessons({ params }: { params: Promise<{ id: stri
             <Link 
               key={lesson.id} 
               href={`/lessons/${lesson.id}`}
-              className="group bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:border-slate-300 hover:shadow-md transition-all flex items-center justify-between"
+              className="group bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-md transition-all flex items-center justify-between"
             >
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-slate-600 group-hover:bg-slate-900 group-hover:text-white transition-colors">
+                <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-600 dark:text-slate-400 group-hover:bg-slate-900 dark:group-hover:bg-slate-100 group-hover:text-white dark:group-hover:text-slate-900 transition-colors">
                   <BookOpen size={24} />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900">{lesson.title}</h3>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{lesson.title}</h3>
                   <div className="flex flex-wrap gap-2 mt-1">
                     {lesson.categories?.map(cat => (
-                      <span 
-                        key={cat.id} 
+                      <span
+                        key={cat.id}
                         className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
-                          cat.id === category.id 
-                            ? "bg-slate-900 text-white" 
-                            : "bg-slate-100 text-slate-600"
+                          cat.id === category.id
+                            ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
+                            : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
                         }`}
                       >
                         {cat.name}
@@ -115,19 +115,19 @@ export default function CategoryLessons({ params }: { params: Promise<{ id: stri
               </div>
               <div className="flex items-center gap-3">
                 {completedLessonIds.has(lesson.id) && (
-                  <span className="flex items-center gap-1 text-emerald-600 text-xs font-bold">
+                  <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
                     <CheckCircle2 size={16} />
                     完了
                   </span>
                 )}
-                <ChevronRight className="text-slate-400 group-hover:text-slate-900 transition-colors" />
+                <ChevronRight className="text-slate-400 dark:text-slate-500 group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors" />
               </div>
             </Link>
           ))
         ) : (
-          <div className="bg-white rounded-xl border border-dashed border-slate-300 p-12 text-center">
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 p-12 text-center">
             <p className="text-slate-500">このカテゴリにはまだレッスンが登録されていません。</p>
-            <Link href="/" className="text-slate-900 font-bold underline mt-4 inline-block">
+            <Link href="/" className="text-slate-900 dark:text-slate-100 font-bold underline mt-4 inline-block">
               ダッシュボードへ戻る
             </Link>
           </div>
