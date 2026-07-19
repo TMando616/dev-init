@@ -324,7 +324,7 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
               </div>
             </div>
           )}
-          <MarkdownRenderer content={lesson.content} />
+          <MarkdownRenderer content={lesson.content} invertOnDark={false} />
         </div>
 
         {/* Right Pane: Editor(s) & Console */}
