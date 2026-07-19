@@ -113,13 +113,13 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between sticky top-0 z-10">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-8 py-4 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-4">
-          <Link href="/admin" className="text-slate-500 hover:text-slate-900 transition-colors">
+          <Link href="/admin" className="text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
             <ArrowLeft size={20} />
           </Link>
-          <h1 className="text-xl font-bold">
+          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">
             {isNew ? '新規レッスン作成' : 'レッスン編集'}
           </h1>
         </div>
@@ -135,13 +135,13 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
       </header>
 
       <main className="p-8 max-w-6xl mx-auto space-y-8">
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 space-y-6">
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-8 space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div className="lg:col-span-2">
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                 レッスンタイトル
               </label>
-              <Input 
+              <Input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="例: JavaScriptの基礎"
@@ -149,7 +149,7 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                 実行言語
               </label>
               <Select
@@ -164,12 +164,12 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
               </Select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                 カテゴリ <span className="text-red-500">*</span>
               </label>
-              <div className={`flex flex-wrap gap-2 p-3 border rounded-md bg-slate-50/50 min-h-[42px] ${categoryError ? 'border-red-400' : 'border-slate-200'}`}>
+              <div className={`flex flex-wrap gap-2 p-3 border rounded-md bg-slate-50/50 dark:bg-slate-800/40 min-h-[42px] ${categoryError ? 'border-red-400 dark:border-red-500' : 'border-slate-200 dark:border-slate-700'}`}>
                 {categories.map((category) => (
-                  <label key={category.id} className="flex items-center gap-2 cursor-pointer bg-white px-2 py-1 rounded border border-slate-200 hover:border-slate-300 transition-colors">
+                  <label key={category.id} className="flex items-center gap-2 cursor-pointer bg-white dark:bg-slate-900 px-2 py-1 rounded border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
                     <input
                       type="checkbox"
                       checked={selectedCategoryIds.includes(category.id)}
@@ -180,9 +180,9 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
                           setSelectedCategoryIds(selectedCategoryIds.filter(id => id !== category.id));
                         }
                       }}
-                      className="w-3.5 h-3.5 rounded text-slate-900 focus:ring-slate-950"
+                      className="w-3.5 h-3.5 rounded text-slate-900 dark:text-slate-100 focus:ring-slate-950 dark:focus:ring-slate-300"
                     />
-                    <span className="text-xs font-medium text-slate-700">{category.name}</span>
+                    <span className="text-xs font-medium text-slate-700 dark:text-slate-300">{category.name}</span>
                   </label>
                 ))}
                 {categories.length === 0 && (
@@ -190,17 +190,17 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
                 )}
               </div>
               {categoryError && (
-                <p className="mt-1 text-xs text-red-500">{categoryError}</p>
+                <p className="mt-1 text-xs text-red-500 dark:text-red-400">{categoryError}</p>
               )}
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-700">
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
                 本文 (Markdown)
               </label>
-              <div className="border border-slate-200 rounded-md overflow-hidden h-[500px]">
+              <div className="border border-slate-200 dark:border-slate-700 rounded-md overflow-hidden h-[500px]">
                 <Editor
                   height="100%"
                   defaultLanguage="markdown"
@@ -219,10 +219,10 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-slate-700">
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
                   模範解答 ({SUPPORTED_LANGUAGES.find(l => l.value === language)?.label})
                 </label>
-                <div className="border border-slate-200 rounded-md overflow-hidden h-[360px]">
+                <div className="border border-slate-200 dark:border-slate-700 rounded-md overflow-hidden h-[360px]">
                   <Editor
                     height="100%"
                     language={language}
@@ -238,7 +238,7 @@ export default function LessonEditor({ params }: { params: Promise<{ id: string 
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-slate-700">
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
                   期待される出力 <span className="text-xs font-normal text-slate-500">(自動判定に使用。空白の場合は判定しない)</span>
                 </label>
                 <textarea
