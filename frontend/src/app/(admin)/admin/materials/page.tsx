@@ -69,10 +69,10 @@ export default function AdminMaterials() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-8 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold">学習資料管理</h1>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">学習資料管理</h1>
         </div>
         <Link href="/admin/materials/new">
           <Button className="flex items-center gap-2">
@@ -116,25 +116,25 @@ export default function AdminMaterials() {
           </Select>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
           <table className="w-full text-left">
-            <thead className="bg-slate-50 border-b border-slate-200">
+            <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700">
               <tr>
-                <th className="px-6 py-4 font-semibold text-slate-700">タイトル</th>
-                <th className="px-6 py-4 font-semibold text-slate-700">レッスン</th>
-                <th className="px-6 py-4 font-semibold text-slate-700">カテゴリ</th>
-                <th className="px-6 py-4 font-semibold text-slate-700">順序</th>
-                <th className="px-6 py-4 font-semibold text-slate-700 text-right">操作</th>
+                <th className="px-6 py-4 font-semibold text-slate-700 dark:text-slate-300">タイトル</th>
+                <th className="px-6 py-4 font-semibold text-slate-700 dark:text-slate-300">レッスン</th>
+                <th className="px-6 py-4 font-semibold text-slate-700 dark:text-slate-300">カテゴリ</th>
+                <th className="px-6 py-4 font-semibold text-slate-700 dark:text-slate-300">順序</th>
+                <th className="px-6 py-4 font-semibold text-slate-700 dark:text-slate-300 text-right">操作</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {filteredMaterials.length > 0 ? (
                 filteredMaterials.map((material) => (
-                  <tr key={material.id} className="hover:bg-slate-50 transition-colors">
+                  <tr key={material.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <FileText size={18} className="text-slate-400" />
-                        <span className="font-medium text-slate-900">{material.title}</span>
+                        <FileText size={18} className="text-slate-400 dark:text-slate-500" />
+                        <span className="font-medium text-slate-900 dark:text-slate-100">{material.title}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-slate-500 text-sm">
@@ -146,13 +146,13 @@ export default function AdminMaterials() {
                           material.lesson.categories.map((c) => (
                             <span
                               key={c.id}
-                              className="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-medium"
+                              className="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-medium"
                             >
                               {c.name}
                             </span>
                           ))
                         ) : (
-                          <span className="text-slate-400 text-sm">—</span>
+                          <span className="text-slate-400 dark:text-slate-500 text-sm">—</span>
                         )}
                       </div>
                     </td>
@@ -163,7 +163,7 @@ export default function AdminMaterials() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                            className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/40"
                           >
                             <Edit2 size={16} />
                           </Button>
@@ -171,7 +171,7 @@ export default function AdminMaterials() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/40"
                           onClick={() => handleDelete(material.id)}
                         >
                           <Trash2 size={16} />
