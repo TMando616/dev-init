@@ -57,7 +57,7 @@ export default function Home() {
   if (authLoading || isLoading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-lg text-slate-600 animate-pulse font-medium">読み込み中...</p>
+        <p className="text-lg text-slate-600 dark:text-slate-400 animate-pulse font-medium">読み込み中...</p>
       </div>
     );
   }
@@ -67,44 +67,44 @@ export default function Home() {
   return (
     <main className="flex-1 p-8 max-w-6xl mx-auto w-full space-y-8">
       <div>
-        <h2 className="text-3xl font-bold text-slate-900">ダッシュボード</h2>
-        <p className="text-slate-600 mt-2">ようこそ {user?.name} さん。学習を続けましょう。</p>
+        <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">ダッシュボード</h2>
+        <p className="text-slate-600 dark:text-slate-400 mt-2">ようこそ {user?.name} さん。学習を続けましょう。</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Overall Progress */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm">
           <div className="flex items-center justify-between mb-8">
-            <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <BarChart2 size={20} className="text-slate-500" />
               全体の進捗
             </h3>
-            <span className="text-2xl font-black text-slate-900">{data.overall_progress.percentage}%</span>
+            <span className="text-2xl font-black text-slate-900 dark:text-slate-100">{data.overall_progress.percentage}%</span>
           </div>
 
           <div className="space-y-6">
-            <div className="w-full bg-slate-100 rounded-full h-4 overflow-hidden">
-              <div 
-                className="bg-slate-900 h-full transition-all duration-1000 ease-out"
+            <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-4 overflow-hidden">
+              <div
+                className="bg-slate-900 dark:bg-slate-100 h-full transition-all duration-1000 ease-out"
                 style={{ width: `${data.overall_progress.percentage}%` }}
               />
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+              <div className="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-4 border border-slate-100 dark:border-slate-800">
                 <p className="text-sm text-slate-500 font-medium">完了済みレッスン</p>
-                <p className="text-2xl font-bold text-slate-900 mt-1">{data.overall_progress.completed}</p>
+                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">{data.overall_progress.completed}</p>
               </div>
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+              <div className="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-4 border border-slate-100 dark:border-slate-800">
                 <p className="text-sm text-slate-500 font-medium">全レッスン数</p>
-                <p className="text-2xl font-bold text-slate-900 mt-1">{data.overall_progress.total}</p>
+                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">{data.overall_progress.total}</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Recent Lesson / Continue */}
-        <div className="bg-slate-900 rounded-2xl p-8 shadow-sm text-white flex flex-col justify-between">
+        <div className="bg-slate-900 dark:bg-slate-800 rounded-2xl p-8 shadow-sm text-white flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2 mb-6">
               <Clock size={20} className="text-slate-400" />
@@ -141,7 +141,7 @@ export default function Home() {
       <div>
         <div className="flex items-center gap-2 mb-6">
           <Tag size={20} className="text-slate-500" />
-          <h3 className="text-xl font-bold text-slate-900">カテゴリ別進捗</h3>
+          <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">カテゴリ別進捗</h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -152,25 +152,25 @@ export default function Home() {
                 <Link 
                   key={cat.category_id}
                   href={`/categories/${cat.category_id}`}
-                  className="group bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:border-slate-300 hover:shadow-md transition-all space-y-4"
+                  className="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-md transition-all space-y-4"
                 >
                   <div className="flex items-center justify-between">
-                    <h4 className="font-bold text-slate-900 group-hover:text-slate-700 transition-colors">
+                    <h4 className="font-bold text-slate-900 dark:text-slate-100 group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors">
                       {cat.name}
                     </h4>
                     <span className="text-sm font-bold text-slate-500">{percentage}%</span>
                   </div>
-                  
-                  <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                    <div 
-                      className="bg-slate-900 h-full transition-all duration-700"
+
+                  <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-slate-900 dark:bg-slate-100 h-full transition-all duration-700"
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
-                  
+
                   <div className="flex items-center justify-between text-xs font-medium">
                     <span className="text-slate-500">{cat.completed} / {cat.total} レッスン</span>
-                    <span className="text-slate-400 flex items-center gap-1 group-hover:text-slate-900 transition-colors">
+                    <span className="text-slate-400 dark:text-slate-500 flex items-center gap-1 group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors">
                       詳細 <ChevronRight size={14} />
                     </span>
                   </div>
@@ -178,7 +178,7 @@ export default function Home() {
               );
             })
           ) : (
-            <div className="col-span-full bg-white rounded-2xl border border-dashed border-slate-300 p-12 text-center">
+            <div className="col-span-full bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-600 p-12 text-center">
               <p className="text-slate-500">カテゴリがまだ登録されていません。</p>
             </div>
           )}
@@ -187,7 +187,7 @@ export default function Home() {
 
       {/* Quick Access All Lessons Link */}
       <div className="flex justify-center pt-8">
-        <Link href="/lessons/list" className="text-slate-500 hover:text-slate-900 font-medium flex items-center gap-2 transition-colors">
+        <Link href="/lessons/list" className="text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 font-medium flex items-center gap-2 transition-colors">
           <BookOpen size={20} />
           すべてのレッスンをブラウズする
         </Link>
