@@ -150,16 +150,16 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between sticky top-0 z-10">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-8 py-4 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-4">
           <Link
             href="/admin/materials"
-            className="text-slate-500 hover:text-slate-900 transition-colors"
+            className="text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
           >
             <ArrowLeft size={20} />
           </Link>
-          <h1 className="text-xl font-bold">
+          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">
             {isNew ? '新規学習資料作成' : '学習資料編集'}
           </h1>
         </div>
@@ -180,10 +180,10 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
 
       <main className="p-8 max-w-7xl mx-auto space-y-6">
         {/* メタ情報 */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div className="lg:col-span-1">
-              <label className="block text-sm font-semibold text-slate-700 mb-2">タイトル</label>
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">タイトル</label>
               <Input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -192,7 +192,7 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                 カテゴリで絞り込む
               </label>
               <Select value={categoryFilterId} onChange={(e) => handleCategoryFilterChange(e.target.value)}>
@@ -205,7 +205,7 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
               </Select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                 レッスン <span className="text-red-500">*</span>
               </label>
               <Select value={lessonId} onChange={(e) => setLessonId(e.target.value)} required>
@@ -218,7 +218,7 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
               </Select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">表示順</label>
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">表示順</label>
               <Input
                 type="number"
                 min={0}
@@ -231,7 +231,7 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
                 </p>
               )}
               {orderError && (
-                <p className="mt-1 text-xs text-red-500">{orderError}</p>
+                <p className="mt-1 text-xs text-red-500 dark:text-red-400">{orderError}</p>
               )}
             </div>
           </div>
@@ -239,9 +239,9 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
 
         {/* エディタ + プレビュー */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="px-4 py-3 border-b border-slate-200 bg-slate-50">
-              <p className="text-sm font-semibold text-slate-700">Markdownエディタ</p>
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
+              <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">Markdownエディタ</p>
             </div>
             <Editor
               height="70vh"
@@ -258,15 +258,15 @@ export default function MaterialEditor({ params }: { params: Promise<{ id: strin
             />
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="px-4 py-3 border-b border-slate-200 bg-slate-50">
-              <p className="text-sm font-semibold text-slate-700">プレビュー</p>
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
+              <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">プレビュー</p>
             </div>
             <div className="p-6 overflow-auto h-[70vh]">
               {content ? (
                 <MarkdownRenderer content={content} />
               ) : (
-                <p className="text-slate-400 text-sm">左のエディタに Markdown を入力すると、ここにプレビューが表示されます。</p>
+                <p className="text-slate-400 dark:text-slate-500 text-sm">左のエディタに Markdown を入力すると、ここにプレビューが表示されます。</p>
               )}
             </div>
           </div>
