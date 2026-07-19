@@ -23,15 +23,15 @@ export default function MaterialModal({ material, onClose }: MaterialModalProps)
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-2xl max-h-[80vh] flex flex-col bg-white rounded-xl shadow-2xl mx-4"
+        className="relative w-full max-w-2xl max-h-[80vh] flex flex-col bg-white dark:bg-slate-900 rounded-xl shadow-2xl mx-4"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 flex-shrink-0">
-          <h2 className="text-lg font-bold text-slate-900 truncate pr-4">{material.title}</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex-shrink-0">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 truncate pr-4">{material.title}</h2>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0"
+            className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors flex-shrink-0"
             aria-label="閉じる"
           >
             <X size={20} />
