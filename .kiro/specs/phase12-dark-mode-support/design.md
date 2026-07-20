@@ -119,7 +119,7 @@ className="flex min-h-screen bg-slate-50 dark:bg-slate-950"
 ```
 className="min-h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100"
 ```
-`globals.css` の `--background`/`--foreground` はこのクラスセレクタに上書きされて実質無効なため、`globals.css` 側は変更不要（`:root` のCSS変数分岐は追加しない）。ここに `dark:` を追加しない場合、ログイン/登録ページの外枠（カード外の余白部分）だけがダーク未対応のまま残るため、土台対応の一部として明記する。
+**実装時に判明した修正点**: `globals.css` の `body { background: var(--background); color: var(--foreground); }` は `@layer` の外に書かれた素のCSSであり、Tailwind v4のユーティリティクラス（`@layer utilities` 内）よりCSS Cascade Layersの規定で常に優先されてしまう。そのため当初の想定（クラスセレクタが上書きするので変更不要）は誤りで、この`body{}`ルールが`<body>`の`dark:bg-slate-950 dark:text-slate-100`を無効化し、ログイン/登録ページの見出し（`DevInit`）等が実質的に読めなくなる不具合が発生した。`globals.css`から`background`/`color`の宣言を削除し、`<body>`のクラスに一本化することで解消した（ブラウザでの`prefers-color-scheme: dark`エミュレーション確認時に発見）。
 
 ---
 
