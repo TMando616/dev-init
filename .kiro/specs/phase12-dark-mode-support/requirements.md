@@ -24,19 +24,19 @@
 > As a 受講生・管理者 / I want to OSをダークモードに設定していてもアプリ内のテキストと背景が適切なコントラストで表示されてほしい / So that 現状のように文字が背景色に同化して読めなくなる不具合を避けられる。
 
 受け入れ条件:
-- [ ] `MarkdownRenderer`を使用する画面（学習資料モーダル `MaterialModal.tsx`、レッスン本文 `lessons/[id]`、資料詳細 `materials/[id]`、管理画面の資料プレビュー `admin/materials/[id]`）は、ダーク時に文字色だけでなく背景色も追随して反転する
-- [ ] 共通UIコンポーネント（`Input` / `Select` / `Button`、`components/ui/index.tsx`）に`dark:`バリアントを追加する
-- [ ] 主要レイアウト（`Sidebar.tsx` / `AdminSidebar.tsx` / `MainLayout.tsx` / `AdminLayout.tsx`）の背景色・境界線・テキスト色に`dark:`バリアントを追加する
-- [ ] ダッシュボード（`(student)/page.tsx`）・レッスン一覧・カテゴリ一覧・管理画面各ページ（admins / categories / lessons / materials / users）の主要な背景・カード・テキスト色に`dark:`バリアントを追加する
-- [ ] レッスンエディタ画面（`lessons/[id]`）は現状すでにダーク基調の配色（`bg-slate-900`）のため、既存の見た目を維持しつつ、OSがライト/ダークいずれの設定でも表示が破綻しないことを確認する
-- [ ] コードエディタ（Monaco、`vs-dark`テーマ固定）・`Console.tsx`は現状の配色を維持してよい（元々ダーク基調のため対応優先度は低い）
+- [x] `MarkdownRenderer`を使用する画面（学習資料モーダル `MaterialModal.tsx`、レッスン本文 `lessons/[id]`、資料詳細 `materials/[id]`、管理画面の資料プレビュー `admin/materials/[id]`）は、ダーク時に文字色だけでなく背景色も追随して反転する
+- [x] 共通UIコンポーネント（`Input` / `Select` / `Button`、`components/ui/index.tsx`）に`dark:`バリアントを追加する
+- [x] 主要レイアウト（`Sidebar.tsx` / `AdminSidebar.tsx` / `MainLayout.tsx` / `AdminLayout.tsx`）の背景色・境界線・テキスト色に`dark:`バリアントを追加する
+- [x] ダッシュボード（`(student)/page.tsx`）・レッスン一覧・カテゴリ一覧・管理画面各ページ（admins / categories / lessons / materials / users）の主要な背景・カード・テキスト色に`dark:`バリアントを追加する
+- [x] レッスンエディタ画面（`lessons/[id]`）は現状すでにダーク基調の配色（`bg-slate-900`）のため、既存の見た目を維持しつつ、OSがライト/ダークいずれの設定でも表示が破綻しないことを確認する
+- [x] コードエディタ（Monaco、`vs-dark`テーマ固定）・`Console.tsx`は現状の配色を維持してよい（元々ダーク基調のため対応優先度は低い）
 
 ### US-2: ダークモード対応の範囲を明確にする
 > As a 開発者 / I want to ダークモードの適用範囲がOS設定への自動追随に閉じていることを明確にしたい / So that 手動切り替えの要望が出た際に本要件と区別して扱える。
 
 受け入れ条件:
-- [ ] Tailwind標準の`prefers-color-scheme`メディアクエリベースの`dark:`バリアントをそのまま利用する（`next-themes`等によるクラスベースの手動切り替えは本要件では導入しない）
-- [ ] アプリ内にライト/ダークを手動切り替えるUIは追加しない（スコープ外）
+- [x] Tailwind標準の`prefers-color-scheme`メディアクエリベースの`dark:`バリアントをそのまま利用する（`next-themes`等によるクラスベースの手動切り替えは本要件では導入しない）
+- [x] アプリ内にライト/ダークを手動切り替えるUIは追加しない（スコープ外）
 
 ---
 
