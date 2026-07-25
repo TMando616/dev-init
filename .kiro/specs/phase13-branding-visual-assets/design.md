@@ -316,4 +316,4 @@ const visibleLessons = selectedLanguage
 
 ---
 
-**承認待ち**: 内容をご確認ください。問題なければタスク分解（`tasks.md`）に進みます。
+**完了**: 実装・動作確認済み（2026-07-26）。

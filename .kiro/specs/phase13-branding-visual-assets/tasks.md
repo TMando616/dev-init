@@ -63,10 +63,9 @@
 
 ## 7. 動作確認・仕上げ
 
-- [ ] 7.1 ダークモード（`prefers-color-scheme: dark`）でロゴ・言語画像の視認性を確認する
-  - **未実施（要ユーザー確認）**: Docker Desktop再起動でWSL統合を復旧し`docker compose exec php`でのバックエンドテストは実行できたが、ヘッドレスブラウザ（Playwright）は共有ライブラリ（libnspr4等）不足でこの環境では起動できず、インストールにsudoパスワードが必要なため断念。`http://localhost:8080`（nginx経由）または`:3000`をブラウザで開いて目視確認してください
-- [ ] 7.2 サイドバー折りたたみ時のロゴ表示、未知言語値時のフォールバック表示を確認する
-  - **未実施（要ユーザー確認）**: 7.1と同じ理由。コードレビュー上は`getLanguageAsset`が`null`を返すケースで`BookOpen`にフォールバックする実装を確認済み
+- [x] 7.1 ダークモード（`prefers-color-scheme: dark`）でロゴ・言語画像の視認性を確認する
+  - ユーザーがブラウザで目視確認済み。問題なし
+- [x] 7.2 サイドバー折りたたみ時のロゴ表示、未知言語値時のフォールバック表示を確認する
+  - ユーザーがブラウザで目視確認済み。問題なし
 - [x] 7.3 `frontend`の`npm run lint`はエラーなしを確認。`npm run build`は`/admin/admins`ページで`TypeError: Cannot read properties of null (reading 'useContext')`によるprerenderエラーが発生するが、**phase13の変更前（コミット539901e）でも同一エラーが再現するため既存の別問題**（本フェーズのファイルは無関係）。`tsc --noEmit`では変更ファイルに型エラーなし
-- [ ] 7.4 `requirements.md`の受け入れ条件を全てチェックし、`design.md`末尾の「承認待ち」を解消する
-  - ブラウザでの動作確認（7.1, 7.2）完了後に実施
+- [x] 7.4 `requirements.md`の受け入れ条件を全てチェックし、`design.md`末尾の「承認待ち」を解消する
