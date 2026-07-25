@@ -45,9 +45,9 @@
 - [x] 5.1 バックエンド: `DashboardService::getDashboardData`に`language_progress`を追加する
   - 対象: `backend/app/Services/DashboardService.php`
   - `Lesson::select('id', 'language')->get()->groupBy('language')`で集計し、`completed`/`total`を算出する（design §6.1のコード例通り）
-- [x] 5.2 バックエンドテストを追加し、`language_progress`のレスポンス形状を確認するテストケースを実装する
+- [x] 5.2 バックエンドテストを追加・実行し、`language_progress`のレスポンス形状を確認する
   - 対象: `backend/tests/Feature/DashboardTest.php`（`test_dashboard_returns_language_progress`を追加）
-  - `php -l`でシンタックスチェック済み。**このセッションのWSL環境ではDockerが使えず（WSL統合無効）、`docker compose exec php php artisan test --filter=Dashboard`は未実行**。次回Docker起動可能な環境で実行して確認してください
+  - `docker compose exec php php artisan test --filter=DashboardTest`で3件PASS確認。全体テストスイート（`php artisan test`）も57件全PASS確認済み
 - [x] 5.3 フロントエンド: `DashboardData`型に`language_progress`を追加し、「言語別」セクションをカテゴリ別進捗の直後に新設する
   - 対象: `frontend/src/app/(student)/page.tsx`
   - `total > 0`でフィルタし0件言語は非表示（design §6.2のコード例通り）
@@ -64,9 +64,9 @@
 ## 7. 動作確認・仕上げ
 
 - [ ] 7.1 ダークモード（`prefers-color-scheme: dark`）でロゴ・言語画像の視認性を確認する
-  - **未実施**: このセッションのWSL環境では`next dev`/`next build`がネイティブバイナリの`Bus error`で起動できない（phase13の変更前のmainブランチでも再現するため、変更が原因ではなく環境固有の問題）。ブラウザでの目視確認が必要
+  - **未実施（要ユーザー確認）**: Docker Desktop再起動でWSL統合を復旧し`docker compose exec php`でのバックエンドテストは実行できたが、ヘッドレスブラウザ（Playwright）は共有ライブラリ（libnspr4等）不足でこの環境では起動できず、インストールにsudoパスワードが必要なため断念。`http://localhost:8080`（nginx経由）または`:3000`をブラウザで開いて目視確認してください
 - [ ] 7.2 サイドバー折りたたみ時のロゴ表示、未知言語値時のフォールバック表示を確認する
-  - **未実施**: 7.1と同じ理由でブラウザ確認不可。コードレビュー上は`getLanguageAsset`が`null`を返すケースで`BookOpen`にフォールバックする実装を確認済み
-- [x] 7.3 `frontend`の`npm run lint`は実行しエラーなしを確認。`npm run build`は上記の環境問題で未実行（`tsc --noEmit`では変更ファイルに型エラーなしを確認、既存の`MarkdownRenderer.tsx`の未解決モジュールエラーは本フェーズと無関係の既存問題）
+  - **未実施（要ユーザー確認）**: 7.1と同じ理由。コードレビュー上は`getLanguageAsset`が`null`を返すケースで`BookOpen`にフォールバックする実装を確認済み
+- [x] 7.3 `frontend`の`npm run lint`はエラーなしを確認。`npm run build`は`/admin/admins`ページで`TypeError: Cannot read properties of null (reading 'useContext')`によるprerenderエラーが発生するが、**phase13の変更前（コミット539901e）でも同一エラーが再現するため既存の別問題**（本フェーズのファイルは無関係）。`tsc --noEmit`では変更ファイルに型エラーなし
 - [ ] 7.4 `requirements.md`の受け入れ条件を全てチェックし、`design.md`末尾の「承認待ち」を解消する
   - ブラウザでの動作確認（7.1, 7.2）完了後に実施
