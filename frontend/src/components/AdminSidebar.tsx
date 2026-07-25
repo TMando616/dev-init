@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAdminAuth } from '@/context/AdminAuthContext';
+import Logo from '@/components/Logo';
 import {
   Settings,
   FileText,
@@ -11,7 +12,6 @@ import {
   Users,
   ShieldCheck,
   LogOut,
-  Code2,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -59,17 +59,11 @@ export default function AdminSidebar() {
       <div className="p-6 flex items-center justify-between border-b border-slate-50 dark:border-slate-800">
         {!isCollapsed && (
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
-              <Code2 size={20} />
-            </div>
-            <span className="font-bold text-xl tracking-tight text-slate-900 dark:text-slate-100">DevInit <span className="text-blue-600 dark:text-blue-400">Admin</span></span>
+            <Logo />
+            <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Admin</span>
           </div>
         )}
-        {isCollapsed && (
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white mx-auto">
-            <Code2 size={20} />
-          </div>
-        )}
+        {isCollapsed && <Logo variant="icon" className="mx-auto" />}
       </div>
 
       <nav className="flex-1 p-4 space-y-2 mt-4">

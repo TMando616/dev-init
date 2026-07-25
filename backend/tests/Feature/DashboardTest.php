@@ -88,4 +88,34 @@ class DashboardTest extends TestCase
             ->assertJsonPath('overall_progress.total', 0)
             ->assertJsonPath('recent_lesson', null);
     }
+
+    public function test_dashboard_returns_language_progress()
+    {
+        // PHP: 2 lessons, 1 completed / Python: 1 lesson, 0 completed
+        $phpLesson1 = Lesson::factory()->create(['language' => 'php']);
+        $phpLesson2 = Lesson::factory()->create(['language' => 'php']);
+        Lesson::factory()->create(['language' => 'python']);
+
+        Submission::create([
+            'user_id' => $this->user->id,
+            'lesson_id' => $phpLesson1->id,
+            'code' => '// test',
+            'status' => 'completed',
+        ]);
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->getJson('/api/dashboard');
+
+        $response->assertStatus(200)
+            ->assertJsonFragment([
+                'language' => 'php',
+                'completed' => 1,
+                'total' => 2,
+            ])
+            ->assertJsonFragment([
+                'language' => 'python',
+                'completed' => 0,
+                'total' => 1,
+            ]);
+    }
 }

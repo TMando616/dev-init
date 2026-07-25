@@ -43,6 +43,21 @@ class DashboardService
             ];
         });
 
+        $languageProgress = Lesson::select('id', 'language')
+            ->get()
+            ->groupBy('language')
+            ->map(function ($lessons, $language) use ($completedLessonIds) {
+                $lessonIds = $lessons->pluck('id');
+                $completedInLanguage = $completedLessonIds->intersect($lessonIds)->count();
+
+                return [
+                    'language' => $language,
+                    'completed' => $completedInLanguage,
+                    'total' => $lessons->count(),
+                ];
+            })
+            ->values();
+
         $recentSubmission = Submission::where('user_id', $user->id)
             ->with('lesson')
             ->latest('id') // Use ID to ensure deterministic order in tests
@@ -51,6 +66,7 @@ class DashboardService
         return [
             'overall_progress' => $overallProgress,
             'category_progress' => $categoryProgress,
+            'language_progress' => $languageProgress,
             'recent_lesson' => $recentSubmission ? [
                 'id' => $recentSubmission->lesson->id,
                 'title' => $recentSubmission->lesson->title,

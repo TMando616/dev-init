@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useAdminAuth } from '@/context/AdminAuthContext';
 import { Button, Input } from '@/components/ui';
+import Logo from '@/components/Logo';
 import adminApi from '@/lib/adminApi';
 import { isAxiosError } from 'axios';
 import { ShieldCheck } from 'lucide-react';
@@ -40,7 +41,10 @@ export default function AdminLoginPage() {
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-white">
             <ShieldCheck size={24} />
           </div>
-          <h1 className="text-3xl font-bold">DevInit <span className="text-blue-600 dark:text-blue-400">Admin</span></h1>
+          <div className="flex items-center justify-center gap-2">
+            <Logo className="h-10" />
+            <span className="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Admin</span>
+          </div>
           <p className="mt-2 text-slate-600 dark:text-slate-400">管理者専用ログイン</p>
         </div>
 

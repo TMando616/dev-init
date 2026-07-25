@@ -5,11 +5,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
+import Logo from '@/components/Logo';
 import {
   Home,
   BookOpen,
   LogOut,
-  Code2,
   ChevronLeft,
   ChevronRight,
   Tag,
@@ -66,19 +66,8 @@ export default function Sidebar() {
       )}
     >
       <div className="p-6 flex items-center justify-between border-b border-slate-50 dark:border-slate-800">
-        {!isCollapsed && (
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-white">
-              <Code2 size={20} />
-            </div>
-            <span className="font-bold text-xl tracking-tight text-slate-900 dark:text-slate-100">DevInit</span>
-          </div>
-        )}
-        {isCollapsed && (
-          <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-white mx-auto">
-            <Code2 size={20} />
-          </div>
-        )}
+        {!isCollapsed && <Logo />}
+        {isCollapsed && <Logo variant="icon" className="mx-auto" />}
       </div>
 
       <nav className="flex-1 p-4 space-y-2 mt-4">

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { Button, Input } from '@/components/ui';
+import Logo from '@/components/Logo';
 import api from '@/lib/api';
 import { isAxiosError } from 'axios';
 
@@ -38,7 +39,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8 rounded-xl bg-white dark:bg-slate-900 p-8 shadow-lg">
         <div className="text-center">
-          <h1 className="text-3xl font-bold">DevInit</h1>
+          <Logo className="mx-auto h-10" />
           <p className="mt-2 text-slate-600 dark:text-slate-400">アカウントにログインして学習を再開しましょう</p>
         </div>
 

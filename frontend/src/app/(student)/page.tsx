@@ -2,15 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
-import { 
-  ChevronRight, 
-  BookOpen, 
-  BarChart2, 
-  Clock, 
+import { getLanguageAsset } from '@/lib/languages';
+import {
+  ChevronRight,
+  BookOpen,
+  BarChart2,
+  Clock,
   ArrowRight,
-  Tag
+  Tag,
+  Code2
 } from 'lucide-react';
 
 interface DashboardData {
@@ -22,6 +25,11 @@ interface DashboardData {
   category_progress: {
     category_id: number;
     name: string;
+    completed: number;
+    total: number;
+  }[];
+  language_progress: {
+    language: string;
     completed: number;
     total: number;
   }[];
@@ -184,6 +192,51 @@ export default function Home() {
           )}
         </div>
       </div>
+
+      {/* Language Progress */}
+      {data.language_progress.filter((lang) => lang.total > 0).length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-6">
+            <Code2 size={20} className="text-slate-500" />
+            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">言語別進捗</h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {data.language_progress
+              .filter((lang) => lang.total > 0)
+              .map((lang) => {
+                const asset = getLanguageAsset(lang.language);
+                const percentage = lang.total > 0 ? Math.round((lang.completed / lang.total) * 100) : 0;
+                return (
+                  <Link
+                    key={lang.language}
+                    href={`/lessons/list?language=${lang.language}`}
+                    className="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-md transition-all"
+                  >
+                    <div className="relative h-24 bg-slate-50 dark:bg-slate-800">
+                      {asset && (
+                        <Image src={asset.image} alt={asset.label} fill className="object-cover object-center" />
+                      )}
+                    </div>
+                    <div className="p-4 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-bold text-slate-900 dark:text-slate-100">{asset?.label ?? lang.language}</h4>
+                        <span className="text-sm font-bold text-slate-500">{percentage}%</span>
+                      </div>
+                      <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                        <div
+                          className="bg-slate-900 dark:bg-slate-100 h-full transition-all duration-700"
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-slate-500">{lang.completed} / {lang.total} レッスン</p>
+                    </div>
+                  </Link>
+                );
+              })}
+          </div>
+        </div>
+      )}
 
       {/* Quick Access All Lessons Link */}
       <div className="flex justify-center pt-8">
