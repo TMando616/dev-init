@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ExecuteRequest;
 use App\Services\CodeExecutionService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class ExecutionController extends Controller
 {
@@ -15,12 +15,9 @@ class ExecutionController extends Controller
     /**
      * Handle the code execution request.
      */
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(ExecuteRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'language' => 'required|string',
-            'code' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
         $result = $this->executionService->execute(
             $validated['language'],

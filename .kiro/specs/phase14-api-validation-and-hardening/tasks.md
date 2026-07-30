@@ -13,11 +13,12 @@
   - 対象: `backend/app/Http/Requests/RegisterRequest.php`, `LoginRequest.php`, `AdminLoginRequest.php`
   - `authorize()`は`true`（公開エンドポイント、誰でも叩ける前提とコメント）
   - `AuthController::register/login`, `AdminAuthController::login`の型ヒントを差し替え、`$request->validated()`を使う
-- [ ] 2.2 コード実行のFormRequestを作成する（`Language` enum利用）
+- [x] 2.2 コード実行のFormRequestを作成する（`Language` enum利用）
   - 対象: `backend/app/Http/Requests/ExecuteRequest.php`
   - `language`に`Rule::in(Language::values())`を追加（design §2, §3）
   - `authorize()`は`true`（`auth:sanctum`ミドルウェアで担保済みとコメント）
   - `ExecutionController::__invoke`の型ヒントを差し替える
+  - 注: Docker Desktop未起動のためテスト未実行。`test_returns_error_for_unsupported_language`が422に変わるはず（§5.1で対応予定）なので、次回作業時にテスト実行して確認すること
 - [ ] 2.3 提出系2件のFormRequestを作成する
   - 対象: `backend/app/Http/Requests/StoreSubmissionRequest.php`, `CompleteSubmissionRequest.php`
   - `SubmissionController::store/complete`の型ヒントを差し替える
