@@ -18,7 +18,7 @@
   - `language`に`Rule::in(Language::values())`を追加（design §2, §3）
   - `authorize()`は`true`（`auth:sanctum`ミドルウェアで担保済みとコメント）
   - `ExecutionController::__invoke`の型ヒントを差し替える
-  - 注: Docker Desktop未起動のためテスト未実行。`test_returns_error_for_unsupported_language`が422に変わるはず（§5.1で対応予定）なので、次回作業時にテスト実行して確認すること
+  - Docker復旧後にテスト実行し、想定通り`test_returns_error_for_unsupported_language`のみ失敗することを確認済み（§5.1で対応）
 - [ ] 2.3 提出系2件のFormRequestを作成する
   - 対象: `backend/app/Http/Requests/StoreSubmissionRequest.php`, `CompleteSubmissionRequest.php`
   - `SubmissionController::store/complete`の型ヒントを差し替える
@@ -81,9 +81,10 @@
 
 ## 5. 既存テストの仕様変更対応（design §6）
 
-- [ ] 5.1 `CodeExecutionTest::test_returns_error_for_unsupported_language`を422期待に更新する
+- [x] 5.1 `CodeExecutionTest::test_returns_error_for_unsupported_language`を422期待に更新する
   - 対象: `backend/tests/Feature/CodeExecutionTest.php`
   - 不正`language`送信時のレスポンスを`200+{status:error}`から`422+バリデーションエラー`のアサーションに変更（design §6, US-2で明記された意図的仕様変更）
+  - テスト名も`test_returns_validation_error_for_unsupported_language`に変更。全57件（アサーション数は模範解答除外テスト未追加のため138件）通過確認済み
 
 ## 6. 動作確認・仕上げ
 

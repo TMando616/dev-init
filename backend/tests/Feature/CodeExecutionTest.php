@@ -70,20 +70,17 @@ class CodeExecutionTest extends TestCase
     }
 
     /**
-     * Test unsupported language.
+     * Unsupported languages are rejected by ExecuteRequest before reaching the service.
      */
-    public function test_returns_error_for_unsupported_language(): void
+    public function test_returns_validation_error_for_unsupported_language(): void
     {
         $response = $this->actingAs($this->user)->postJson('/api/execute', [
             'language' => 'cplusplus',
             'code' => 'std::cout << "Hello";'
         ]);
 
-        $response->assertStatus(200)
-            ->assertJson([
-                'status' => 'error',
-                'stderr' => 'Unsupported language: cplusplus',
-            ]);
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors('language');
     }
 
     /**
