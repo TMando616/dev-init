@@ -19,7 +19,7 @@
   - `authorize()`は`true`（`auth:sanctum`ミドルウェアで担保済みとコメント）
   - `ExecutionController::__invoke`の型ヒントを差し替える
   - Docker復旧後にテスト実行し、想定通り`test_returns_error_for_unsupported_language`のみ失敗することを確認済み（§5.1で対応）
-- [ ] 2.3 提出系2件のFormRequestを作成する
+- [x] 2.3 提出系2件のFormRequestを作成する
   - 対象: `backend/app/Http/Requests/StoreSubmissionRequest.php`, `CompleteSubmissionRequest.php`
   - `SubmissionController::store/complete`の型ヒントを差し替える
 - [ ] 2.4 管理者アカウント管理系のFormRequestを作成する

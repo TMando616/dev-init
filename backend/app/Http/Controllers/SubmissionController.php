@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CompleteSubmissionRequest;
+use App\Http\Requests\StoreSubmissionRequest;
 use App\Services\SubmissionService;
 use Illuminate\Http\Request;
 
@@ -14,12 +16,9 @@ class SubmissionController extends Controller
     /**
      * Store or update a submission (Save code).
      */
-    public function store(Request $request)
+    public function store(StoreSubmissionRequest $request)
     {
-        $validated = $request->validate([
-            'lesson_id' => 'required|exists:lessons,id',
-            'code' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
         $submission = $this->service->saveCode(
             $request->user()->id,
@@ -33,11 +32,9 @@ class SubmissionController extends Controller
     /**
      * Mark a lesson as completed.
      */
-    public function complete(Request $request)
+    public function complete(CompleteSubmissionRequest $request)
     {
-        $validated = $request->validate([
-            'lesson_id' => 'required|exists:lessons,id',
-        ]);
+        $validated = $request->validated();
 
         $submission = $this->service->completeLesson(
             $request->user()->id,
