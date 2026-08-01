@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreMaterialRequest;
+use App\Http\Requests\UpdateMaterialRequest;
 use App\Services\MaterialService;
-use Illuminate\Http\Request;
 
 class MaterialController extends Controller
 {
@@ -27,30 +28,16 @@ class MaterialController extends Controller
         return response()->json($result);
     }
 
-    public function store(Request $request)
+    public function store(StoreMaterialRequest $request)
     {
-        $validated = $request->validate([
-            'title'     => 'required|string|max:255',
-            'content'   => 'required|string',
-            'lesson_id' => 'required|exists:lessons,id',
-            'order'     => 'nullable|integer|min:0',
-        ]);
-
-        $material = $this->service->createMaterial($validated);
+        $material = $this->service->createMaterial($request->validated());
 
         return response()->json($material->load('lesson:id,title'), 201);
     }
 
-    public function update(Request $request, string $id)
+    public function update(UpdateMaterialRequest $request, string $id)
     {
-        $validated = $request->validate([
-            'title'     => 'sometimes|required|string|max:255',
-            'content'   => 'sometimes|required|string',
-            'lesson_id' => 'required|exists:lessons,id',
-            'order'     => 'nullable|integer|min:0',
-        ]);
-
-        $material = $this->service->updateMaterial((int)$id, $validated);
+        $material = $this->service->updateMaterial((int)$id, $request->validated());
         if (!$material) {
             return response()->json(['message' => 'Material not found'], 404);
         }

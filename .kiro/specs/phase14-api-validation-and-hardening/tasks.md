@@ -35,13 +35,14 @@
 - [x] 2.6 カテゴリのFormRequestを作成する
   - 対象: `backend/app/Http/Requests/StoreCategoryRequest.php`, `UpdateCategoryRequest.php`
   - `CategoryController::store/update`の型ヒントを差し替える
-- [ ] 2.7 マテリアルのFormRequestを作成し、`sometimes`統一を反映する
+- [x] 2.7 マテリアルのFormRequestを作成し、`sometimes`統一を反映する
   - 対象: `backend/app/Http/Requests/StoreMaterialRequest.php`, `UpdateMaterialRequest.php`
   - `UpdateMaterialRequest`: `lesson_id`を`required`→`sometimes|exists:lessons,id`に変更（design §1.3）
   - `MaterialController::store/update`の型ヒントを差し替える
-- [ ] 2.8 バックエンドの既存テスト（57件）が全て通ることを確認する
+- [x] 2.8 バックエンドの既存テストが全て通ることを確認する
   - `docker compose exec php php artisan test`
-  - `test_returns_error_for_unsupported_language`の失敗は想定内（§6で対応するため、ここでは失敗理由が想定通りか確認するのみ）
+  - 全59件・144アサーション通過（2.5で追加した`language`関連テスト2件を含む）
+  - Controller内の`$request->validate([...])`直書きが全廃されたことをgrepで確認済み
 
 ## 3. レート制限（design §4）
 
