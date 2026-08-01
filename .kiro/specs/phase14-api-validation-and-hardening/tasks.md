@@ -46,22 +46,23 @@
 
 ## 3. レート制限（design §4）
 
-- [ ] 3.1 `AppServiceProvider::boot()`に名前付きリミッター4種を定義する
+- [x] 3.1 `AppServiceProvider::boot()`に名前付きリミッター4種を定義する
   - 対象: `backend/app/Providers/AppServiceProvider.php`（design §4.1のコード例通り、`auth`/`execute`/`submissions`/`api`）
-- [ ] 3.2 `routes/api.php`の各ルートグループに`throttle:`ミドルウェアを適用する
+- [x] 3.2 `routes/api.php`の各ルートグループに`throttle:`ミドルウェアを適用する
   - 対象: `backend/routes/api.php`（design §4.2の対応表通り）
   - `/register`, `/login`, `/admin/login` → `throttle:auth`
   - `/execute` → `throttle:execute`
   - `/submissions`, `/submissions/complete` → `throttle:submissions`
   - 共有readグループ・学生専用グループ・管理者専用グループ → `throttle:api`
-- [ ] 3.3 レート制限のテストを追加する
-  - 対象: `backend/tests/Feature/RateLimitingTest.php`（新規）
-  - 認証系: 6回/分の閾値超過で429になること、閾値内は429にならないこと
+- [x] 3.3 レート制限のテストを追加する
+  - 対象: `backend/tests/Feature/RateLimitingTest.php`（新規、7件）
+  - 認証系: 6回/分の閾値超過で429＋`Retry-After`、閾値内は429にならないこと、キーがメールアドレス単位で分離されていること
   - 実行系: 20回/分の閾値超過で429になること
-  - 提出系: 40回/分の閾値超過で429になること、2秒デバウンス想定の連続呼び出し回数（理論上限30回/分）では429にならないこと（design §4.4、US-3【重要】要件の直接検証）
-- [ ] 3.4 既存テストがレート制限の追加で新たに失敗しないことを確認する
-  - 特に同一テストメソッド内で`/login`等を規定回数超えて連続呼び出している箇所がないか確認する
-  - `docker compose exec php php artisan test`
+  - 提出系: 40回/分の閾値超過で429になること、autosave想定の30回/分では429にならないこと、`api`枠を使い切っても提出は通ること（US-3【重要】要件の直接検証）
+  - 【design §4.4からの差分】ログイン失敗は401ではなく422（`ValidationException`）を返すため、テストの期待値を422にした
+  - throttleミドルウェアはController到達前に実行されるため、`/execute`は不正ペイロード（422）でカウントを消費させDocker実行を回避している
+- [x] 3.4 既存テストがレート制限の追加で新たに失敗しないことを確認する
+  - 全66件・258アサーション通過。テスト環境は`CACHE_STORE=array`かつテストメソッドごとにアプリが再生成されるため、リミッターのカウントはメソッド間に持ち越されない
 
 ## 4. model_answerの秘匿（design §5）
 

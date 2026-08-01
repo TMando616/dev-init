@@ -13,14 +13,16 @@ use App\Http\Controllers\SubmissionController;
 use Illuminate\Support\Facades\Route;
 
 // Public auth endpoints
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::middleware('throttle:auth')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
 
-// Admin login (no public registration: admins are created by other admins)
-Route::post('/admin/login', [AdminAuthController::class, 'login']);
+    // Admin login (no public registration: admins are created by other admins)
+    Route::post('/admin/login', [AdminAuthController::class, 'login']);
+});
 
 // Content read endpoints shared by students and admins (both guards allowed)
-Route::middleware('auth:sanctum,admin')->group(function () {
+Route::middleware(['auth:sanctum,admin', 'throttle:api'])->group(function () {
     Route::get('/lessons', [LessonController::class, 'index']);
     Route::get('/lessons/{id}', [LessonController::class, 'show']);
     Route::get('/categories', [CategoryController::class, 'index']);
@@ -31,24 +33,30 @@ Route::middleware('auth:sanctum,admin')->group(function () {
 
 // Student-only protected endpoints
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user', [AuthController::class, 'user']);
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::middleware('throttle:api')->group(function () {
+        Route::get('/user', [AuthController::class, 'user']);
+        Route::post('/logout', [AuthController::class, 'logout']);
 
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index']);
+        // Dashboard
+        Route::get('/dashboard', [DashboardController::class, 'index']);
 
-    // Code Execution
-    Route::post('/execute', ExecutionController::class);
+        Route::get('/submissions/lesson/{lessonId}', [SubmissionController::class, 'show']);
+        Route::get('/submissions/completed-lesson-ids', [SubmissionController::class, 'completedLessonIds']);
+    });
 
-    // Submissions
-    Route::post('/submissions', [SubmissionController::class, 'store']);
-    Route::post('/submissions/complete', [SubmissionController::class, 'complete']);
-    Route::get('/submissions/lesson/{lessonId}', [SubmissionController::class, 'show']);
-    Route::get('/submissions/completed-lesson-ids', [SubmissionController::class, 'completedLessonIds']);
+    // Code Execution (one Docker container per request: tighter budget)
+    Route::post('/execute', ExecutionController::class)->middleware('throttle:execute');
+
+    // Autosave-driven writes get their own budget so they never compete with
+    // the endpoints above.
+    Route::middleware('throttle:submissions')->group(function () {
+        Route::post('/submissions', [SubmissionController::class, 'store']);
+        Route::post('/submissions/complete', [SubmissionController::class, 'complete']);
+    });
 });
 
 // Admin-only protected endpoints
-Route::middleware('auth:admin')->prefix('admin')->group(function () {
+Route::middleware(['auth:admin', 'throttle:api'])->prefix('admin')->group(function () {
     Route::get('/me', [AdminAuthController::class, 'me']);
     Route::post('/logout', [AdminAuthController::class, 'logout']);
 
