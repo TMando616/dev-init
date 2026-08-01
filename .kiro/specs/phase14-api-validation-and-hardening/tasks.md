@@ -32,7 +32,7 @@
   - `UpdateLessonRequest`: `language`を`sometimes|required|...`、`category_ids`を`required`→`sometimes|array|min:1`に変更（design §1.3）
   - `LessonController::store/update`の型ヒントを差し替える
   - 【design §6からの差分】`LessonTest::test_admin_can_create_lesson`が`language`を送っていなかったため422で失敗。`language`送信を追加し、`language`必須・不正値拒否の新規テスト2件を追加した（US-1検証）
-- [ ] 2.6 カテゴリのFormRequestを作成する
+- [x] 2.6 カテゴリのFormRequestを作成する
   - 対象: `backend/app/Http/Requests/StoreCategoryRequest.php`, `UpdateCategoryRequest.php`
   - `CategoryController::store/update`の型ヒントを差し替える
 - [ ] 2.7 マテリアルのFormRequestを作成し、`sometimes`統一を反映する
