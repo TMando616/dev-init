@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreLessonRequest;
+use App\Http\Requests\UpdateLessonRequest;
 use App\Services\LessonService;
-use Illuminate\Http\Request;
 
 class LessonController extends Controller
 {
@@ -22,18 +23,9 @@ class LessonController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreLessonRequest $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'model_answer' => 'nullable|string',
-            'expected_output' => 'nullable|string',
-            'category_ids' => 'required|array|min:1',
-            'category_ids.*' => 'exists:categories,id',
-        ]);
-
-        $lesson = $this->service->createLesson($validated);
+        $lesson = $this->service->createLesson($request->validated());
 
         return response()->json($lesson, 201);
     }
@@ -55,18 +47,9 @@ class LessonController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateLessonRequest $request, string $id)
     {
-        $validated = $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'content' => 'sometimes|required|string',
-            'model_answer' => 'nullable|string',
-            'expected_output' => 'nullable|string',
-            'category_ids' => 'required|array|min:1',
-            'category_ids.*' => 'exists:categories,id',
-        ]);
-
-        $lesson = $this->service->updateLesson((int)$id, $validated);
+        $lesson = $this->service->updateLesson((int)$id, $request->validated());
         if (!$lesson) {
             return response()->json(['message' => 'Lesson not found'], 404);
         }

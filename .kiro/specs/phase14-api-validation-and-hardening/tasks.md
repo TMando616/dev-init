@@ -26,11 +26,12 @@
   - 対象: `backend/app/Http/Requests/Admin/StoreAdminRequest.php`, `StoreUserRequest.php`, `UpdateUserRequest.php`
   - `UpdateUserRequest`は現行の`sometimes`規則をそのまま踏襲（既にsometimes運用のため変更なし）
   - `Admin\AdminController::store`, `Admin\UserController::store/update`の型ヒントを差し替える
-- [ ] 2.5 レッスンのFormRequestを作成し、`language`必須化・`sometimes`統一を反映する
+- [x] 2.5 レッスンのFormRequestを作成し、`language`必須化・`sometimes`統一を反映する
   - 対象: `backend/app/Http/Requests/StoreLessonRequest.php`, `UpdateLessonRequest.php`
   - `StoreLessonRequest`: `language`を`required` + `Rule::in(Language::values())`で追加（design §3, US-1対応）
   - `UpdateLessonRequest`: `language`を`sometimes|required|...`、`category_ids`を`required`→`sometimes|array|min:1`に変更（design §1.3）
   - `LessonController::store/update`の型ヒントを差し替える
+  - 【design §6からの差分】`LessonTest::test_admin_can_create_lesson`が`language`を送っていなかったため422で失敗。`language`送信を追加し、`language`必須・不正値拒否の新規テスト2件を追加した（US-1検証）
 - [ ] 2.6 カテゴリのFormRequestを作成する
   - 対象: `backend/app/Http/Requests/StoreCategoryRequest.php`, `UpdateCategoryRequest.php`
   - `CategoryController::store/update`の型ヒントを差し替える

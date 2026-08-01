@@ -63,6 +63,7 @@ class LessonTest extends TestCase
             ->postJson('/api/admin/lessons', [
                 'title'        => 'Admin Lesson',
                 'content'      => 'Admin Content',
+                'language'     => 'javascript',
                 'model_answer' => 'console.log(1)',
                 'category_ids' => [$category->id],
             ]);
@@ -70,7 +71,41 @@ class LessonTest extends TestCase
         $response->assertStatus(201)
             ->assertJsonPath('title', 'Admin Lesson');
 
-        $this->assertDatabaseHas('lessons', ['title' => 'Admin Lesson']);
+        $this->assertDatabaseHas('lessons', [
+            'title'    => 'Admin Lesson',
+            'language' => 'javascript',
+        ]);
+    }
+
+    public function test_creating_lesson_requires_language()
+    {
+        $category = \App\Models\Category::factory()->create();
+
+        $response = $this->actingAs($this->admin, 'admin')
+            ->postJson('/api/admin/lessons', [
+                'title'        => 'No Language Lesson',
+                'content'      => 'Admin Content',
+                'category_ids' => [$category->id],
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors('language');
+    }
+
+    public function test_creating_lesson_rejects_unsupported_language()
+    {
+        $category = \App\Models\Category::factory()->create();
+
+        $response = $this->actingAs($this->admin, 'admin')
+            ->postJson('/api/admin/lessons', [
+                'title'        => 'Unsupported Language Lesson',
+                'content'      => 'Admin Content',
+                'language'     => 'cplusplus',
+                'category_ids' => [$category->id],
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors('language');
     }
 
     public function test_admin_can_update_lesson()
