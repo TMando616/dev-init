@@ -29,7 +29,6 @@ interface Lesson {
   title: string;
   language: string;
   content: string;
-  model_answer?: string;
   expected_output?: string;
   categories: Category[];
   materials: Material[];
@@ -49,6 +48,9 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [showModelAnswer, setShowModelAnswer] = useState(false);
+  // Fetched on demand so the model answer never ships with the initial payload.
+  const [modelAnswer, setModelAnswer] = useState<string | null>(null);
+  const [isLoadingModelAnswer, setIsLoadingModelAnswer] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
 
   // Execution State
@@ -67,9 +69,32 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
     setError(undefined);
     setJudgeResult(null);
     setShowModelAnswer(false);
+    setModelAnswer(null);
     setSelectedMaterial(null);
     setIsLoading(true);
   }
+
+  const toggleModelAnswer = async () => {
+    if (showModelAnswer) {
+      setShowModelAnswer(false);
+      return;
+    }
+
+    setShowModelAnswer(true);
+
+    // Only the first open hits the API; the answer is cached for this lesson.
+    if (modelAnswer === null) {
+      setIsLoadingModelAnswer(true);
+      try {
+        const res = await api.get(`/lessons/${id}/model-answer`);
+        setModelAnswer(res.data.model_answer ?? '');
+      } catch (error) {
+        console.error('Failed to fetch model answer', error);
+      } finally {
+        setIsLoadingModelAnswer(false);
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchLessonAndSubmission = async () => {
@@ -253,7 +278,7 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
             variant="ghost" 
             size="sm" 
             className={`text-slate-300 hover:bg-slate-700 hover:text-white ${showModelAnswer ? 'bg-slate-700 text-white' : ''}`}
-            onClick={() => setShowModelAnswer(!showModelAnswer)}
+            onClick={toggleModelAnswer}
           >
             {showModelAnswer ? <EyeOff size={18} className="mr-2" /> : <Eye size={18} className="mr-2" />}
             模範解答
@@ -378,7 +403,11 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
                     height="100%"
                     language={lesson.language || 'javascript'}
                     theme="vs-dark"
-                    value={lesson.model_answer || '// 模範解答は用意されていません'}
+                    value={
+                      isLoadingModelAnswer
+                        ? '// 読み込み中...'
+                        : modelAnswer || '// 模範解答は用意されていません'
+                    }
                     options={{
                       fontSize: 14,
                       minimap: { enabled: false },

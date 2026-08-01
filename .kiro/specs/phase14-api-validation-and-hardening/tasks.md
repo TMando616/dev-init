@@ -66,21 +66,26 @@
 
 ## 4. model_answerの秘匿（design §5）
 
-- [ ] 4.1 `LessonResource`を新規作成し、`LessonController::index/show`に適用する
-  - 対象: `backend/app/Http/Resources/LessonResource.php`（design §5.1のコード例通り）
+- [x] 4.1 `LessonResource`を新規作成し、`LessonController::index/show`に適用する
+  - 対象: `backend/app/Http/Resources/LessonResource.php`
   - `backend/app/Http/Controllers/LessonController.php`の`index`/`show`を`LessonResource`経由のレスポンスに差し替える
-- [ ] 4.2 模範解答専用エンドポイントを追加する
+  - 【design §5.1からの差分1】`created_at`/`updated_at`をフィールドに追加。管理ダッシュボード（`(admin)/admin/page.tsx`）が一覧の`created_at`を表示しているため
+  - 【design §5.1からの差分2】`next_lesson_id`は`offsetExists`ではなく`whenAppended('next_lesson_id')`で出し分ける。`offsetExists`はアクセサを実行してしまい、一覧側で常にキーが出る＋N+1クエリになるため
+  - 【design §5.1からの差分3】`LessonResource::collection()`をそのまま返すと`{"data": [...]}`にラップされ既存フロント・テストが壊れるため、従来どおり`response()->json(...)`で包んで返している（`jsonSerialize()`経由になりラップされない）
+- [x] 4.2 模範解答専用エンドポイントを追加する
   - 対象: `backend/app/Http/Controllers/LessonController.php`（`modelAnswer`メソッド新設）, `backend/routes/api.php`（`GET /lessons/{id}/model-answer`を共有readグループに追加、`throttle:api`）
-- [ ] 4.3 学生向けレッスンページの模範解答トグルを専用エンドポイント呼び出しに変更する
+- [x] 4.3 学生向けレッスンページの模範解答トグルを専用エンドポイント呼び出しに変更する
   - 対象: `frontend/src/app/(student)/lessons/[id]/page.tsx`
-  - `Lesson`インターフェースから`model_answer`を削除し、`modelAnswer`state（`string | null`）を追加
-  - トグルボタンの`onClick`を非同期化し、初回オープン時のみ`api.get(`/lessons/${id}/model-answer`)`を呼ぶ（design §5.3）
-  - エディタの`value`参照先を`modelAnswer`に変更
-- [ ] 4.4 `model_answer`秘匿のテストを追加する
-  - 対象: `backend/tests/Feature/LessonTest.php`
-  - 学生ガードで`GET /lessons/{id}`のレスポンスに`model_answer`キーが含まれないことを検証
-  - 管理者ガードで`GET /lessons/{id}`のレスポンスに`model_answer`が従来どおり含まれることを検証
-  - `GET /lessons/{id}/model-answer`が学生ガードでも`model_answer`を返すことを検証
+  - `Lesson`インターフェースから`model_answer`を削除し、`modelAnswer`state（`string | null`）と`isLoadingModelAnswer`を追加
+  - `toggleModelAnswer`を新設。初回オープン時のみ`GET /lessons/{id}/model-answer`を呼び、以後はキャッシュを再利用。レッスン切り替え時は`modelAnswer`をリセット
+  - エディタの`value`参照先を`modelAnswer`に変更（取得中は「読み込み中...」を表示）
+  - `npm run lint` / `npx tsc --noEmit` ともにエラーなし
+- [x] 4.4 `model_answer`秘匿のテストを追加する
+  - 対象: `backend/tests/Feature/LessonTest.php`（5件追加）
+  - 学生ガードで`GET /lessons/{id}`・`GET /lessons`のレスポンスに`model_answer`キーが含まれないこと
+  - 管理者ガードで`GET /lessons/{id}`に`model_answer`が従来どおり含まれること
+  - `GET /lessons/{id}/model-answer`が学生ガードでも`model_answer`を返すこと、存在しないIDで404になること
+  - `test_user_can_show_lesson`に`assertJsonStructure`を足し、`LessonResource`導入でレスポンス形状が退行していないことを固定した
 
 ## 5. 既存テストの仕様変更対応（design §6）
 

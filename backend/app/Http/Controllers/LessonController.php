@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreLessonRequest;
 use App\Http\Requests\UpdateLessonRequest;
+use App\Http\Resources\LessonResource;
 use App\Services\LessonService;
 
 class LessonController extends Controller
@@ -17,7 +18,9 @@ class LessonController extends Controller
      */
     public function index()
     {
-        return response()->json($this->service->getAllLessons());
+        return response()->json(
+            LessonResource::collection($this->service->getAllLessons())
+        );
     }
 
     /**
@@ -41,7 +44,22 @@ class LessonController extends Controller
             return response()->json(['message' => 'Lesson not found'], 404);
         }
 
-        return response()->json($lesson);
+        return response()->json(new LessonResource($lesson));
+    }
+
+    /**
+     * Return the model answer on its own so it never rides along with the
+     * lesson payload students load on page open.
+     */
+    public function modelAnswer(string $id)
+    {
+        $lesson = $this->service->getLessonById((int)$id);
+
+        if (!$lesson) {
+            return response()->json(['message' => 'Lesson not found'], 404);
+        }
+
+        return response()->json(['model_answer' => $lesson->model_answer]);
     }
 
     /**

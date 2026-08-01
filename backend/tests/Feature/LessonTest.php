@@ -41,7 +41,11 @@ class LessonTest extends TestCase
             ->getJson("/api/lessons/{$lesson->id}");
 
         $response->assertStatus(200)
-            ->assertJsonPath('title', $lesson->title);
+            ->assertJsonPath('title', $lesson->title)
+            ->assertJsonStructure([
+                'id', 'title', 'language', 'content', 'expected_output',
+                'categories', 'materials', 'next_lesson_id', 'created_at',
+            ]);
     }
 
     public function test_student_cannot_create_lesson()
@@ -133,6 +137,58 @@ class LessonTest extends TestCase
 
         $response->assertStatus(204);
         $this->assertDatabaseMissing('lessons', ['id' => $lesson->id]);
+    }
+
+    public function test_show_hides_model_answer_from_students()
+    {
+        $lesson = Lesson::factory()->create(['model_answer' => 'console.log(1)']);
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->getJson("/api/lessons/{$lesson->id}");
+
+        $response->assertStatus(200)
+            ->assertJsonMissingPath('model_answer');
+    }
+
+    public function test_index_hides_model_answer_from_students()
+    {
+        Lesson::factory()->create(['model_answer' => 'console.log(1)']);
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->getJson('/api/lessons');
+
+        $response->assertStatus(200)
+            ->assertJsonMissingPath('0.model_answer');
+    }
+
+    public function test_show_keeps_model_answer_for_admins()
+    {
+        $lesson = Lesson::factory()->create(['model_answer' => 'console.log(1)']);
+
+        $response = $this->actingAs($this->admin, 'admin')
+            ->getJson("/api/lessons/{$lesson->id}");
+
+        $response->assertStatus(200)
+            ->assertJsonPath('model_answer', 'console.log(1)');
+    }
+
+    public function test_student_can_fetch_model_answer_from_dedicated_endpoint()
+    {
+        $lesson = Lesson::factory()->create(['model_answer' => 'console.log(1)']);
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->getJson("/api/lessons/{$lesson->id}/model-answer");
+
+        $response->assertStatus(200)
+            ->assertJsonPath('model_answer', 'console.log(1)');
+    }
+
+    public function test_model_answer_endpoint_returns_404_for_missing_lesson()
+    {
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->getJson('/api/lessons/999999/model-answer');
+
+        $response->assertStatus(404);
     }
 
     public function test_lesson_can_belong_to_multiple_categories()
