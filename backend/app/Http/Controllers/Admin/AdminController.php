@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreAdminRequest;
 use App\Services\AdminService;
 use Illuminate\Http\Request;
 
@@ -23,15 +24,9 @@ class AdminController extends Controller
     /**
      * Create a new admin (invited by the authenticated admin).
      */
-    public function store(Request $request)
+    public function store(StoreAdminRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:admins',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        $admin = $this->service->create($validated);
+        $admin = $this->service->create($request->validated());
 
         return response()->json($admin, 201);
     }

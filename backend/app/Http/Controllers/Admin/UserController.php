@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreUserRequest;
+use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Services\UserService;
-use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
@@ -23,15 +24,9 @@ class UserController extends Controller
     /**
      * Create a new student.
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        $user = $this->service->create($validated);
+        $user = $this->service->create($request->validated());
 
         return response()->json($user, 201);
     }
@@ -39,15 +34,9 @@ class UserController extends Controller
     /**
      * Update a student.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateUserRequest $request, string $id)
     {
-        $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $id,
-            'password' => 'sometimes|nullable|string|min:8|confirmed',
-        ]);
-
-        $user = $this->service->update((int) $id, $validated);
+        $user = $this->service->update((int) $id, $request->validated());
 
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);

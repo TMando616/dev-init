@@ -22,7 +22,7 @@
 - [x] 2.3 提出系2件のFormRequestを作成する
   - 対象: `backend/app/Http/Requests/StoreSubmissionRequest.php`, `CompleteSubmissionRequest.php`
   - `SubmissionController::store/complete`の型ヒントを差し替える
-- [ ] 2.4 管理者アカウント管理系のFormRequestを作成する
+- [x] 2.4 管理者アカウント管理系のFormRequestを作成する
   - 対象: `backend/app/Http/Requests/Admin/StoreAdminRequest.php`, `StoreUserRequest.php`, `UpdateUserRequest.php`
   - `UpdateUserRequest`は現行の`sometimes`規則をそのまま踏襲（既にsometimes運用のため変更なし）
   - `Admin\AdminController::store`, `Admin\UserController::store/update`の型ヒントを差し替える
