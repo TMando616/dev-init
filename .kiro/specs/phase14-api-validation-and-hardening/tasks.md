@@ -96,11 +96,13 @@
 
 ## 6. 動作確認・仕上げ
 
-- [ ] 6.1 バックエンド全テスト・lintを実行する
-  - `docker compose exec php php artisan test`（全件成功を確認）
-- [ ] 6.2 フロントエンドのlint・型チェック・buildを実行する
-  - `docker compose exec node npm run lint`
-  - `docker compose exec node npm run build`（phase13で既知の`/admin/admins`ビルドエラーが別問題として再現するかを確認し、新規エラーでないことを確認する）
+- [x] 6.1 バックエンド全テスト・lintを実行する
+  - 全73件・283アサーション通過
+- [x] 6.2 フロントエンドのlint・型チェック・buildを実行する
+  - `npm run lint` エラーなし、`npx tsc --noEmit` エラーなし
+  - `npm run build` は`/admin/admins`のprerenderで`TypeError: Cannot read properties of null (reading 'useContext')`。phase13で記録済みの既知事象と同一で、phase14の変更に起因する新規エラーではない
 - [ ] 6.3 手動確認: 管理画面でレッスンの`language`を設定→保存→受講生側で実行できることを確認する（US-1のブラウザ確認）
 - [ ] 6.4 手動確認: 学生アカウントで「模範解答を見る」を押した時だけ`model-answer`エンドポイントが呼ばれ、初期ロード時のレスポンスに含まれないことをDevToolsのNetworkタブで確認する
-- [ ] 6.5 `requirements.md`の受け入れ条件を全てチェックし、`design.md`末尾の「承認待ち」を解消する
+- [x] 6.5 `requirements.md`の受け入れ条件を全てチェックし、`design.md`末尾の「承認待ち」を解消する
+  - 手動確認待ちの2項目（US-1の実行確認・サムネイル表示）を除き全てチェック済み
+  - `design.md`に §7「実装時に判明した設計との差分」を追記した

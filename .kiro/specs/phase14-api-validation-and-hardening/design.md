@@ -230,4 +230,18 @@ GET /api/lessons/{id}/model-answer
 
 ---
 
-**承認待ち**: 内容をご確認ください。問題なければタスク分解（`tasks.md`）に進みます。
+## 7. 実装時に判明した設計との差分
+
+実装・テストを通して以下が本設計の記述と異なることが分かったため、実装側を正とし記録する（詳細は`tasks.md`の各タスクに記載）。
+
+| 箇所 | 設計の記述 | 実際 |
+|---|---|---|
+| §5.1 `LessonResource`のフィールド | `id`/`title`/`language`/`content`/`expected_output`/`categories`/`materials`/`next_lesson_id` | 上記に加え`created_at`/`updated_at`が必要。管理ダッシュボードがレッスン一覧の`created_at`を表示しているため |
+| §5.1 `next_lesson_id`の出し分け | `$this->resource->offsetExists('next_lesson_id')` | `offsetExists`はアクセサを実行してしまい一覧側でも常に真になる（＋N+1）。`whenAppended('next_lesson_id')`を使う |
+| §5.1 レスポンスのラップ | 言及なし | `LessonResource::collection()`をそのまま返すと`{"data": [...]}`にラップされ既存フロント・テストが壊れる。従来どおり`response()->json(...)`で包んで返す（`jsonSerialize()`経由になりラップされない） |
+| §6 `LessonTest`への影響 | 「無変更で通る」 | `test_admin_can_create_lesson`が`language`を送っていなかったため422で失敗。`language`送信を追加した |
+| §4.4 レート制限テストの期待値 | ログイン失敗を401前提で記述 | 認証失敗は`ValidationException`のため422。テストの期待値を422にした |
+
+---
+
+**承認済み**: 上記の差分を含め実装完了。

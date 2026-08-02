@@ -73,7 +73,8 @@ class LessonTest extends TestCase
             ]);
 
         $response->assertStatus(201)
-            ->assertJsonPath('title', 'Admin Lesson');
+            ->assertJsonPath('title', 'Admin Lesson')
+            ->assertJsonPath('language', 'javascript');
 
         $this->assertDatabaseHas('lessons', [
             'title'    => 'Admin Lesson',
@@ -126,6 +127,37 @@ class LessonTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonPath('title', 'Updated Title');
+    }
+
+    public function test_admin_can_update_lesson_language()
+    {
+        $lesson = Lesson::factory()->create(['language' => 'javascript']);
+
+        $response = $this->actingAs($this->admin, 'admin')
+            ->putJson("/api/admin/lessons/{$lesson->id}", [
+                'language' => 'ruby',
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('language', 'ruby');
+
+        $this->assertDatabaseHas('lessons', [
+            'id'       => $lesson->id,
+            'language' => 'ruby',
+        ]);
+    }
+
+    public function test_updating_lesson_rejects_unsupported_language()
+    {
+        $lesson = Lesson::factory()->create();
+
+        $response = $this->actingAs($this->admin, 'admin')
+            ->putJson("/api/admin/lessons/{$lesson->id}", [
+                'language' => 'cplusplus',
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors('language');
     }
 
     public function test_admin_can_delete_lesson()
