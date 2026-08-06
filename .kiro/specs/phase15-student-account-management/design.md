@@ -5,7 +5,7 @@
 - `User` に `SoftDeletes` を導入する。Laravelのグローバルスコープにより、**退会済みユーザーは既存クエリから自動的に消える**（ログイン検索・`UserRepository::all()`・Sanctumの `tokenable` 解決・`Password` ブローカーのユーザー取得がすべて対象外になる）。既存コードに条件分岐を足すのではなく、この「見えなくなる」性質に乗る形で US-3・US-4・US-7 の大半を満たす。
 - アカウント系の責務は `AuthController` に足さず、**用途ごとにController/Serviceを分割**する（`AccountController` / `PasswordResetController` / `ReactivationController`）。`AuthController::register` だけは、退会済みメール検知の分岐を持つため `ReactivationService` に委譲する。
 - 復会トークンは `password_reset_tokens` を流用せず、**専用テーブル `account_reactivation_tokens` を新設**する。理由: 標準の `Password` ブローカーは `users` プロバイダ経由でユーザーを取得するため、ソフトデリート済みユーザーを引けない。ブローカーを退会済みも見えるように歪めると、パスワードリセット側の「退会済みには送らない」保証（US-3）まで壊れる。テーブル構造はLaravel標準の `password_reset_tokens` に揃える（email主キー・トークンはハッシュ保存・単回使用）。
-- **`POST /register` のレスポンス契約を変更する**。「メールアドレスの登録状態を推測させない」（US-5）を満たすため、既に使われているメールアドレス（有効・退会済みの両方）では **202 + 汎用メッセージ** を返し、アカウントの存在有無に応じたメールを送る。未登録のメールアドレスのみ従来どおり 200 + トークンを返す。→ 影響が大きいため §13 に整理し、代替案も併記した。**レビュー時にここを確認してほしい。**
+- **`POST /register` は退会済みメールのときだけ挙動が変わる**。有効なアカウントが存在する場合は従来どおり 422（重複エラー）、未登録なら従来どおり 200 + トークン、退会済み（保持期間内）のときのみ **202 + 案内メッセージ** を返して復会メールを送る。退会済みかどうかはレスポンスの違いから推測されうるが、実害が小さいことと登録UXの維持を優先して許容する（requirements.md US-5 に決定を記録済み）。
 - パスワードリセット・復会の完了後は**トークンを自動発行しない**。完了画面からログイン画面へ誘導し、新しいパスワードでログインさせる（Laravel標準のリセットフローと同じ挙動。メールリンクの所持だけでセッションが手に入る状態を避ける）。
 - メール本文はすべて日本語のため、Laravel標準の `ResetPassword` 通知はそのまま使わず**自前の Notification クラス**を用意する（リンク先をフロントエンドURLへ向ける件も同時に解決する）。
 - 保持期間（30日）とトークン有効期限は `config/account.php` に集約し、Artisanコマンド・復会検証・画面文言の根拠を一箇所にする。
@@ -85,7 +85,6 @@ return [
 | Command | `App\Console\Commands\PurgeDeletedUsers` | 保持期間超過ユーザーの物理削除 |
 | Notification | `App\Notifications\ResetPasswordNotification` | パスワードリセットメール（日本語） |
 | Notification | `App\Notifications\ReactivateAccountNotification` | 復会案内メール（日本語） |
-| Notification | `App\Notifications\AccountAlreadyExistsNotification` | 登録済みメールへの案内メール（日本語） |
 
 ### 2.2 FormRequest（Phase 14 の方針を踏襲し、Controller内 `validate()` 直書きは禁止）
 
@@ -105,7 +104,7 @@ return [
 
 **`UpdateProfileRequest` の unique 判定について**: `Rule::unique` はモデルではなくテーブルを直接見るため、退会済みユーザーが保持しているメールアドレスも「使用中」として 422 になる。DBのunique制約違反（500）を防ぐ意味でこれが正しい挙動であり、`whereNull('deleted_at')` は**付けない**。
 
-**`RegisterRequest` の変更**: `email` から `unique:users` を**外す**（§5.1 の分岐で扱うため）。
+**`RegisterRequest` の変更**: `email` の `unique:users` を `Rule::unique('users')->whereNull('deleted_at')` に差し替える。有効なアカウントとの重複は従来どおりバリデーション層で 422 になり、退会済みが保持しているメールアドレスだけがバリデーションを通過して §5.1 の復会分岐に到達する。
 
 **`Admin\StoreUserRequest`**: `unique:users` はそのまま残すが、退会済みメールと衝突したときに管理者が原因を判断できるよう `messages()` に「退会済みユーザーが使用中の可能性があります」旨を追記する。
 
@@ -182,13 +181,16 @@ return [
 // 422: トークン不正・期限切れ・使用済み・保持期間超過
 ```
 
-#### 7. `POST /api/register`（契約変更）
+#### 7. `POST /api/register`（退会済みメール時のみ追加される分岐）
 
 ```jsonc
 // 未登録メール → 200（従来どおり）
 { "user": {...}, "access_token": "...", "token_type": "Bearer" }
 
-// 既に使われているメール（有効・退会済みのいずれも）→ 202
+// 有効なアカウントが存在 → 422（従来どおり。RegisterRequest のバリデーションエラー）
+{ "message": "...", "errors": { "email": ["..."] } }
+
+// 退会済み（保持期間内）→ 202
 { "message": "ご入力のメールアドレス宛に確認メールを送信しました。メールをご確認ください。" }
 ```
 
@@ -208,23 +210,25 @@ sequenceDiagram
 
     U->>F: 名前・メール・パスワード送信
     F->>A: POST /api/register
-    A->>S: resolveRegistration(email)
 
-    alt 未登録
-        S-->>A: create
-        A-->>F: 200 { user, access_token }
-        F->>F: login() → ダッシュボードへ
-    else 有効なアカウントが存在
-        S->>M: AccountAlreadyExistsNotification
-        A-->>F: 202 { message }
-    else 退会済み（30日以内）
-        S->>S: トークン発行・ハッシュ保存
-        S->>M: ReactivateAccountNotification
-        A-->>F: 202 { message }
-    else 退会済み（30日超過・未purge）
-        S->>S: forceDelete して通常登録へ
-        S-->>A: create
-        A-->>F: 200 { user, access_token }
+    alt 有効なアカウントが存在
+        Note over A: RegisterRequest の unique(whereNull deleted_at) で弾かれる
+        A-->>F: 422 { errors.email }
+    else それ以外
+        A->>S: resolveRegistration(data)
+        alt 未登録
+            S-->>A: create
+            A-->>F: 200 { user, access_token }
+            F->>F: login() → ダッシュボードへ
+        else 退会済み（30日以内）
+            S->>S: トークン発行・ハッシュ保存
+            S->>M: ReactivateAccountNotification
+            A-->>F: 202 { message }
+        else 退会済み（30日超過・未purge）
+            S->>S: forceDelete して通常登録へ
+            S-->>A: create
+            A-->>F: 200 { user, access_token }
+        end
     end
 
     U->>M: メールを開き復会リンクをクリック
@@ -294,21 +298,17 @@ class ReactivationService
     ) {}
 
     /**
-     * 登録時の分岐判定。呼び出し元（AuthController）は戻り値で
-     * 「即時登録する / 案内メールを送って 202 を返す」を決める。
+     * 登録時の分岐判定。有効なアカウントとの重複は RegisterRequest が
+     * 先に 422 で弾いているため、ここに来るのは「未登録」か「退会済み」のみ。
+     * 呼び出し元（AuthController）は戻り値で
+     * 「即時登録して 200 を返す / 復会メールを送って 202 を返す」を決める。
      */
     public function resolveRegistration(array $data): ?User
     {
-        $active = $this->users->findByEmail($data['email']);
-        if ($active) {
-            $active->notify(new AccountAlreadyExistsNotification());
-            return null;                       // 202 汎用メッセージ
-        }
-
         $trashed = $this->users->findTrashedByEmail($data['email']);
         if ($trashed && $this->isWithinRetention($trashed)) {
             $this->sendReactivationLink($trashed);
-            return null;                       // 202 汎用メッセージ
+            return null;                       // 202 案内メッセージ
         }
 
         // 保持期間を過ぎた退会済みレコードが purge 前に残っている場合は
@@ -370,7 +370,6 @@ public function trashedOlderThan(CarbonInterface $threshold): Collection;
 |---|---|---|
 | `ResetPasswordNotification` | 【DevInit】パスワード再設定のご案内 | `{FRONTEND_URL}/reset-password?token={token}&email={urlencode(email)}` / 有効期限60分 / 心当たりがなければ破棄してよい旨 |
 | `ReactivateAccountNotification` | 【DevInit】アカウント復元のご案内 | `{FRONTEND_URL}/reactivate?token={token}&email={urlencode(email)}` / 有効期限60分 / 復元すると以前の学習進捗を引き継ぐ旨 / 氏名は退会前のままで設定画面から変更できる旨 |
-| `AccountAlreadyExistsNotification` | 【DevInit】アカウント登録のお知らせ | 既に登録済みのためログインしてほしい旨 / パスワードを忘れた場合は `{FRONTEND_URL}/forgot-password` へ / 心当たりがなければ破棄してよい旨（**リンクにトークンは含めない**） |
 
 `ResetPasswordNotification` は `User::sendPasswordResetNotification()` のオーバーライドから呼ばれるため、`Password` ブローカー経由で自動的に使われる。`ResetPassword::createUrlUsing()` は使わない（メール文面も日本語化するため、通知クラスごと差し替えたほうが一箇所で完結する）。
 
@@ -599,7 +598,7 @@ export const isPublicPath = (pathname: string): boolean =>
 |---|---|
 | `tests/Feature/AccountTest.php` | プロフィール更新成功 / 自分の現在のメールのまま保存できる / 他人のメールで422 / 未認証401 / パスワード変更成功 / 現在パスワード誤りで422 / 変更後に他端末トークンが失効し操作端末は生存 / 退会でdeleted_atがセットされ全トークン失効 / 退会後にログイン不可 / 退会後も submissions が残る |
 | `tests/Feature/PasswordResetTest.php` | 登録済み/未登録で同一メッセージ / 通知が送られる・送られない / リセット成功後に新パスワードでログイン可 / トークン再利用で422 / 改ざんトークンで422 / 退会済みには送信されない |
-| `tests/Feature/ReactivationTest.php` | 退会済みメールで登録してもユーザーが増えない / 復会通知が送られる / 復会でdeleted_atがクリアされログイン可 / 退会前のsubmissionsが引き継がれる / トークン再利用で422 / 30日超過は復会不可 / 30日超過レコードがある状態での新規登録は成功する / 有効なメールでの登録は202かつ AccountAlreadyExistsNotification が飛ぶ / 未登録メールは従来どおり200+トークン |
+| `tests/Feature/ReactivationTest.php` | 退会済みメールで登録してもユーザーが増えず202が返る / 復会通知が送られる / 復会でdeleted_atがクリアされログイン可 / 退会前のsubmissionsが引き継がれる / トークン再利用で422 / 30日超過は復会不可 / 30日超過レコードがある状態での新規登録は成功する / 有効なメールでの登録は従来どおり422 / 未登録メールは従来どおり200+トークン |
 | `tests/Feature/PurgeDeletedUsersTest.php` | 30日超過ユーザーが削除される（submissionsも連鎖削除） / 29日目は削除されない / 未退会は削除されない / `--dry-run` では削除されない / 件数がログ出力される |
 
 **既存テストへの影響**
@@ -619,9 +618,9 @@ export const isPublicPath = (pathname: string): boolean =>
 
 | # | 変更 | 影響 | 判断 |
 |---|---|---|---|
-| 1 | `POST /register` が既存メールで **422 → 202 + 汎用メッセージ** | フロントの登録画面がレスポンス分岐を必要とする。「メールアドレスは既に使用されています」というエラーが出なくなり、ユーザーはメールを見るまで理由が分からない | US-5 の「登録済み・退会済みを問わず同一の案内メッセージ」を満たすための必須変更。**代替案**: 有効なメールは従来どおり 422 のままにし、退会済みのみ 202 とする。実装は単純で UX も維持できるが、レスポンスの違いから「このメールは退会済みである」ことが外部から判別できてしまう。→ 要件に明記された条件を優先して 202 統一を採用したが、UX を優先するなら代替案に切り替えられる。**レビュー判断ポイント** |
+| 1 | `POST /register` に **202（退会済みメール）** の分岐が増える | フロントの登録画面がレスポンス分岐を必要とする（`access_token` の有無で判定）。有効なメールでの重複は 422 のままなので、既存の登録UXとテストは維持される | 2026-08-06 に案Bで決定（requirements.md US-5 に記録）。退会済みかどうかはレスポンス差から推測されうるが、DevInitでの実害は小さいと判断し、全ユーザーが踏む登録UXの維持を優先した |
 | 2 | `DELETE /api/admin/users/{id}` がソフトデリートに変わる | 管理者から見て「削除したのにメールアドレスを再利用できない」状況が生まれる | US-7 の要求どおり。完全削除の導線（`/force`）を同時に提供して回避可能にする |
-| 3 | `RegisterRequest` から `unique:users` を外す | バリデーション層での重複保証が無くなる | 重複判定は `ReactivationService::resolveRegistration()` が担う。同時リクエストによる競合は DB の unique 制約が最後の砦になるため、`create()` を `QueryException`（unique violation）で捕捉し、その場合も 202 の汎用メッセージを返す |
+| 3 | `RegisterRequest` の `unique:users` が `whereNull('deleted_at')` 付きになる | 有効なアカウントとの重複は従来どおり 422。退会済みが持つメールアドレスはバリデーションを通過する | 通過後は `ReactivationService` が復会分岐に流す。バリデーション通過から insert までの競合で DB の unique 制約に当たる可能性は残るが、これは本フェーズ以前から同じ性質のもので、新たに悪化しない |
 | 4 | 登録・リセット要求のレスポンスに SMTP 送信時間が乗る | 数百ms程度の遅延 | キュー導入はワーカー常駐が必要なため見送る。将来 `ShouldQueue` を付ける際は `QUEUE_CONNECTION` とワーカーサービスをセットで追加する |
 
 ---
