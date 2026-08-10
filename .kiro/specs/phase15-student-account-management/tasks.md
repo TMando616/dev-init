@@ -9,20 +9,18 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
 
 ## 1. 基盤整備（SoftDeletes・設定・メール環境）
 
-- [ ] 1-1. Mailpit と scheduler サービスを docker-compose に追加
+- [x] 1-1. Mailpit と scheduler サービスを docker-compose に追加
   - `docker-compose.yml`: `mailpit`（`axllent/mailpit`, SMTP 1025 / UI 8025）を追加
   - `docker-compose.yml`: `scheduler` サービスを `profiles: ["scheduler"]` 付きで追加（`php artisan schedule:work`、Dockerソケットはマウントしない）
   - `backend/.env.example`: `MAIL_MAILER=smtp` / `MAIL_HOST=mailpit` / `MAIL_PORT=1025` / `MAIL_FROM_ADDRESS` / `MAIL_FROM_NAME` / `FRONTEND_URL` / `ACCOUNT_RETENTION_DAYS` を更新・追加
   - ローカルの `backend/.env` にも同じ値を反映し、`http://localhost:8025` が開けることを確認する
   - 参照: design.md §8.3, §11
-  - **残**: ファイル編集は完了。`docker compose up` して Mailpit UI が開けることの確認が未実施（Docker Desktop の WSL 統合が切れていたため）
 
-- [ ] 1-2. `users` へのソフトデリート導入
+- [x] 1-2. `users` へのソフトデリート導入
   - `backend/database/migrations/2026_08_05_000000_add_deleted_at_to_users_table.php` を新規作成（`softDeletes()`）
   - `backend/app/Models/User.php` に `SoftDeletes` トレイトを追加
   - `docker compose exec php php artisan migrate` で適用
   - 参照: design.md §1.1, §1.2
-  - **残**: マイグレーションファイルとモデルの変更は完了。`artisan migrate` の適用が未実施（同上）
 
 - [x] 1-3. 設定ファイルの追加
   - `backend/config/account.php` を新規作成（`retention_days` / `reactivation_token_expire`）
