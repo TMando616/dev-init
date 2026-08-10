@@ -53,5 +53,12 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()->id);
         });
+
+        // Sensitive self-account operations (password change, withdrawal).
+        // As strict as 'auth', but keyed by user id since these requests
+        // carry no email in the body.
+        RateLimiter::for('account', function (Request $request) {
+            return Limit::perMinute(6)->by($request->user()?->id ?: $request->ip());
+        });
     }
 }

@@ -35,26 +35,26 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
 
 ## 2. 自分のアカウント操作（US-1 プロフィール / US-2 パスワード変更 / US-4 退会）
 
-- [ ] 2-1. FormRequest 3件を追加
+- [x] 2-1. FormRequest 3件を追加
   - `backend/app/Http/Requests/UpdateProfileRequest.php`
   - `backend/app/Http/Requests/UpdatePasswordRequest.php`（`current_password:sanctum` を使う）
   - `backend/app/Http/Requests/DeleteAccountRequest.php`
   - `authorize()` は Phase 14 と同じ方針でコメントを残す
   - 参照: design.md §2.2
 
-- [ ] 2-2. `AccountService` を実装
+- [x] 2-2. `AccountService` を実装
   - `backend/app/Services/AccountService.php`: `updateProfile` / `changePassword` / `delete`
   - `changePassword` は現在のトークン以外を失効させる（`TransientToken` 対策の分岐を入れる）
   - `delete` は全トークン失効 → `$user->delete()`
   - 参照: design.md §5.2
 
-- [ ] 2-3. `AccountController` とルートを追加
+- [x] 2-3. `AccountController` とルートを追加
   - `backend/app/Http/Controllers/AccountController.php`: `updateProfile` / `updatePassword` / `destroy`
   - `backend/app/Providers/AppServiceProvider.php` に `account` リミッターを追加
   - `backend/routes/api.php` に3ルートを追加（profile は `throttle:api`、password / delete は `throttle:account`）
   - 参照: design.md §3.1, §3.2, §7
 
-- [ ] 2-4. `tests/Feature/AccountTest.php` を作成
+- [x] 2-4. `tests/Feature/AccountTest.php` を作成
   - プロフィール更新成功 / 自分の現在のメールのまま保存できる / 他人のメールで422 / 未認証401
   - パスワード変更成功 / 現在パスワード誤りで422 / 変更後に他端末トークンが失効し操作端末は生存（実トークンを2本取得して検証）
   - 退会で `deleted_at` がセットされ全トークン失効 / 退会後にログイン不可 / 退会前トークンで401 / `submissions` が残る

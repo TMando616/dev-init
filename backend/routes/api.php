@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AdminAuthController;
@@ -43,6 +44,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('/submissions/lesson/{lessonId}', [SubmissionController::class, 'show']);
         Route::get('/submissions/completed-lesson-ids', [SubmissionController::class, 'completedLessonIds']);
+
+        // Account (self-service)
+        Route::put('/account/profile', [AccountController::class, 'updateProfile']);
+    });
+
+    // Sensitive self-account operations get their own tighter budget.
+    Route::middleware('throttle:account')->group(function () {
+        Route::put('/account/password', [AccountController::class, 'updatePassword']);
+        Route::delete('/account', [AccountController::class, 'destroy']);
     });
 
     // Code Execution (one Docker container per request: tighter budget)
