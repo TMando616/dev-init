@@ -10,6 +10,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExecutionController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\SubmissionController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('throttle:auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
+    Route::post('/reset-password', [PasswordResetController::class, 'reset']);
 
     // Admin login (no public registration: admins are created by other admins)
     Route::post('/admin/login', [AdminAuthController::class, 'login']);

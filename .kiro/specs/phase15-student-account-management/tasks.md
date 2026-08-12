@@ -64,12 +64,12 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
 
 ## 3. パスワードリセット（US-3）
 
-- [ ] 3-1. `ResetPasswordNotification` を追加
+- [x] 3-1. `ResetPasswordNotification` を追加
   - `backend/app/Notifications/ResetPasswordNotification.php`（日本語・リンク先は `config('app.frontend_url')`）
   - `User::sendPasswordResetNotification()` をオーバーライドして差し替え
   - 参照: design.md §1.2, §6
 
-- [ ] 3-2. リセット系の FormRequest / Service / Controller / ルートを追加
+- [x] 3-2. リセット系の FormRequest / Service / Controller / ルートを追加
   - `ForgotPasswordRequest` / `ResetPasswordRequest`
   - `backend/app/Services/PasswordResetService.php`（`Password` ファサードのラップ、ステータス変換）
   - `backend/app/Http/Controllers/PasswordResetController.php`: `sendResetLink` / `reset`
@@ -77,12 +77,12 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
   - 送信結果によらず同一メッセージを返すこと
   - 参照: design.md §3.2, §7
 
-- [ ] 3-3. `tests/Feature/PasswordResetTest.php` を作成
+- [x] 3-3. `tests/Feature/PasswordResetTest.php` を作成
   - 登録済み / 未登録で同一メッセージ・通知の有無 / リセット成功後に新パスワードでログイン可
   - トークン再利用で422 / 改ざんトークンで422 / 退会済みには送信されない
   - 参照: design.md §12
 
-- [ ] 3-4. Mailpit で実際のメール受信を手動確認
+- [x] 3-4. Mailpit で実際のメール受信を手動確認
   - `/api/forgot-password` を叩き、`http://localhost:8025` で本文とリンク先URLを確認する
   - リンクが `http://localhost:3000/reset-password?token=..&email=..` になっていること
 
