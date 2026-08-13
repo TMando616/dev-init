@@ -5,24 +5,31 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use App\Services\ReactivationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    public function __construct(
+        protected ReactivationService $reactivationService
+    ) {}
+
     /**
      * Register a new student.
      */
     public function register(RegisterRequest $request)
     {
-        $validated = $request->validated();
+        $user = $this->reactivationService->resolveRegistration($request->validated());
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
+        // Withdrawn email inside the retention window: the reactivation link
+        // has been mailed, so there is no account to hand a token to yet.
+        if (! $user) {
+            return response()->json([
+                'message' => 'ご入力のメールアドレス宛に確認メールを送信しました。メールをご確認ください。',
+            ], 202);
+        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

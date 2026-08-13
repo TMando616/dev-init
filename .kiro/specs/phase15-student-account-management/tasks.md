@@ -90,28 +90,28 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
 
 ## 4. 復会（US-5）
 
-- [ ] 4-1. 復会トークンのテーブルとリポジトリを追加
+- [x] 4-1. 復会トークンのテーブルとリポジトリを追加
   - `backend/database/migrations/2026_08_05_000001_create_account_reactivation_tokens_table.php`
   - `backend/app/Repositories/ReactivationTokenRepository.php`（発行・取得・削除。トークンはハッシュ保存）
   - 参照: design.md §1.1, §5.1
 
-- [ ] 4-2. `ReactivateAccountNotification` を追加
+- [x] 4-2. `ReactivateAccountNotification` を追加
   - `backend/app/Notifications/ReactivateAccountNotification.php`（日本語・有効期限60分・進捗引き継ぎと氏名据え置きの説明を含める）
   - 参照: design.md §6
 
-- [ ] 4-3. `ReactivationService` を実装
+- [x] 4-3. `ReactivationService` を実装
   - `resolveRegistration()`: 退会済み（保持期間内）→ 復会メール送信で `null` を返す / 保持期間超過 → `forceDelete()` して通常登録 / 未登録 → 通常登録
   - `reactivate()`: トークン照合・期限・保持期間を検証 → `restore()` + パスワード更新 + トークン行削除。失敗は `ValidationException` で422
   - 復会時に氏名は上書きしない
   - 参照: design.md §5.1
 
-- [ ] 4-4. 登録フローと復会エンドポイントを接続
+- [x] 4-4. 登録フローと復会エンドポイントを接続
   - `RegisterRequest` の `email` を `Rule::unique('users')->whereNull('deleted_at')` に変更
   - `AuthController::register` を `ReactivationService::resolveRegistration()` 経由に変更（`null` なら202 + 案内メッセージ）
   - `ReactivateAccountRequest` / `ReactivationController` を追加し、`throttle:auth` グループに `POST /reactivate` を追加
   - 参照: design.md §2.2, §3.2, §4.1, §7
 
-- [ ] 4-5. `tests/Feature/ReactivationTest.php` を作成
+- [x] 4-5. `tests/Feature/ReactivationTest.php` を作成
   - 退会済みメールで登録してもユーザーが増えず202 / 復会通知が送られる
   - 復会で `deleted_at` がクリアされ新パスワードでログイン可 / 退会前の `submissions` を引き継ぐ
   - トークン再利用で422 / 30日超過は復会不可 / 30日超過レコードがある状態での新規登録は成功する

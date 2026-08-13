@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class RegisterRequest extends FormRequest
 {
@@ -19,7 +20,13 @@ class RegisterRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            // Only active accounts block registration. An email held by a
+            // withdrawn account passes validation so the controller can send
+            // a reactivation link instead of a duplicate-email error.
+            'email' => [
+                'required', 'string', 'email', 'max:255',
+                Rule::unique('users')->whereNull('deleted_at'),
+            ],
             'password' => 'required|string|min:8|confirmed',
         ];
     }
