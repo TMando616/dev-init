@@ -137,7 +137,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
   - `--dry-run` では削除されない / 件数がログ出力される
   - 参照: design.md §12
 
-- [ ] 5-4. scheduler サービスの動作確認
+- [x] 5-4. scheduler サービスの動作確認
   - `docker compose --profile scheduler up scheduler` で起動し、`schedule:list` にコマンドが載ることを確認する
 
 ---
