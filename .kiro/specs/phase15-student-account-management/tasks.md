@@ -132,7 +132,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
   - `backend/routes/console.php` に `Schedule::command('users:purge-deleted')->dailyAt('03:00')->withoutOverlapping()`
   - 参照: design.md §8.2
 
-- [ ] 5-3. `tests/Feature/PurgeDeletedUsersTest.php` を作成
+- [x] 5-3. `tests/Feature/PurgeDeletedUsersTest.php` を作成
   - 30日超過は削除される（submissions も連鎖削除）/ 29日目は削除されない / 未退会は削除されない
   - `--dry-run` では削除されない / 件数がログ出力される
   - 参照: design.md §12
