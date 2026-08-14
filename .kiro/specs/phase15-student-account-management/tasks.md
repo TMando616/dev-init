@@ -153,7 +153,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
   - `Admin\StoreUserRequest` の `messages()` に退会済み衝突時の説明を追加
   - 参照: design.md §2.2, §9
 
-- [ ] 6-2. `StudentManagementTest` を更新・拡充
+- [x] 6-2. `StudentManagementTest` を更新・拡充
   - `test_admin_can_delete_student`（`tests/Feature/StudentManagementTest.php:89`）の `assertDatabaseMissing` を `assertSoftDeleted` に変更
   - 完全削除で `assertDatabaseMissing` になるケースを追加
   - 退会済みが既定の一覧に出ない / `?status=deleted` で出るケースを追加
