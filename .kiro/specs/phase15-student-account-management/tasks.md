@@ -122,7 +122,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
 
 ## 5. 保持期間超過アカウントの自動削除（US-6）
 
-- [ ] 5-1. `PurgeDeletedUsers` コマンドを実装
+- [x] 5-1. `PurgeDeletedUsers` コマンドを実装
   - `backend/app/Console/Commands/PurgeDeletedUsers.php`（`users:purge-deleted {--days=} {--dry-run}`）
   - `forceDelete()` で `users` と連鎖する `submissions` を物理削除。`account_reactivation_tokens` の残骸も削除
   - 件数を `Log::info` とコンソールに出力
