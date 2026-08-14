@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Repositories\ReactivationTokenRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Hash;
@@ -10,15 +11,19 @@ use Illuminate\Support\Facades\Hash;
 class UserService
 {
     public function __construct(
-        protected UserRepository $repository
+        protected UserRepository $repository,
+        protected ReactivationTokenRepository $reactivationTokens,
     ) {}
 
     /**
-     * List all students.
+     * List students. 'active' relies on the SoftDeletes global scope to hide
+     * withdrawn accounts, so the default listing is unchanged.
      */
-    public function list(): Collection
+    public function list(string $status = 'active'): Collection
     {
-        return $this->repository->all();
+        return $status === 'deleted'
+            ? $this->repository->allTrashed()
+            : $this->repository->all();
     }
 
     /**
@@ -53,7 +58,9 @@ class UserService
     }
 
     /**
-     * Delete a student.
+     * Withdraw a student. Same handling as a self-service withdrawal: revoke
+     * every token first so the account cannot keep using the API, then soft
+     * delete so the record survives the retention window.
      */
     public function delete(int $id): bool
     {
@@ -62,6 +69,29 @@ class UserService
             return false;
         }
 
+        $user->tokens()->delete();
+
         return $this->repository->delete($user);
+    }
+
+    /**
+     * Permanently delete a student, withdrawn or not, so an immediate
+     * deletion request can be honoured without waiting out the retention
+     * period. Submissions go with it via cascadeOnDelete.
+     */
+    public function forceDelete(int $id): bool
+    {
+        $user = $this->repository->findWithTrashed($id);
+        if (!$user) {
+            return false;
+        }
+
+        $user->tokens()->delete();
+
+        // The email address is personal data too, and this table has no
+        // foreign key to cascade from.
+        $this->reactivationTokens->delete($user->email);
+
+        return $this->repository->forceDelete($user);
     }
 }

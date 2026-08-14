@@ -86,6 +86,7 @@ Route::middleware(['auth:admin', 'throttle:api'])->prefix('admin')->group(functi
     Route::post('/users', [UserController::class, 'store']);
     Route::put('/users/{id}', [UserController::class, 'update']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
+    Route::delete('/users/{id}/force', [UserController::class, 'forceDestroy']);
 
     // Content management (write operations)
     Route::post('/lessons', [LessonController::class, 'store']);

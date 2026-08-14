@@ -23,4 +23,17 @@ class StoreUserRequest extends FormRequest
             'password' => 'required|string|min:8|confirmed',
         ];
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            // unique:users also matches withdrawn accounts, which the default
+            // listing hides. Point the admin at the 退会済み tab instead of
+            // leaving them to wonder where the conflict is.
+            'email.unique' => 'このメールアドレスは既に使用されています。退会済みユーザーが使用している可能性があります（一覧の「退会済み」から確認できます）。',
+        ];
+    }
 }

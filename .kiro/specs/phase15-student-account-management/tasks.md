@@ -144,7 +144,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
 
 ## 6. 管理者側の対応（US-7）
 
-- [ ] 6-1. 一覧フィルタと完全削除をバックエンドに追加
+- [x] 6-1. 一覧フィルタと完全削除をバックエンドに追加
   - `backend/app/Http/Requests/Admin/IndexUserRequest.php`（`status: sometimes|in:active,deleted`）
   - `UserService::list(string $status)` / `UserService::forceDelete(int $id)` を追加
   - `UserService::delete` を「全トークン失効 + ソフトデリート」に揃える

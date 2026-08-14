@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\IndexUserRequest;
 use App\Http\Requests\Admin\StoreUserRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Services\UserService;
@@ -14,11 +15,14 @@ class UserController extends Controller
     ) {}
 
     /**
-     * List all students.
+     * List students. Defaults to active ones; ?status=deleted shows the
+     * withdrawn accounts still inside the retention period.
      */
-    public function index()
+    public function index(IndexUserRequest $request)
     {
-        return response()->json($this->service->list());
+        return response()->json(
+            $this->service->list($request->validated()['status'] ?? 'active')
+        );
     }
 
     /**
@@ -46,11 +50,25 @@ class UserController extends Controller
     }
 
     /**
-     * Delete a student.
+     * Withdraw a student (soft delete, reversible during retention).
      */
     public function destroy(string $id)
     {
         $deleted = $this->service->delete((int) $id);
+
+        if (!$deleted) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        return response()->json(null, 204);
+    }
+
+    /**
+     * Permanently delete a student. Irreversible: submissions go with it.
+     */
+    public function forceDestroy(string $id)
+    {
+        $deleted = $this->service->forceDelete((int) $id);
 
         if (!$deleted) {
             return response()->json(['message' => 'User not found'], 404);
