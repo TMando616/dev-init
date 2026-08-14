@@ -128,7 +128,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
   - 件数を `Log::info` とコンソールに出力
   - 参照: design.md §8.1
 
-- [ ] 5-2. スケジュール登録
+- [x] 5-2. スケジュール登録
   - `backend/routes/console.php` に `Schedule::command('users:purge-deleted')->dailyAt('03:00')->withoutOverlapping()`
   - 参照: design.md §8.2
 
