@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Tag,
+  Settings,
 } from 'lucide-react';
 
 // Since I don't see a lib/utils.ts, I'll use a simple conditional class joiner
@@ -38,6 +39,7 @@ export default function Sidebar() {
   const navItems = [
     { name: 'ダッシュボード', href: '/', icon: Home },
     { name: 'レッスン一覧', href: '/lessons/list', icon: BookOpen },
+    { name: '設定', href: '/settings', icon: Settings },
   ];
 
   // A nav item is active when its href is the most specific (longest) one matching

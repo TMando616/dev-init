@@ -3,17 +3,17 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { isPublicPath } from '@/lib/routes';
 import Sidebar from './Sidebar';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const pathname = usePathname();
 
-  const isPublicPath = ['/login', '/register'].includes(pathname);
   const isLessonPath = pathname.startsWith('/lessons/') && pathname.split('/').length > 2;
-  
+
   // Don't show sidebar for public pages or if user is not loaded
-  if (isPublicPath || loading || !user) {
+  if (isPublicPath(pathname) || loading || !user) {
     return <>{children}</>;
   }
 

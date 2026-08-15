@@ -163,7 +163,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
 
 ## 7. フロントエンド
 
-- [ ] 7-1. 公開パス定義の一元化と設定画面への導線
+- [x] 7-1. 公開パス定義の一元化と設定画面への導線
   - `frontend/src/lib/routes.ts` を新規作成（`PUBLIC_PATHS` / `isPublicPath`）
   - `context/AuthContext.tsx` と `components/MainLayout.tsx` の公開パス配列を差し替え
   - `AuthContext` に `refreshUser`（`checkAuth` の公開）と `clearSession()` を追加

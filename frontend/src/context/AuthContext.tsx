@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import api from '@/lib/api';
+import { isPublicPath } from '@/lib/routes';
 
 interface User {
   id: number;
@@ -16,6 +17,8 @@ interface AuthContextType {
   login: (token: string, user: User) => void;
   logout: () => void;
   checkAuth: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+  clearSession: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -66,8 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (loading) return;
 
-    const publicPaths = ['/login', '/register'];
-    if (!user && !publicPaths.includes(pathname)) {
+    if (!user && !isPublicPath(pathname)) {
       router.push('/login');
     }
   }, [user, loading, pathname, router]);
@@ -91,8 +93,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const clearSession = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+    router.push('/login');
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, checkAuth }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, logout, checkAuth, refreshUser: checkAuth, clearSession }}
+    >
       {children}
     </AuthContext.Provider>
   );
