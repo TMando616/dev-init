@@ -11,10 +11,14 @@ interface Student {
   name: string;
   email: string;
   created_at: string;
+  deleted_at?: string | null;
 }
+
+type StatusTab = 'active' | 'deleted';
 
 export default function AdminUsers() {
   const { admin, loading: authLoading } = useAdminAuth();
+  const [status, setStatus] = useState<StatusTab>('active');
   const [users, setUsers] = useState<Student[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -30,26 +34,10 @@ export default function AdminUsers() {
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
 
-  useEffect(() => {
-    if (!admin) return;
-
-    const loadUsers = async () => {
-      try {
-        const response = await adminApi.get('/admin/users');
-        setUsers(response.data);
-      } catch (error) {
-        console.error('Failed to fetch students', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadUsers();
-  }, [admin]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = async (targetStatus: StatusTab) => {
     setIsLoading(true);
     try {
-      const response = await adminApi.get('/admin/users');
+      const response = await adminApi.get('/admin/users', { params: { status: targetStatus } });
       setUsers(response.data);
     } catch (error) {
       console.error('Failed to fetch students', error);
@@ -57,6 +45,15 @@ export default function AdminUsers() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!admin) return;
+
+    const loadUsers = async () => {
+      await fetchUsers(status);
+    };
+    loadUsers();
+  }, [admin, status]);
 
   const handleEditStart = (student: Student) => {
     setEditingId(student.id);
@@ -73,7 +70,7 @@ export default function AdminUsers() {
         email: editEmail,
       });
       setEditingId(null);
-      await fetchUsers();
+      await fetchUsers(status);
     } catch (error) {
       console.error('Update failed', error);
       alert('更新に失敗しました。');
@@ -83,14 +80,26 @@ export default function AdminUsers() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('この生徒を削除してもよろしいですか？この操作は取り消せません。')) return;
+    if (!confirm('この生徒を退会させてもよろしいですか？30日以内なら本人が同じメールアドレスで復会できます。')) return;
 
     try {
       await adminApi.delete(`/admin/users/${id}`);
       setUsers(users.filter(u => u.id !== id));
     } catch (error) {
       console.error('Delete failed', error);
-      alert('削除に失敗しました。');
+      alert('退会処理に失敗しました。');
+    }
+  };
+
+  const handleForceDelete = async (id: number) => {
+    if (!confirm('この操作は取り消せません。学習履歴も含めて完全に削除されます。')) return;
+
+    try {
+      await adminApi.delete(`/admin/users/${id}/force`);
+      setUsers(users.filter(u => u.id !== id));
+    } catch (error) {
+      console.error('Force delete failed', error);
+      alert('完全削除に失敗しました。');
     }
   };
 
@@ -107,7 +116,7 @@ export default function AdminUsers() {
       setNewName('');
       setNewEmail('');
       setNewPassword('');
-      await fetchUsers();
+      await fetchUsers(status);
     } catch (error) {
       console.error('Add student failed', error);
       alert('生徒の作成に失敗しました。');
@@ -122,13 +131,38 @@ export default function AdminUsers() {
     <>
       <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-8 py-4 flex items-center justify-between sticky top-0 z-10">
         <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">生徒管理</h1>
-        <Button onClick={() => setShowAddModal(true)} size="sm" className="flex items-center gap-2">
-          <UserPlus size={18} />
-          新規生徒追加
-        </Button>
+        {status === 'active' && (
+          <Button onClick={() => setShowAddModal(true)} size="sm" className="flex items-center gap-2">
+            <UserPlus size={18} />
+            新規生徒追加
+          </Button>
+        )}
       </header>
 
       <main className="p-8 max-w-6xl mx-auto w-full">
+        <div className="mb-4 flex gap-2">
+          <button
+            onClick={() => setStatus('active')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              status === 'active'
+                ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900'
+                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
+            }`}
+          >
+            有効
+          </button>
+          <button
+            onClick={() => setStatus('deleted')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              status === 'deleted'
+                ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900'
+                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
+            }`}
+          >
+            退会済み
+          </button>
+        </div>
+
         <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
           <table className="w-full text-left">
             <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700">
@@ -174,7 +208,16 @@ export default function AdminUsers() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">
-                        {editingId === u.id ? (
+                        {status === 'deleted' ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/40"
+                            onClick={() => handleForceDelete(u.id)}
+                          >
+                            完全削除
+                          </Button>
+                        ) : editingId === u.id ? (
                           <>
                             <Button
                               variant="ghost"
@@ -222,7 +265,7 @@ export default function AdminUsers() {
               ) : (
                 <tr>
                   <td colSpan={3} className="px-6 py-12 text-center text-slate-500">
-                    生徒が見つかりませんでした。
+                    {status === 'deleted' ? '退会済みの生徒はいません。' : '生徒が見つかりませんでした。'}
                   </td>
                 </tr>
               )}

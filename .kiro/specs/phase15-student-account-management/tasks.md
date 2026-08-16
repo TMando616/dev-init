@@ -190,7 +190,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
   - `app/(student)/register/page.tsx`: `access_token` があれば `login()`、無ければ（202）案内メッセージを表示
   - 参照: design.md §10.1, §10.3
 
-- [ ] 7-5. 管理画面に退会済みタブと完全削除を追加（US-7）
+- [x] 7-5. 管理画面に退会済みタブと完全削除を追加（US-7）
   - `frontend/src/app/(admin)/admin/users/page.tsx`
   - 「有効 / 退会済み」タブ、退会済みタブでは操作を「完全削除」のみに
   - 完全削除は「この操作は取り消せません」の `confirm()` を挟んで `DELETE /admin/users/{id}/force`
