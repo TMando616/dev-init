@@ -178,7 +178,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
   - すべて `dark:` バリアント付きで実装
   - 参照: design.md §10.1, §10.4
 
-- [ ] 7-3. パスワードリセットの画面を実装（US-3）
+- [x] 7-3. パスワードリセットの画面を実装（US-3）
   - `frontend/src/app/(student)/forgot-password/page.tsx`
   - `frontend/src/app/(student)/reset-password/page.tsx`（`useSearchParams` は `<Suspense>` で包む）
   - `app/(student)/login/page.tsx` に「パスワードをお忘れの方」リンクを追加
