@@ -185,7 +185,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
   - 実装前に `frontend/node_modules/next/dist/docs/` で現行APIを確認する
   - 参照: design.md §10.1, §10.3
 
-- [ ] 7-4. 復会の画面と登録画面の分岐を実装（US-5）
+- [x] 7-4. 復会の画面と登録画面の分岐を実装（US-5）
   - `frontend/src/app/(student)/reactivate/page.tsx`
   - `app/(student)/register/page.tsx`: `access_token` があれば `login()`、無ければ（202）案内メッセージを表示
   - 参照: design.md §10.1, §10.3
