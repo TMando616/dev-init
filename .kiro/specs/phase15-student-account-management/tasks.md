@@ -170,7 +170,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
   - `components/Sidebar.tsx` に「設定」ナビ項目を追加
   - 参照: design.md §10.2, §10.3
 
-- [ ] 7-2. `/settings` を実装（US-1 / US-2 / US-4）
+- [x] 7-2. `/settings` を実装（US-1 / US-2 / US-4）
   - `frontend/src/app/(student)/settings/page.tsx`
   - プロフィール / パスワード変更 / 退会 の3カード。それぞれ独立フォーム
   - プロフィール保存後に `refreshUser()`、422 の `errors.email` をフィールド下に表示
