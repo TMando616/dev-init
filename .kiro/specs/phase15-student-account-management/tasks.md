@@ -200,7 +200,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
 
 ## 8. 仕上げ
 
-- [ ] 8-1. テストとLintを通す
+- [x] 8-1. テストとLintを通す
   - `docker compose exec php php artisan test`（既存テストの回帰を含めて全緑にする）
   - `docker compose exec node npm run lint`
   - `RateLimitingTest` に `throttle:account` の429ケースを1件追加

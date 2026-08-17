@@ -113,6 +113,19 @@ class RateLimitingTest extends TestCase
         }
     }
 
+    public function test_account_operations_are_throttled_after_six_requests()
+    {
+        for ($i = 0; $i < 6; $i++) {
+            $this->actingAs($this->user, 'sanctum')
+                ->putJson('/api/account/password', [])
+                ->assertStatus(422);
+        }
+
+        $this->actingAs($this->user, 'sanctum')
+            ->putJson('/api/account/password', [])
+            ->assertStatus(429);
+    }
+
     public function test_submissions_budget_is_separate_from_the_general_api_budget()
     {
         $lesson = Lesson::factory()->create();
