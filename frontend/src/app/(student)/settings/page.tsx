@@ -21,28 +21,46 @@ function ProfileCard() {
   const { user, refreshUser } = useAuth();
   const [name, setName] = useState(user?.name ?? '');
   const [email, setEmail] = useState(user?.email ?? '');
+  const [currentPassword, setCurrentPassword] = useState('');
   const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const isChangingEmail = email !== (user?.email ?? '');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setEmailError('');
+    setPasswordError('');
     setSuccess('');
     setIsLoading(true);
 
     try {
-      await api.put('/account/profile', { name, email });
+      await api.put('/account/profile', {
+        name,
+        email,
+        // 本人確認が要るのはメールアドレスを実際に変えるときだけ。
+        ...(isChangingEmail ? { current_password: currentPassword } : {}),
+      });
       await refreshUser();
+      setCurrentPassword('');
       setSuccess('プロフィールを更新しました。');
     } catch (err) {
       if (isAxiosError(err)) {
-        const fieldError = err.response?.data?.errors?.email?.[0];
-        if (fieldError) {
-          setEmailError(fieldError);
-        } else {
+        const errors = err.response?.data?.errors;
+        const emailMessage = errors?.email?.[0];
+        const passwordMessage = errors?.current_password?.[0];
+
+        if (emailMessage) {
+          setEmailError(emailMessage);
+        }
+        if (passwordMessage) {
+          setPasswordError(passwordMessage);
+        }
+        if (!emailMessage && !passwordMessage) {
           setError(err.response?.data?.message || 'プロフィールの更新に失敗しました。');
         }
       } else {
@@ -98,6 +116,30 @@ function ProfileCard() {
             <p className="mt-1 text-sm text-red-500 dark:text-red-400">{emailError}</p>
           )}
         </div>
+        {isChangingEmail && (
+          <div>
+            <label
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+              htmlFor="profile-current-password"
+            >
+              現在のパスワード
+            </label>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              メールアドレスを変更する場合のみ入力が必要です。
+            </p>
+            <Input
+              id="profile-current-password"
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              required
+              className="mt-1"
+            />
+            {passwordError && (
+              <p className="mt-1 text-sm text-red-500 dark:text-red-400">{passwordError}</p>
+            )}
+          </div>
+        )}
         <Button type="submit" disabled={isLoading}>
           {isLoading ? '保存中...' : '保存する'}
         </Button>

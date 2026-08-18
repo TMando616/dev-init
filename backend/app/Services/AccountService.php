@@ -3,13 +3,15 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Repositories\PasswordResetTokenRepository;
 use App\Repositories\UserRepository;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class AccountService
 {
     public function __construct(
-        protected UserRepository $repository
+        protected UserRepository $repository,
+        protected PasswordResetTokenRepository $passwordResetTokens,
     ) {}
 
     /**
@@ -43,6 +45,11 @@ class AccountService
     public function delete(User $user): void
     {
         $user->tokens()->delete();
+
+        // A pending reset link would be dead anyway (the broker cannot see a
+        // soft-deleted user), but the row keeps an email address on file.
+        $this->passwordResetTokens->delete($user->email);
+
         $user->delete();
     }
 }

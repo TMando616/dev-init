@@ -62,6 +62,22 @@ class PurgeDeletedUsersTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $user->id, 'deleted_at' => null]);
     }
 
+    public function test_removes_leftover_password_reset_tokens()
+    {
+        $user = $this->withdrawnDaysAgo(31, ['email' => 'gone@example.com']);
+        DB::table('password_reset_tokens')->insert([
+            'email' => 'gone@example.com',
+            'token' => bcrypt('whatever'),
+            'created_at' => now()->subDays(31),
+        ]);
+
+        $this->artisan('users:purge-deleted')->assertExitCode(0);
+
+        // 外部キーが無いので連鎖削除されず、メールアドレスだけが残ってしまう。
+        $this->assertDatabaseMissing('users', ['id' => $user->id]);
+        $this->assertDatabaseMissing('password_reset_tokens', ['email' => 'gone@example.com']);
+    }
+
     public function test_removes_leftover_reactivation_tokens()
     {
         $user = $this->withdrawnDaysAgo(31, ['email' => 'gone@example.com']);

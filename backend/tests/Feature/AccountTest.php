@@ -7,6 +7,7 @@ use App\Models\Submission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Password;
 use Tests\TestCase;
 
 class AccountTest extends TestCase
@@ -21,6 +22,7 @@ class AccountTest extends TestCase
             ->putJson('/api/account/profile', [
                 'name' => '山田 太郎',
                 'email' => 'taro@example.com',
+                'current_password' => 'password',
             ]);
 
         $response->assertStatus(200)
@@ -55,6 +57,7 @@ class AccountTest extends TestCase
         $response = $this->actingAs($user, 'sanctum')
             ->putJson('/api/account/profile', [
                 'email' => 'taken@example.com',
+                'current_password' => 'password',
             ]);
 
         $response->assertStatus(422)->assertJsonValidationErrors('email');
@@ -213,7 +216,10 @@ class AccountTest extends TestCase
         ]);
 
         $this->actingAs($user, 'sanctum')
-            ->putJson('/api/account/profile', ['email' => 'after@example.com'])
+            ->putJson('/api/account/profile', [
+                'email' => 'after@example.com',
+                'current_password' => 'password123',
+            ])
             ->assertStatus(200);
 
         Auth::forgetGuards();
@@ -247,5 +253,67 @@ class AccountTest extends TestCase
             'email' => $user->email,
             'password' => 'new-password',
         ])->assertStatus(200);
+    }
+
+    public function test_changing_the_email_requires_the_current_password()
+    {
+        $user = User::factory()->create(['email' => 'before@example.com']);
+
+        $this->actingAs($user, 'sanctum')
+            ->putJson('/api/account/profile', ['email' => 'after@example.com'])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('current_password');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'email' => 'before@example.com',
+        ]);
+    }
+
+    public function test_changing_the_email_fails_with_a_wrong_current_password()
+    {
+        $user = User::factory()->create(['email' => 'before@example.com']);
+
+        $this->actingAs($user, 'sanctum')
+            ->putJson('/api/account/profile', [
+                'email' => 'after@example.com',
+                'current_password' => 'not-my-password',
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('current_password');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'email' => 'before@example.com',
+        ]);
+    }
+
+    public function test_renaming_does_not_require_the_current_password()
+    {
+        $user = User::factory()->create(['email' => 'stay@example.com']);
+
+        $this->actingAs($user, 'sanctum')
+            ->putJson('/api/account/profile', [
+                'name' => '改名 太郎',
+                'email' => 'stay@example.com',
+            ])
+            ->assertStatus(200);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => '改名 太郎',
+        ]);
+    }
+
+    public function test_withdrawal_clears_a_pending_password_reset_token()
+    {
+        $user = User::factory()->create(['password' => bcrypt('password123')]);
+        Password::createToken($user);
+
+        $this->actingAs($user, 'sanctum')
+            ->deleteJson('/api/account', ['password' => 'password123'])
+            ->assertStatus(200);
+
+        $this->assertDatabaseMissing('password_reset_tokens', ['email' => $user->email]);
     }
 }

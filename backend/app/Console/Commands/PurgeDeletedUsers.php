@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Repositories\PasswordResetTokenRepository;
 use App\Repositories\ReactivationTokenRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Console\Command;
@@ -15,7 +16,11 @@ class PurgeDeletedUsers extends Command
 
     protected $description = '保持期間を過ぎた退会済みユーザーを完全に削除する';
 
-    public function handle(UserRepository $users, ReactivationTokenRepository $tokens): int
+    public function handle(
+        UserRepository $users,
+        ReactivationTokenRepository $tokens,
+        PasswordResetTokenRepository $resetTokens,
+    ): int
     {
         $days = (int) ($this->option('days') ?? config('account.retention_days'));
 
@@ -35,9 +40,11 @@ class PurgeDeletedUsers extends Command
         }
 
         foreach ($targets as $user) {
-            // 未使用の復会トークンが残っていることがあるため先に片付ける。
-            // users への外部キーを持たないので連鎖削除されない。
+            // 未使用の復会トークン・リセットトークンが残っていることがあるため
+            // 先に片付ける。どちらも users への外部キーを持たないので連鎖削除
+            // されず、メールアドレスだけが残ってしまう。
             $tokens->delete($user->email);
+            $resetTokens->delete($user->email);
 
             // submissions は cascadeOnDelete で一緒に消える。
             $users->forceDelete($user);

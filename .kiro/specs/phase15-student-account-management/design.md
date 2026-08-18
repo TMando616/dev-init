@@ -90,7 +90,7 @@ return [
 
 | クラス（新規） | 対象 | ルール要点 |
 |---|---|---|
-| `UpdateProfileRequest` | `PUT /account/profile` | `name`: `sometimes`, `required`, `string`, `max:255`<br>`email`: `sometimes`, `required`, `email`, `max:255`, `Rule::unique('users')->ignore($this->user()->id)` |
+| `UpdateProfileRequest` | `PUT /account/profile` | `name`: `sometimes`, `required`, `string`, `max:255`<br>`email`: `sometimes`, `required`, `email`, `max:255`, `Rule::unique('users')->ignore($this->user()->id)`<br>`current_password`: `Rule::requiredIf(メールを実際に変更するとき)`, `string`, `current_password:sanctum`（§15.4 で追加） |
 | `UpdatePasswordRequest` | `PUT /account/password` | `current_password`: `required`, `string`, `current_password:sanctum`<br>`password`: `required`, `string`, `min:8`, `confirmed` |
 | `DeleteAccountRequest` | `DELETE /account` | `password`: `required`, `string`, `current_password:sanctum` |
 | `ForgotPasswordRequest` | `POST /forgot-password` | `email`: `required`, `email` |
@@ -657,9 +657,31 @@ export const isPublicPath = (pathname: string): boolean =>
 | `PasswordResetTest` | **有効期限切れ**トークンで422（`travel(61)->minutes()`） | US-3 |
 | `ReactivationTest` | **有効期限切れ**トークンで422。失敗しても `deleted_at` は維持される | US-5 |
 | `PurgeDeletedUsersTest` | `--days` オプションが `config` の保持日数を上書きする / 残存した復会トークン行も削除される | US-6・15.1 #1 |
+| `AccountTest` | メール変更に現在のパスワードが要る / 誤っていれば422 / 改名だけなら不要 / 退会でリセットトークン行が消える | US-1・15.4 #3・#5 |
+| `PasswordResetTest` | リセット成功時に既存トークンが全て失効する | 15.4 #2 |
+| `PurgeDeletedUsersTest` | 残存したリセットトークン行も削除される | 15.4 #3 |
+| `ReactivationTest` | 保持期間超過レコードの解放時に両トークンテーブルが掃除される | 15.4 #3・#4 |
 
 `RateLimitingTest` への `throttle:account` の429ケース追加（§12 に記載あり）はタスク8-1で実施済み。
 
-### 15.3 運用上の注意
+### 15.4 コードレビュー（`/code-review high`）での指摘と対応
+
+タスク8-3で phase15 全体（53ファイル）をレビューし、実害のある4件と仕様判断1件に対応した。
+
+| # | 箇所 | 問題 | 対応 |
+|---|---|---|---|
+| 1 | `frontend/src/lib/api.ts` | 401インターセプターの除外パスが `/login` `/register` のハードコードのままで、7-1 の `lib/routes.ts` 一元化から漏れていた。`AuthContext.checkAuth()` はパスを問わず `GET /user` を叩くため、**古いトークンを持つ端末で復会・リセットのリンクを開くと 401 → `/login` へ飛ばされ、ワンタイムリンクを使い切れずに失う** | `isPublicPath()` に差し替え |
+| 2 | `PasswordResetService::reset` | リセット成功後も既存の Sanctum トークンが有効なまま。`AccountService::changePassword` は他端末を失効させているのに、**漏洩を疑ったときに踏む導線であるリセット側が素通し**だった | リセットのコールバック内で `$user->tokens()->delete()` を実行 |
+| 3 | 削除経路全般 | `account_reactivation_tokens` は掃除していたが、同じく `users` への外部キーを持たずメールアドレスを保持する `password_reset_tokens` が放置されていた。完全削除後もメールアドレスが残り、さらに「リセット要求 → 完全削除 → 同じメールで再登録」で**旧リンクが新アカウントのパスワードを変更できてしまう**（`DatabaseTokenRepository::exists()` は email + hash だけで照合する） | `PasswordResetTokenRepository` を新設し、`AccountService::delete` / `UserService::delete` / `UserService::forceDelete` / `PurgeDeletedUsers` / `ReactivationService::resolveRegistration` の全削除経路で該当行を削除 |
+| 4 | `ReactivationService::resolveRegistration` | 保持期間超過レコードを `forceDelete()` して解放する際、そのメールアドレス宛の復会トークン行が残っていた | 同上。両トークンテーブルを消してから `forceDelete()` する |
+| 5 | `UpdateProfileRequest` | メールアドレス変更に本人確認が無く、**トークンを盗まれると「メール変更 → `/forgot-password` → `/reset-password`」で乗っ取りが完結**する。隣接する `updatePassword` / `destroy` は `current_password:sanctum` を要求しているのに、ここだけ抜けていた | `Rule::requiredIf()` で**メールを実際に変更するときだけ** `current_password` を必須にした（改名だけなら不要）。設定画面もメール欄を書き換えたときにパスワード入力欄を表示する。§2.2 の表と requirements.md US-1 も更新済み |
+
+対応しなかった指摘:
+
+- **「30日」「60分」のハードコード**（`settings/page.tsx` / `admin/users/page.tsx` / 各 Notification）。`config/account.php` が「3箇所が同じ値を見る」と謳っている以上ここは崩れているが、解消には保持期間を公開する API か設定エンドポイントの追加が要るため、本フェーズの範囲を超えると判断して見送った。`ACCOUNT_RETENTION_DAYS` を既定値から変える際は文言も直す必要がある。
+- **管理画面の `deleted_at` 未表示**。`Student` 型に足したが一覧に列が無く、退会済みタブで保持期間の残りが分からない。表示するか型から落とすかは次フェーズで判断する。
+- **プライバシーポリシー・登録時の同意取得**。requirements.md の注記および §14 に「未整備」として記録済みで、対象外リストどおり。
+
+### 15.5 運用上の注意
 
 - `CodeExecutionTest > can execute python code` が**全テスト一括実行時にまれに失敗する**。stdout は正しく返っているが、サンドボックスコンテナの起動がテスト全体の負荷で伸び、`CodeExecutionService` の5秒タイムアウトに掛かるため。単体実行では約2.9秒で通る。本フェーズの変更とは無関係だが、CIに載せる際は Python の制限秒数か並列度の見直しが要る。

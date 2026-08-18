@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Notifications\ReactivateAccountNotification;
+use App\Repositories\PasswordResetTokenRepository;
 use App\Repositories\ReactivationTokenRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Carbon;
@@ -16,6 +17,7 @@ class ReactivationService
     public function __construct(
         protected UserRepository $users,
         protected ReactivationTokenRepository $tokens,
+        protected PasswordResetTokenRepository $resetTokens,
     ) {}
 
     /**
@@ -38,8 +40,14 @@ class ReactivationService
 
         // A withdrawn record past its retention period may still be waiting
         // for the purge command. Release its email address here so the person
-        // is not blocked by a row that is already due for deletion.
-        $trashed?->forceDelete();
+        // is not blocked by a row that is already due for deletion. The token
+        // tables go with it: they have no foreign key to cascade from, and a
+        // leftover row keyed by this email would outlive its owner.
+        if ($trashed) {
+            $this->tokens->delete($trashed->email);
+            $this->resetTokens->delete($trashed->email);
+            $trashed->forceDelete();
+        }
 
         return $this->users->create([
             'name' => $data['name'],

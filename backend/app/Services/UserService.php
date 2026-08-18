@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Repositories\PasswordResetTokenRepository;
 use App\Repositories\ReactivationTokenRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Database\Eloquent\Collection;
@@ -13,6 +14,7 @@ class UserService
     public function __construct(
         protected UserRepository $repository,
         protected ReactivationTokenRepository $reactivationTokens,
+        protected PasswordResetTokenRepository $passwordResetTokens,
     ) {}
 
     /**
@@ -70,6 +72,7 @@ class UserService
         }
 
         $user->tokens()->delete();
+        $this->passwordResetTokens->delete($user->email);
 
         return $this->repository->delete($user);
     }
@@ -88,9 +91,10 @@ class UserService
 
         $user->tokens()->delete();
 
-        // The email address is personal data too, and this table has no
+        // The email address is personal data too, and neither table has a
         // foreign key to cascade from.
         $this->reactivationTokens->delete($user->email);
+        $this->passwordResetTokens->delete($user->email);
 
         return $this->repository->forceDelete($user);
     }

@@ -28,6 +28,11 @@ class PasswordResetService
             $data,
             function (User $user, string $password) {
                 $user->forceFill(['password' => $password])->save();
+
+                // Same reasoning as AccountService::changePassword: a reset is
+                // what someone reaches for when they suspect their account is
+                // compromised, so every existing session has to die with it.
+                $user->tokens()->delete();
             }
         );
 

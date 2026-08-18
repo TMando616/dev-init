@@ -19,7 +19,11 @@ class AccountController extends Controller
      */
     public function updateProfile(UpdateProfileRequest $request)
     {
-        $user = $this->service->updateProfile($request->user(), $request->validated());
+        // current_password is a proof of identity, not a profile field.
+        $user = $this->service->updateProfile(
+            $request->user(),
+            $request->safe()->only(['name', 'email']),
+        );
 
         return response()->json($user);
     }

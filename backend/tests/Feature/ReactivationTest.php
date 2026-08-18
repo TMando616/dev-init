@@ -7,6 +7,7 @@ use App\Models\Submission;
 use App\Models\User;
 use App\Notifications\ReactivateAccountNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
@@ -250,5 +251,34 @@ class ReactivationTest extends TestCase
             ->assertJsonValidationErrors('email');
 
         $this->assertSoftDeleted('users', ['id' => $user->id]);
+    }
+
+    public function test_releasing_a_past_retention_record_clears_its_leftover_tokens()
+    {
+        $user = User::factory()->create(['email' => 'gone@example.com']);
+        $user->delete();
+        $user->forceFill(['deleted_at' => now()->subDays(31)])->saveQuietly();
+
+        DB::table('password_reset_tokens')->insert([
+            'email' => 'gone@example.com',
+            'token' => bcrypt('whatever'),
+            'created_at' => now()->subDays(31),
+        ]);
+        DB::table('account_reactivation_tokens')->insert([
+            'email' => 'gone@example.com',
+            'token' => bcrypt('whatever'),
+            'created_at' => now()->subDays(31),
+        ]);
+
+        $this->postJson('/api/register', [
+            'name' => '新しい人',
+            'email' => 'gone@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ])->assertStatus(200);
+
+        // 別人が同じメールで登録し直した以上、前の持ち主のトークン行は残せない。
+        $this->assertDatabaseMissing('password_reset_tokens', ['email' => 'gone@example.com']);
+        $this->assertDatabaseMissing('account_reactivation_tokens', ['email' => 'gone@example.com']);
     }
 }

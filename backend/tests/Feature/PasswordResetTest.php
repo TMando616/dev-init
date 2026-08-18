@@ -120,4 +120,26 @@ class PasswordResetTest extends TestCase
 
         $response->assertStatus(422)->assertJsonValidationErrors('email');
     }
+
+    public function test_reset_revokes_every_existing_token()
+    {
+        $user = User::factory()->create(['password' => bcrypt('old-password')]);
+
+        $token = $this->postJson('/api/login', [
+            'email' => $user->email,
+            'password' => 'old-password',
+        ])->json('access_token');
+
+        $this->postJson('/api/reset-password', [
+            'token' => Password::createToken($user),
+            'email' => $user->email,
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ])->assertStatus(200);
+
+        // 漏洩を疑って踏む導線なので、リセット前のセッションは残さない。
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/user')
+            ->assertStatus(401);
+    }
 }

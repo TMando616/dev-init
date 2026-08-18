@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import { isPublicPath } from './routes';
+
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
@@ -29,7 +31,10 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Clear token and redirect to login if unauthorized
       localStorage.removeItem('token');
-      if (typeof window !== 'undefined' && !window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
+      // Public pages must not be redirected away: reactivation and reset links
+      // are often opened on a device still holding a dead token, and bouncing to
+      // /login there would burn the one-time link unused.
+      if (typeof window !== 'undefined' && !isPublicPath(window.location.pathname)) {
         window.location.href = '/login';
       }
     }
