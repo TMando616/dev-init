@@ -102,4 +102,22 @@ class PasswordResetTest extends TestCase
 
         $response->assertStatus(422)->assertJsonValidationErrors('email');
     }
+
+    public function test_reset_password_fails_with_an_expired_token()
+    {
+        $user = User::factory()->create();
+        $token = Password::createToken($user);
+
+        // config/auth.php passwords.users.expire は60分。
+        $this->travel(61)->minutes();
+
+        $response = $this->postJson('/api/reset-password', [
+            'token' => $token,
+            'email' => $user->email,
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ]);
+
+        $response->assertStatus(422)->assertJsonValidationErrors('email');
+    }
 }

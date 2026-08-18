@@ -637,4 +637,29 @@ export const isPublicPath = (pathname: string): boolean =>
 
 ## 15. 実装時に判明した設計との差分
 
-> 実装完了後に追記する（Phase 14 と同じ運用）。
+設計どおりに実装できた部分は省略し、**設計の記述と実装が食い違った点だけ**を残す。
+
+### 15.1 実装で追加した処理
+
+| # | 箇所 | 設計 | 実装 | 理由 |
+|---|---|---|---|---|
+| 1 | `UserService::forceDelete` | `findWithTrashed()` で取得して `forceDelete()` するだけ（§9.2） | 加えて **全トークン失効** と **`account_reactivation_tokens` の該当行削除** を行う | `account_reactivation_tokens` は `users` への外部キーを持たないため連鎖削除されない。行に載っているメールアドレス自体が個人データなので、完全削除で消し残すと US-7 の「確実に削除できる」を満たさない。トークン失効は `UserService::delete`（ソフトデリート）と処理を揃えるため |
+| 2 | `docker-compose.yml` の Mailpit | ポートを `8025` / `1025` 固定（§8.3・§11） | `${MAILPIT_UI_PORT:-8025}` / `${MAILPIT_SMTP_PORT:-1025}` と環境変数で上書き可能にした | ホスト側で既に 8025/1025 を使っている場合に `docker compose up` 全体が落ちるのを避けるため。既定値は設計どおり |
+
+### 15.2 テストケースの追加（§12 のケース一覧との差分）
+
+受け入れ条件に書かれているのに §12 のケース一覧から漏れていた分を、タスク8-1・8-3で追加した。
+
+| ファイル | 追加ケース | 対応する受け入れ条件 |
+|---|---|---|
+| `AccountTest` | メール変更後に**新しいメールアドレスでログインできる** | US-1 |
+| `AccountTest` | パスワード変更後に**旧パスワードではログインできない** | US-2 |
+| `PasswordResetTest` | **有効期限切れ**トークンで422（`travel(61)->minutes()`） | US-3 |
+| `ReactivationTest` | **有効期限切れ**トークンで422。失敗しても `deleted_at` は維持される | US-5 |
+| `PurgeDeletedUsersTest` | `--days` オプションが `config` の保持日数を上書きする / 残存した復会トークン行も削除される | US-6・15.1 #1 |
+
+`RateLimitingTest` への `throttle:account` の429ケース追加（§12 に記載あり）はタスク8-1で実施済み。
+
+### 15.3 運用上の注意
+
+- `CodeExecutionTest > can execute python code` が**全テスト一括実行時にまれに失敗する**。stdout は正しく返っているが、サンドボックスコンテナの起動がテスト全体の負荷で伸び、`CodeExecutionService` の5秒タイムアウトに掛かるため。単体実行では約2.9秒で通る。本フェーズの変更とは無関係だが、CIに載せる際は Python の制限秒数か並列度の見直しが要る。

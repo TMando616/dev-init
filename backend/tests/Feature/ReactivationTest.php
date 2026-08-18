@@ -229,4 +229,26 @@ class ReactivationTest extends TestCase
         $this->assertDatabaseHas('users', ['email' => 'fresh@example.com']);
         Notification::assertNothingSent();
     }
+
+    public function test_reactivation_fails_with_an_expired_token()
+    {
+        $user = User::factory()->create(['email' => 'gone@example.com']);
+        $user->delete();
+
+        $token = $this->requestReactivationToken($user);
+
+        // config/account.php reactivation_token_expire は60分。
+        $this->travel(61)->minutes();
+
+        $this->postJson('/api/reactivate', [
+            'token' => $token,
+            'email' => 'gone@example.com',
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('email');
+
+        $this->assertSoftDeleted('users', ['id' => $user->id]);
+    }
 }

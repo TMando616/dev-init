@@ -204,4 +204,48 @@ class AccountTest extends TestCase
 
         $this->assertDatabaseHas('submissions', ['id' => $submission->id]);
     }
+
+    public function test_user_can_login_with_the_new_email_after_updating_it()
+    {
+        $user = User::factory()->create([
+            'email' => 'before@example.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $this->actingAs($user, 'sanctum')
+            ->putJson('/api/account/profile', ['email' => 'after@example.com'])
+            ->assertStatus(200);
+
+        Auth::forgetGuards();
+        $this->postJson('/api/login', [
+            'email' => 'after@example.com',
+            'password' => 'password123',
+        ])->assertStatus(200);
+    }
+
+    public function test_the_old_password_stops_working_after_a_change()
+    {
+        $user = User::factory()->create([
+            'password' => bcrypt('old-password'),
+        ]);
+
+        $this->actingAs($user, 'sanctum')
+            ->putJson('/api/account/password', [
+                'current_password' => 'old-password',
+                'password' => 'new-password',
+                'password_confirmation' => 'new-password',
+            ])->assertStatus(200);
+
+        Auth::forgetGuards();
+        $this->postJson('/api/login', [
+            'email' => $user->email,
+            'password' => 'old-password',
+        ])->assertStatus(422);
+
+        Auth::forgetGuards();
+        $this->postJson('/api/login', [
+            'email' => $user->email,
+            'password' => 'new-password',
+        ])->assertStatus(200);
+    }
 }
