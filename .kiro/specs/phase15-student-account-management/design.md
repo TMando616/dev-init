@@ -684,4 +684,6 @@ export const isPublicPath = (pathname: string): boolean =>
 
 ### 15.5 運用上の注意
 
+- **開発DBのマイグレーション適用漏れに注意**。8-2 の手動確認で、新規登録が `column "deleted_at" does not exist` で失敗した。バックエンドのテストは `phpunit.xml` の SQLite インメモリDBを毎回作り直すため、**127件全部通っていても開発用の PostgreSQL にマイグレーションが当たっている保証はない**。画面だけで落ちる症状が出たら、まず `docker compose exec php php artisan migrate:status` を見る。
+
 - `CodeExecutionTest > can execute python code` が**全テスト一括実行時にまれに失敗する**。stdout は正しく返っているが、サンドボックスコンテナの起動がテスト全体の負荷で伸び、`CodeExecutionService` の5秒タイムアウトに掛かるため。単体実行では約2.9秒で通る。本フェーズの変更とは無関係だが、CIに載せる際は Python の制限秒数か並列度の見直しが要る。
