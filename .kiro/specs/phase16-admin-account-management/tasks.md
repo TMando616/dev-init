@@ -15,7 +15,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
   - `docker compose exec php php artisan migrate` を実行し、`migrate:status` で適用済みになったことを確認する（phase15 §15.5 の適用漏れを繰り返さないため）
   - 参照: design.md §1.1, §11
 
-- [ ] 1-2. `config/auth.php` に `admins` ブローカーを追加
+- [x] 1-2. `config/auth.php` に `admins` ブローカーを追加
   - `passwords.admins`: `provider => 'admins'` / `table => 'admin_password_reset_tokens'` / `expire => 60` / `throttle => 60`
   - `AUTH_PASSWORD_BROKER` は `users` のまま変更しない（管理者側は `Password::broker('admins')` と明示取得する）
   - 参照: design.md §1.2
