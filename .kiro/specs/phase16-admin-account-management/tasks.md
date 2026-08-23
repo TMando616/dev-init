@@ -26,7 +26,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
   - `Admin::sendPasswordResetNotification()` をオーバーライドして差し替え
   - 参照: design.md §1.3, §6
 
-- [ ] 1-4. `account` リミッターのキーを修正
+- [x] 1-4. `account` リミッターのキーを修正
   - `backend/app/Providers/AppServiceProvider.php`: `by($request->user()?->id ?: $request->ip())` を `by($user ? $user->getMorphClass() . ':' . $user->id : $request->ip())` に変更
   - **2-3 でルートを追加する前に入れること**。id だけのキーだと admin#1 と user#1 が同じバケットを共有する
   - 参照: design.md §7.1, §11 #1

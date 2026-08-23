@@ -58,7 +58,12 @@ class AppServiceProvider extends ServiceProvider
         // As strict as 'auth', but keyed by user id since these requests
         // carry no email in the body.
         RateLimiter::for('account', function (Request $request) {
-            return Limit::perMinute(6)->by($request->user()?->id ?: $request->ip());
+            $user = $request->user();
+
+            // ガードをまたいで使うため、id だけでは admins と users が衝突する。
+            return Limit::perMinute(6)->by(
+                $user ? $user->getMorphClass() . ':' . $user->id : $request->ip()
+            );
         });
     }
 }
