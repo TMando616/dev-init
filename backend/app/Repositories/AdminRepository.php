@@ -40,6 +40,14 @@ class AdminRepository
     }
 
     /**
+     * Update an admin.
+     */
+    public function update(Admin $admin, array $data): bool
+    {
+        return $admin->update($data);
+    }
+
+    /**
      * Delete an admin.
      */
     public function delete(Admin $admin): bool

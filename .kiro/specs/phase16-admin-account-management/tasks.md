@@ -31,7 +31,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
   - **2-3 でルートを追加する前に入れること**。id だけのキーだと admin#1 と user#1 が同じバケットを共有する
   - 参照: design.md §7.1, §11 #1
 
-- [ ] 1-5. `AdminRepository` に `update` を追加
+- [x] 1-5. `AdminRepository` に `update` を追加
   - `public function update(Admin $admin, array $data): bool`
   - 参照: design.md §5.4
 
