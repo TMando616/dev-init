@@ -9,7 +9,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
 
 ## 1. 基盤整備（リセットブローカー・通知・リミッター）
 
-- [ ] 1-1. 管理者用リセットトークンテーブルを追加
+- [x] 1-1. 管理者用リセットトークンテーブルを追加
   - `backend/database/migrations/2026_08_21_000000_create_admin_password_reset_tokens_table.php` を新規作成
   - `email` 主キー / `token` / `created_at` nullable（Laravel標準の `password_reset_tokens` と同一構造にする。`DatabaseTokenRepository` がこの3カラムを前提にしている）
   - `docker compose exec php php artisan migrate` を実行し、`migrate:status` で適用済みになったことを確認する（phase15 §15.5 の適用漏れを繰り返さないため）
