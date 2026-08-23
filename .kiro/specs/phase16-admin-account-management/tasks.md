@@ -20,7 +20,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
   - `AUTH_PASSWORD_BROKER` は `users` のまま変更しない（管理者側は `Password::broker('admins')` と明示取得する）
   - 参照: design.md §1.2
 
-- [ ] 1-3. `AdminResetPasswordNotification` を追加し `Admin` に接続
+- [x] 1-3. `AdminResetPasswordNotification` を追加し `Admin` に接続
   - `backend/app/Notifications/AdminResetPasswordNotification.php`（日本語・リンク先は `config('app.frontend_url') . '/admin/reset-password'`）
   - 件名に「管理者アカウント」を含める（同じメールアドレスに受講生向け通知が届いても取り違えないため。US-3 の受け入れ条件）
   - `Admin::sendPasswordResetNotification()` をオーバーライドして差し替え

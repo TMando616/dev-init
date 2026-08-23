@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\AdminResetPasswordNotification;
 use Database\Factories\AdminFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -27,5 +28,11 @@ class Admin extends Authenticatable
         return [
             'password' => 'hashed',
         ];
+    }
+
+    // 管理者向けの日本語通知に差し替える(User と同じ形)
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new AdminResetPasswordNotification($token));
     }
 }
