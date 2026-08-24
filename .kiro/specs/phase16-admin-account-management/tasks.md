@@ -47,7 +47,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
   - `authorize()` は既存方針どおり `true` + コメント
   - 参照: design.md §2.2
 
-- [ ] 2-2. `AdminAccountService` を実装
+- [x] 2-2. `AdminAccountService` を実装
   - `backend/app/Services/AdminAccountService.php`: `updateProfile` / `changePassword`
   - `changePassword` は現在のトークン以外を失効させる（`TransientToken` 対策の分岐を入れる）
   - 参照: design.md §5.1
