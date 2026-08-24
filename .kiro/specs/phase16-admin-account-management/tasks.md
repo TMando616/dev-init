@@ -39,7 +39,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
 
 ## 2. 管理者の自己操作（US-1 プロフィール / US-2 パスワード変更）
 
-- [ ] 2-1. FormRequest 2件を追加
+- [x] 2-1. FormRequest 2件を追加
   - `backend/app/Http/Requests/Admin/UpdateProfileRequest.php`
     - `email` の unique 対象は **`admins` テーブルのみ**（`users` との重複は許容する。US-1）
     - `current_password` は `Rule::requiredIf()` で**メールを実際に変更するときだけ**必須。ガード指定は `current_password:admin`
