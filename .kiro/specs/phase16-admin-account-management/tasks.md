@@ -52,7 +52,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
   - `changePassword` は現在のトークン以外を失効させる（`TransientToken` 対策の分岐を入れる）
   - 参照: design.md §5.1
 
-- [ ] 2-3. `Admin\AccountController` とルートを追加
+- [x] 2-3. `Admin\AccountController` とルートを追加
   - `backend/app/Http/Controllers/Admin/AccountController.php`: `updateProfile` / `updatePassword`
   - `updateProfile` は `$request->safe()->only(['name', 'email'])` を Service に渡す（`current_password` は本人確認でありプロフィール項目ではない）
   - `backend/routes/api.php` の `auth:admin` グループに2ルートを追加。パスワード変更は `->withoutMiddleware('throttle:api')->middleware('throttle:account')` とし、**グループ構造は組み替えない**（既存18ルートに影響を出さないため）

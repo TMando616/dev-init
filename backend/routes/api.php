@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Admin\AccountController as AdminAccountController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AdminAuthController;
@@ -75,6 +76,14 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware(['auth:admin', 'throttle:api'])->prefix('admin')->group(function () {
     Route::get('/me', [AdminAuthController::class, 'me']);
     Route::post('/logout', [AdminAuthController::class, 'logout']);
+
+    // Account (self-service)
+    Route::put('/account/profile', [AdminAccountController::class, 'updateProfile']);
+
+    // Sensitive self-account operation gets its own tighter budget.
+    Route::put('/account/password', [AdminAccountController::class, 'updatePassword'])
+        ->withoutMiddleware('throttle:api')
+        ->middleware('throttle:account');
 
     // Admin account management (invite-create only)
     Route::get('/admins', [AdminController::class, 'index']);
