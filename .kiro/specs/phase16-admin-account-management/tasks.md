@@ -58,7 +58,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
   - `backend/routes/api.php` の `auth:admin` グループに2ルートを追加。パスワード変更は `->withoutMiddleware('throttle:api')->middleware('throttle:account')` とし、**グループ構造は組み替えない**（既存18ルートに影響を出さないため）
   - 参照: design.md §3.1, §3.2, §7.3
 
-- [ ] 2-4. `tests/Feature/AdminAccountTest.php` を作成
+- [x] 2-4. `tests/Feature/AdminAccountTest.php` を作成
   - プロフィール更新成功 / 現在のメールのまま保存できる / 他の管理者のメールで422 / **受講生と同じメールには変更できる**
   - メール変更に `current_password` が要る / 誤りで422 / 改名だけなら不要
   - 未認証401 / **受講生トークンで401**
