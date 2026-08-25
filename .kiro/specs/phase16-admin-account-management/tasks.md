@@ -69,7 +69,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
 
 ## 3. 管理者のパスワードリセット（US-3）
 
-- [ ] 3-1. リセット系の FormRequest / Service / Controller / ルートを追加
+- [x] 3-1. リセット系の FormRequest / Service / Controller / ルートを追加
   - `AdminForgotPasswordRequest` / `AdminResetPasswordRequest`
   - `backend/app/Services/AdminPasswordResetService.php`（`Password::broker('admins')` のラップ、ステータス変換）
     - `reset` のコールバックで `$admin->tokens()->delete()` を行う（漏洩を疑って踏む導線のため。phase15 §15.4 #2 の対応を最初から織り込む）
@@ -78,12 +78,12 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
   - 送信結果によらず同一メッセージを返すこと
   - 参照: design.md §3.2, §5.2, §7.2
 
-- [ ] 3-2. `tests/Feature/AdminPasswordResetTest.php` を作成
+- [x] 3-2. `tests/Feature/AdminPasswordResetTest.php` を作成
   - 登録済み / 未登録で同一メッセージ・通知の有無 / リセット成功後に新パスワードでログイン可
   - リセットで既存トークンが全失効 / トークン再利用で422 / 改ざんトークンで422 / 期限切れで422
   - 参照: design.md §10
 
-- [ ] 3-3. `tests/Feature/AdminPasswordResetIsolationTest.php` を作成
+- [x] 3-3. `tests/Feature/AdminPasswordResetIsolationTest.php` を作成
   - **同一メールアドレスの受講生と管理者を併存させた状態**で以下を検証する（本フェーズ固有のリスクのため専用ファイルに切る）
     - 管理者のリセットで受講生のパスワードが変わらない
     - 受講生のリセットで管理者のパスワードが変わらない

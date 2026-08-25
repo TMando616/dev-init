@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AccountController as AdminAccountController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\AdminPasswordResetController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
@@ -26,6 +27,8 @@ Route::middleware('throttle:auth')->group(function () {
 
     // Admin login (no public registration: admins are created by other admins)
     Route::post('/admin/login', [AdminAuthController::class, 'login']);
+    Route::post('/admin/forgot-password', [AdminPasswordResetController::class, 'sendResetLink']);
+    Route::post('/admin/reset-password', [AdminPasswordResetController::class, 'reset']);
 });
 
 // Content read endpoints shared by students and admins (both guards allowed)
