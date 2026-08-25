@@ -118,18 +118,18 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
 
 ## 5. フロントエンド
 
-- [ ] 5-1. 管理者側の公開パス定義を一元化
+- [x] 5-1. 管理者側の公開パス定義を一元化
   - `frontend/src/lib/adminRoutes.ts` を新規作成（`ADMIN_PUBLIC_PATHS` / `isAdminPublicPath`）
   - `lib/adminApi.ts` の401リダイレクト除外、`context/AdminAuthContext.tsx` の `publicPaths`、`components/AdminLayout.tsx` の判定をすべて差し替える
   - **5-3・5-4 の画面追加より先に行う**。ここを直さないと古いトークンを持つ端末でリセットリンクが使い切れない（phase15 §15.4 #1 と同じ不具合）
   - 参照: design.md §9.2
 
-- [ ] 5-2. `AdminAuthContext` と `AdminSidebar` の変更
+- [x] 5-2. `AdminAuthContext` と `AdminSidebar` の変更
   - `AdminAuthContext` に `refreshAdmin`（`checkAuth` の公開）を追加
   - `AdminSidebar` に「設定」(`/admin/settings`) を追加。`Settings` アイコンは「レッスン管理」が使用済みのため別アイコン（`UserCog` 等）を充てる
   - 参照: design.md §9.3
 
-- [ ] 5-3. `/admin/settings` を実装（US-1 / US-2）
+- [x] 5-3. `/admin/settings` を実装（US-1 / US-2）
   - `frontend/src/app/(admin)/admin/settings/page.tsx`
   - プロフィール / パスワード変更 の2カード。それぞれ独立フォーム（**退会カードは作らない**）
   - メール欄が現在値と変わったときだけ「現在のパスワード」欄を表示し `current_password` として送る
@@ -137,7 +137,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
   - すべて `dark:` バリアント付きで実装
   - 参照: design.md §9.1, §9.4
 
-- [ ] 5-4. 管理者パスワードリセットの画面を実装（US-3）
+- [x] 5-4. 管理者パスワードリセットの画面を実装（US-3）
   - `frontend/src/app/(admin)/admin/forgot-password/page.tsx`
   - `frontend/src/app/(admin)/admin/reset-password/page.tsx`（`useSearchParams` は `<Suspense>` で包む）
   - `app/(admin)/admin/login/page.tsx` に「パスワードをお忘れの方」リンクを追加

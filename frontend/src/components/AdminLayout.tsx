@@ -3,14 +3,15 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import { useAdminAuth } from '@/context/AdminAuthContext';
+import { isAdminPublicPath } from '@/lib/adminRoutes';
 import AdminSidebar from './AdminSidebar';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { admin, loading } = useAdminAuth();
   const pathname = usePathname();
 
-  // Login page (and any unauthenticated state) renders without the admin shell.
-  if (pathname === '/admin/login' || loading || !admin) {
+  // Public pages (and any unauthenticated state) render without the admin shell.
+  if (isAdminPublicPath(pathname) || loading || !admin) {
     return <>{children}</>;
   }
 

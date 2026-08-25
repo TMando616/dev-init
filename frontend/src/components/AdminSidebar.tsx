@@ -11,6 +11,7 @@ import {
   Tag,
   Users,
   ShieldCheck,
+  UserCog,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -34,6 +35,7 @@ export default function AdminSidebar() {
     { name: 'カテゴリ管理', href: '/admin/categories', icon: Tag },
     { name: '生徒管理', href: '/admin/users', icon: Users },
     { name: '管理者管理', href: '/admin/admins', icon: ShieldCheck },
+    { name: '設定', href: '/admin/settings', icon: UserCog },
   ];
 
   const allHrefs = navItems.map((item) => item.href);

@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import adminApi from '@/lib/adminApi';
+import { isAdminPublicPath } from '@/lib/adminRoutes';
 
 interface Admin {
   id: number;
@@ -16,6 +17,7 @@ interface AdminAuthContextType {
   login: (token: string, admin: Admin) => void;
   logout: () => void;
   checkAuth: () => Promise<void>;
+  refreshAdmin: () => Promise<void>;
 }
 
 const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
@@ -75,8 +77,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (loading) return;
 
-    const publicPaths = ['/admin/login'];
-    if (!admin && !publicPaths.includes(pathname)) {
+    if (!admin && !isAdminPublicPath(pathname)) {
       router.push('/admin/login');
     }
   }, [admin, loading, pathname, router]);
@@ -102,7 +103,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AdminAuthContext.Provider value={{ admin, loading, login, logout, checkAuth }}>
+    <AdminAuthContext.Provider value={{ admin, loading, login, logout, checkAuth, refreshAdmin: checkAuth }}>
       {children}
     </AdminAuthContext.Provider>
   );

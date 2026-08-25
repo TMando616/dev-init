@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { isAdminPublicPath } from '@/lib/adminRoutes';
 
 // Separate axios instance for the admin area. It uses its own token key
 // (`admin_token`) so admin and student sessions never share credentials.
@@ -26,7 +27,7 @@ adminApi.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('admin_token');
-      if (typeof window !== 'undefined' && !window.location.pathname.includes('/admin/login')) {
+      if (typeof window !== 'undefined' && !isAdminPublicPath(window.location.pathname)) {
         window.location.href = '/admin/login';
       }
     }

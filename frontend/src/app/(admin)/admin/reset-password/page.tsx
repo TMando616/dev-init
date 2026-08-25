@@ -1,20 +1,31 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import Link from 'next/link';
-import { useAdminAuth } from '@/context/AdminAuthContext';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button, Input } from '@/components/ui';
 import Logo from '@/components/Logo';
 import adminApi from '@/lib/adminApi';
 import { isAxiosError } from 'axios';
-import { ShieldCheck } from 'lucide-react';
 
-export default function AdminLoginPage() {
-  const [email, setEmail] = useState('');
+export default function AdminResetPasswordPage() {
+  return (
+    <Suspense fallback={null}>
+      <AdminResetPasswordForm />
+    </Suspense>
+  );
+}
+
+function AdminResetPasswordForm() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const token = searchParams.get('token') ?? '';
+  const email = searchParams.get('email') ?? '';
+
   const [password, setPassword] = useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAdminAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,11 +33,16 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await adminApi.post('/admin/login', { email, password });
-      login(response.data.access_token, response.data.admin);
+      await adminApi.post('/admin/reset-password', {
+        token,
+        email,
+        password,
+        password_confirmation: passwordConfirmation,
+      });
+      router.push('/admin/login');
     } catch (err) {
       if (isAxiosError(err)) {
-        setError(err.response?.data?.message || 'ログインに失敗しました。');
+        setError(err.response?.data?.message || 'パスワードの再設定に失敗しました。');
       } else {
         setError('予期せぬエラーが発生しました。');
       }
@@ -39,14 +55,8 @@ export default function AdminLoginPage() {
     <div className="flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8 rounded-xl bg-white dark:bg-slate-900 p-8 shadow-lg">
         <div className="text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-white">
-            <ShieldCheck size={24} />
-          </div>
-          <div className="flex items-center justify-center gap-2">
-            <Logo className="h-10" />
-            <span className="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Admin</span>
-          </div>
-          <p className="mt-2 text-slate-600 dark:text-slate-400">管理者専用ログイン</p>
+          <Logo className="mx-auto h-10" />
+          <p className="mt-2 text-slate-600 dark:text-slate-400">新しいパスワードを設定してください</p>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
@@ -60,19 +70,11 @@ export default function AdminLoginPage() {
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="email">
                 メールアドレス
               </label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="mt-1"
-                placeholder="admin@example.com"
-              />
+              <Input id="email" type="email" value={email} readOnly className="mt-1 bg-slate-50 dark:bg-slate-800" />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="password">
-                パスワード
+                新しいパスワード
               </label>
               <Input
                 id="password"
@@ -84,16 +86,30 @@ export default function AdminLoginPage() {
                 placeholder="••••••••"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="passwordConfirmation">
+                新しいパスワード（確認）
+              </label>
+              <Input
+                id="passwordConfirmation"
+                type="password"
+                value={passwordConfirmation}
+                onChange={(e) => setPasswordConfirmation(e.target.value)}
+                required
+                className="mt-1"
+                placeholder="••••••••"
+              />
+            </div>
           </div>
 
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? 'ログイン中...' : 'ログイン'}
+            {isLoading ? '設定中...' : 'パスワードを再設定する'}
           </Button>
         </form>
 
         <p className="text-center text-sm text-slate-600 dark:text-slate-400">
-          <Link href="/admin/forgot-password" className="font-semibold text-slate-900 dark:text-slate-100 hover:underline">
-            パスワードをお忘れの方
+          <Link href="/admin/login" className="font-semibold text-slate-900 dark:text-slate-100 hover:underline">
+            ログイン画面に戻る
           </Link>
         </p>
       </div>
