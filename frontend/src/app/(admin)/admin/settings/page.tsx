@@ -17,7 +17,7 @@ export default function AdminSettingsPage() {
 }
 
 function ProfileCard() {
-  const { admin, refreshAdmin } = useAdminAuth();
+  const { admin, setAdmin: setAuthAdmin } = useAdminAuth();
   const [name, setName] = useState(admin?.name ?? '');
   const [email, setEmail] = useState(admin?.email ?? '');
   const [currentPassword, setCurrentPassword] = useState('');
@@ -38,13 +38,15 @@ function ProfileCard() {
     setIsLoading(true);
 
     try {
-      await adminApi.put('/admin/account/profile', {
+      const response = await adminApi.put('/admin/account/profile', {
         name,
         email,
         // 本人確認が要るのはメールアドレスを実際に変えるときだけ。
         ...(isChangingEmail ? { current_password: currentPassword } : {}),
       });
-      await refreshAdmin();
+      // 更新後のadminはPUTのレスポンスに既に入っているため、GET /admin/meへの
+      // 再フェッチはしない。サイドバー表示はcontextの状態を直接更新して同期する。
+      setAuthAdmin(response.data);
       setCurrentPassword('');
       setSuccess('プロフィールを更新しました。');
     } catch (err) {
