@@ -99,18 +99,18 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
 
 ## 4. 管理者削除時のあと片付け（US-4）
 
-- [ ] 4-1. `AdminPasswordResetTokenRepository` を追加し `AdminService::delete` に接続
+- [x] 4-1. `AdminPasswordResetTokenRepository` を追加し `AdminService::delete` に接続
   - `backend/app/Repositories/AdminPasswordResetTokenRepository.php`: `delete(string $email): void` のみ（発行・照合はブローカーが握るため掃除だけを持つ）
   - `AdminService::delete` に全トークン失効とリセットトークン行の削除を追加。戻り値の契約（`'self' | 'not_found' | 'deleted'`）は変えない
   - 参照: design.md §5.3, §5.4, §8
 
-- [ ] 4-2. `AdminManagementTest` にケースを追加
+- [x] 4-2. `AdminManagementTest` にケースを追加
   - 削除された管理者のトークンで管理者APIを叩くと401
   - 削除で `admin_password_reset_tokens` の該当行が消える
   - 自己削除禁止（400）の既存挙動が変わっていないこと
   - 参照: design.md §10
 
-- [ ] 4-3. `RateLimitingTest` にケースを追加
+- [x] 4-3. `RateLimitingTest` にケースを追加
   - 同じ id を持つ管理者と受講生が、`throttle:account` で互いに429にならないこと（1-4 のキー修正の裏付け）
   - 参照: design.md §7.1, §10
 

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Admin;
+use App\Repositories\AdminPasswordResetTokenRepository;
 use App\Repositories\AdminRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Hash;
@@ -10,7 +11,8 @@ use Illuminate\Support\Facades\Hash;
 class AdminService
 {
     public function __construct(
-        protected AdminRepository $repository
+        protected AdminRepository $repository,
+        protected AdminPasswordResetTokenRepository $resetTokens,
     ) {}
 
     /**
@@ -46,6 +48,9 @@ class AdminService
         if (!$admin) {
             return 'not_found';
         }
+
+        $admin->tokens()->delete();
+        $this->resetTokens->delete($admin->email);   // admins への外部キーが無く連鎖しない
 
         $this->repository->delete($admin);
 

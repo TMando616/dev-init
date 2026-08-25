@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\Admin;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Password;
 use Tests\TestCase;
 
 class AdminManagementTest extends TestCase
@@ -76,5 +78,37 @@ class AdminManagementTest extends TestCase
 
         $response->assertStatus(204);
         $this->assertDatabaseMissing('admins', ['id' => $other->id]);
+    }
+
+    public function test_deleting_an_admin_revokes_their_tokens()
+    {
+        $other = Admin::factory()->create();
+        $token = $other->createToken('other_admin_token')->plainTextToken;
+
+        $this->actingAs($this->admin, 'admin')
+            ->deleteJson("/api/admin/admins/{$other->id}")
+            ->assertStatus(204);
+
+        // The admin guard memoizes the resolved user on first use within a
+        // test (see AdminAccountTest), so this second request needs a fresh
+        // guard resolve or it will keep returning $this->admin from actingAs().
+        Auth::forgetGuards();
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/admin/me')
+            ->assertStatus(401);
+    }
+
+    public function test_deleting_an_admin_removes_its_pending_reset_token_row()
+    {
+        $other = Admin::factory()->create();
+        Password::broker('admins')->createToken($other);
+
+        $this->assertDatabaseHas('admin_password_reset_tokens', ['email' => $other->email]);
+
+        $this->actingAs($this->admin, 'admin')
+            ->deleteJson("/api/admin/admins/{$other->id}")
+            ->assertStatus(204);
+
+        $this->assertDatabaseMissing('admin_password_reset_tokens', ['email' => $other->email]);
     }
 }

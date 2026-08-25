@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Admin;
 use App\Models\Lesson;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -124,6 +125,31 @@ class RateLimitingTest extends TestCase
         $this->actingAs($this->user, 'sanctum')
             ->putJson('/api/account/password', [])
             ->assertStatus(429);
+    }
+
+    /**
+     * design.md §7.1: the 'account' limiter key used to be by(id) alone, so an
+     * admin and a student sharing the same numeric id shared one 6/min bucket.
+     * getMorphClass() must keep them separate.
+     */
+    public function test_account_throttle_is_scoped_per_guard_even_with_the_same_id()
+    {
+        $admin = Admin::factory()->create(['id' => $this->user->id]);
+
+        for ($i = 0; $i < 6; $i++) {
+            $this->actingAs($this->user, 'sanctum')
+                ->putJson('/api/account/password', [])
+                ->assertStatus(422);
+        }
+
+        $this->actingAs($this->user, 'sanctum')
+            ->putJson('/api/account/password', [])
+            ->assertStatus(429);
+
+        // Same id, different guard: must not have been throttled by the loop above.
+        $this->actingAs($admin, 'admin')
+            ->putJson('/api/admin/account/password', [])
+            ->assertStatus(422);
     }
 
     public function test_submissions_budget_is_separate_from_the_general_api_budget()
