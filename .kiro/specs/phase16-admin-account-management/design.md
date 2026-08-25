@@ -396,13 +396,14 @@ Route::put('/account/password', [Admin\AccountController::class, 'updatePassword
 
 ### 9.2 公開パス定義の一元化
 
-現在、管理者側の公開パス判定が3箇所にハードコードされている。
+現在、管理者側の公開パス判定が4箇所にハードコードされている。
 
 | ファイル | 現在の判定 |
 |---|---|
 | `lib/adminApi.ts:29` | `!pathname.includes('/admin/login')` |
 | `context/AdminAuthContext.tsx:78` | `const publicPaths = ['/admin/login']` |
 | `components/AdminLayout.tsx:13` | `pathname === '/admin/login'` |
+| `proxy.ts:11`（Next.js 16 で `middleware.ts` から改称されたエッジ層） | `pathname !== '/admin/login'` |
 
 公開パスが3つに増えるため、受講生側の `lib/routes.ts` と同じ形で切り出す。
 
@@ -419,6 +420,8 @@ export const isAdminPublicPath = (pathname: string): boolean =>
 ```
 
 **`adminApi.ts` の差し替えは必須**。ここを直さないと、古い `admin_token` を持つ端末でリセットリンクを開いたとき `GET /admin/me` が401を返し、`/admin/login` へ飛ばされてワンタイムリンクを使い切れない。Phase 15 で受講生側がまさにこの状態だった（§15.4 #1）。
+
+**`proxy.ts` の差し替えも必須（実装時に判明。§13参照）**。ここを直さないと、`admin_token` Cookieを一切持たない端末（メールのリンクを初めて開いた場合が該当）で `/admin/forgot-password` `/admin/reset-password` を開いた瞬間、クライアントJSが実行される前にエッジで `/admin/login` へ307リダイレクトされ、画面自体に到達できない。
 
 `AdminLayout` も差し替えて、リセット画面がサイドバー無しで描画されるようにする。
 
@@ -487,4 +490,5 @@ export const isAdminPublicPath = (pathname: string): boolean =>
 
 ## 13. 実装時に判明した設計との差分
 
-> 実装完了後に追記する（Phase 14・15 と同じ運用）。
+- **`proxy.ts`（Next.js 16 の `middleware.ts` 相当）が公開パスの4番目のハードコード箇所だった**。design.md §9.2 の当初案は3箇所（`adminApi.ts` / `AdminAuthContext.tsx` / `AdminLayout.tsx`）のみを列挙していたが、実装時に `frontend/src/proxy.ts` が `pathname !== '/admin/login'` を直書きしているのを発見。これは `admin_token` Cookie を持たない端末（パスワードリセットのメールリンクを初めて開く、まさにUS-3の主要導線）が `/admin/forgot-password` `/admin/reset-password` を開いた瞬間、クライアントJSの実行前にエッジで `/admin/login` へ307リダイレクトされ、画面に到達できないという不具合を生んでいた。`isAdminPublicPath()` を使うよう修正し、5-1のタスク範囲に含めた。手動確認（6-2相当）をPlaywright経由のE2Eスクリプトで行った際に検出。
+- 6-2の手動確認は、実機ブラウザではなく Playwright（Chromium）を `docker compose` の `node` サービス内にセットアップして自動化した。ログイン→設定変更→ログアウト→パスワードリセット（Mailpit経由）→古いトークンでの公開ページアクセス→ダークモード表示、の一連をスクリプト化して検証済み。

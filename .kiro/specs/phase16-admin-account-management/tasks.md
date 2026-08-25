@@ -91,7 +91,7 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
     - `/api/admin/forgot-password` に受講生のメールを送っても受講生宛に通知が飛ばない
   - 参照: design.md §4.1, §10
 
-- [ ] 3-4. Mailpit で実際のメール受信を手動確認
+- [x] 3-4. Mailpit で実際のメール受信を手動確認
   - `/api/admin/forgot-password` を叩き、`http://localhost:8025` で件名・本文・リンク先URLを確認する
   - 件名に「管理者アカウント」が入っていること、リンクが `http://localhost:3000/admin/reset-password?token=..&email=..` になっていること
 
@@ -148,12 +148,12 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
 
 ## 6. 仕上げ
 
-- [ ] 6-1. テストとLintを通す
+- [x] 6-1. テストとLintを通す
   - `docker compose exec php php artisan test`（既存テストの回帰を含めて全緑にする）
   - `docker compose exec node npm run lint` と `npx tsc --noEmit`
   - 参照: design.md §10
 
-- [ ] 6-2. 手動での通し確認
+- [x] 6-2. 手動での通し確認
   - 管理者を新規招待 → その管理者でログイン → `/admin/settings` で改名（サイドバー名が即反映されるか）
   - メールアドレス変更（パスワード欄が出るか、誤ったパスワードで弾かれるか）→ 変更後のメールでログイン
   - パスワード変更を2端末（通常ウィンドウ + シークレットウィンドウ）で確認（他端末が401、操作端末は継続）
