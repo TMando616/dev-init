@@ -1,0 +1,18 @@
+FROM node:20-slim
+
+WORKDIR /app/frontend
+
+# Install dependencies (image-build time; only re-runs when package*.json changes).
+COPY frontend/package*.json ./
+RUN npm ci
+
+# Source is bind-mounted at runtime by docker-compose.prod.yml, so this COPY only
+# matters for a from-scratch image build (e.g. CI). The actual production content
+# always comes from the bind mount.
+COPY frontend/ .
+
+EXPOSE 3000
+
+# .next is rebuilt fresh on every container start (see docker-compose.prod.yml
+# for why: stale Next.js build cache bit us in phase16).
+CMD ["sh", "-c", "rm -rf .next && npm run build && npx next start -H 0.0.0.0"]

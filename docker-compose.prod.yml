@@ -1,0 +1,108 @@
+# 本番デプロイ用の独立したcomposeファイル。docker-compose.yml（開発用）への
+# 上書き（override）ではなく、完結ファイルとして管理する。差分が大きいため
+# （Mailpit不在、Caddy追加、node/schedulerのコマンドが違う等）、部分マージより
+# 独立ファイルの方が読みやすく事故りにくいという判断。詳細は
+# .kiro/specs/phase17-production-deployment/design.md 参照。
+#
+# 使い方: すべて `-f docker-compose.prod.yml` を明示して実行する。
+#   docker compose -f docker-compose.prod.yml up -d --build
+#   docker compose -f docker-compose.prod.yml exec php php artisan migrate --force
+#
+# 必要な .env ファイル（VM上にのみ作成し、Gitにはコミットしない）:
+#   - ./.env                    (このファイルの ${...} 展開用。DB_DATABASE / DB_USERNAME /
+#                                 DB_PASSWORD / SITE_ADDRESS / ACME_EMAIL)
+#   - ./backend/.env            (Laravelアプリ本体の設定。DB認証情報はルート.envと一致させる)
+#   - ./frontend/.env.production (NEXT_PUBLIC_API_URL。ビルド時に埋め込まれるため
+#                                 SITE_ADDRESS確定後に用意すること)
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS}
+      ACME_EMAIL: ${ACME_EMAIL}
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - nginx
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    volumes:
+      - ./backend:/var/www/backend
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+      - node
+
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./backend:/var/www/backend
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DOCKER_HOST_PATH: ${PWD}/backend/storage/app/temp_code
+
+  node:
+    build:
+      context: .
+      dockerfile: docker/node/Dockerfile.prod
+    restart: unless-stopped
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
+    environment:
+      NODE_ENV: production
+    # .next を毎回消してからビルドする。phase16でNext.jsのビルドキャッシュ
+    # (.next) が実体のないmiddlewareをコンパイル済みのまま残し続け、本番導線を
+    # 壊しかけた実例を踏まえた対応（.kiro/specs/phase16-admin-account-management/
+    # design.md §13参照）。フルビルドの都度キャッシュ無効化のコストより安全性を優先する。
+    command: sh -c "rm -rf .next && npm run build && npx next start -H 0.0.0.0"
+
+  # users:purge-deleted の日次実行。開発用composeでは事故防止のためopt-in
+  # (profiles) だが、本番では退会済みアカウントの保持期限パージが実際に必要な
+  # 機能のため常時起動する。
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./backend:/var/www/backend
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    command: php artisan schedule:work
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:
+  caddy_data:
+  caddy_config:
