@@ -42,19 +42,19 @@ design.md の章番号を各タスクに併記する。原則としてタスク1
 
 ## 2. ローカルでの検証 🤖
 
-- [ ] 2-1. `docker compose -f docker-compose.prod.yml config` で構文エラーがないことを確認
+- [x] 2-1. `docker compose -f docker-compose.prod.yml config` で構文エラーがないことを確認
   - 参照: design.md §2
 
-- [ ] 2-2. `docker/node/Dockerfile.prod` のビルドをローカルで試す
+- [x] 2-2. `docker/node/Dockerfile.prod` のビルドをローカルで試す
   - `docker build -f docker/node/Dockerfile.prod -t devinit-node-prod-test .` が成功することを確認
   - ダミーの`NEXT_PUBLIC_API_URL`で`npm run build`相当が通ることを確認（コンテナ起動まではローカルでは行わない。API不在のため）
   - 参照: design.md §2.5
 
-- [ ] 2-3. `docker/caddy/Caddyfile` の構文を検証
+- [x] 2-3. `docker/caddy/Caddyfile` の構文を検証
   - `docker run --rm -v $(pwd)/docker/caddy/Caddyfile:/etc/caddy/Caddyfile caddy:2-alpine caddy validate --config /etc/caddy/Caddyfile` 等で構文チェック
   - 参照: design.md §2.2
 
-- [ ] 2-4. `scripts/backup-db.sh` をシェルスクリプトとしてレビュー（`sh -n` で構文チェック）
+- [x] 2-4. `scripts/backup-db.sh` をシェルスクリプトとしてレビュー（`sh -n` で構文チェック）
   - 参照: design.md §5.1
 
 ---
